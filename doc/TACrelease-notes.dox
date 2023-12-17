@@ -1,0 +1,23 @@
+/**
+\page ReleaseNotes Release notes and porting
+
+This page lists the most important API changes between versions,
+and gives tips to help porting your application to and upgraded version.
+\tableofcontents
+
+@section Release_Notes General release notes
+
+@subsection Release_Notes_GenComp Release notes for the GenComp package
+
+@section Release_Development_History Development history
+@subsection Release_Development_GenComp Development notes for the GenComp package
+
+
+
+@subsubsection Version_0_0_0 Version 0.0.0
+The first version that that the development started from. It can be used to build other packages upon.
+
+@section Release_Notes_Errata Errata for the packages
+@subsection Errata_BASIC  Errata for package GenComp
+*/
+
