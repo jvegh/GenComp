@@ -7,6 +7,7 @@
 3rdParty/
 build/
 .GenComp_token.txt
+.github-recovery-codes.txt
 
 # Compiled Java class files
 *.class

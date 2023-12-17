@@ -34,7 +34,7 @@ class AbstractGenComp_PU
     /*!
      * \brief
      *
-     * Creates
+     * Creates an abstract processing unit for the general computing paradigm
      */
 
     AbstractGenComp_PU(void);
