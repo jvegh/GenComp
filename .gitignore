@@ -4,9 +4,9 @@
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
 # Node artifact files
-node_modules/
 3rdParty/
 build/
+.GenComp_token.txt
 
 # Compiled Java class files
 *.class
