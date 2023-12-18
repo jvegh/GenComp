@@ -20,6 +20,7 @@ file(GLOB_RECURSE TEST_INCLUDES
 
 file(GLOB_RECURSE TEST_SOURCES
     Test*.cpp
+    ../../modules/scAbstractGenComp_PU.cpp #//??
 )
 #TestUtils.cpp           # Utility funtions
 #TestStuff.cpp           # Other processing stuff

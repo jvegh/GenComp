@@ -1,4 +1,4 @@
-/** @file scGenCompStates.h
+/** @file GenCompStates.h
  *  @ingroup GENCOMP_MODULE_PROCESS
  *  @brief Working states of the archetypes of processing units
  */
@@ -9,11 +9,12 @@
 #ifndef GenCompStates_h
 #define GenCompStates_h
 
-#include <systemc>
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
+// must not be taken as in SystemC no new electronic module can be created.
+// So, AbstractGenComp_PU handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
-class AbstractGenComp_PU;
+class scAbstractGenComp_PU;
 
 
 /*! \var typedef  GenCompStateMachineType_t
@@ -81,89 +82,65 @@ typedef enum {gcsm_Dormant, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_R
  * @see GenCompStateMachineType_t
  */
 
-class AbstractGenCompState {
+class AbstractGenCompState
+{
     public:
+        /**
+         * @brief Puts the PU state to 'Ready' (called by the AbstractGenComp_PU's constructor)
+         * and sets up its event handling
+         */
+        AbstractGenCompState(void);
         virtual ~AbstractGenCompState(void);
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
-         * @param machine The HW that delivers its result
          */
-        virtual void Deliver(AbstractGenComp_PU& machine);
+        virtual void Deliver();
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
-         * @param machine The HW that starts to process
          */
-        virtual void Process(AbstractGenComp_PU& machine);
+        virtual void Process(void);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
-         * @param machine The HW to relax
          */
-        virtual void Relax(AbstractGenComp_PU& machine);
+        virtual void Relax();
 
         /**
-         * @brief Reinitialize: Sets the HW to its well-defined initial state
-         * @param machine The HW to reinitialize
+         * @brief Initialize: Sets the state machineto its well-defined initial state
+         *
+         * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void Reinitialize(AbstractGenComp_PU& machine);
+        virtual void Initialize();
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
-         * @param machine The HW to synchronize
          */
-        virtual void Synchronize(AbstractGenComp_PU& machine);
+        virtual void Synchronize();
 
         /**
          * @brief Fail: Independently from its actual state, forces the HW to @see Deliver
-         * @param machine The HW that failed
          */
-        virtual void Fail(AbstractGenComp_PU& machine);
+        virtual void Fail();
 
-        /**
-         * @brief HeartBeat: The unit updates its internal state
-         * @param machine For which the heartbeat goes to
-         */
-        virtual void HeartBeat(AbstractGenComp_PU& machine);
-        /**
-         * @brief Flag_Get Return the code for its internal state
-         * @return The flag info about the state
-         *
-         * This is a heartbet for the simulation, not the processor clock
-         */
-        GenCompStateMachineType_t Flag_Get(void){return flag;}
-
-        /**
+         /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
-         * @param machine The HW to be sent to sleep ; just technical
          */
-        virtual void Sleep(AbstractGenComp_PU& machine);
+        virtual void Sleep();
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
-         * @param machine The HW to wake up; just technical
          */
-        virtual void WakeUp(AbstractGenComp_PU& machine);
+        virtual void WakeUp();
         /**
          * @brief State_Set Set the state of PU to st
          * @param PU The HW to set
-         * @param st The stae to set to
+         * @param[inout] State The state to set to
          */
-        void State_Set(AbstractGenComp_PU& PU, AbstractGenCompState* st);
+        void State_Set(scAbstractGenComp_PU* PU, GenCompStateMachineType_t& State);
 
-        struct{
-            sc_core::sc_event
-                GenComp_Begin,          // Time to begin computing
-                GenComp_End,            // Time to end computing
-                GenComp_Fail,           // Computing failed, start over
-                GenComp_Awake,          // The HW is needed again, awake it
-                GenComp_Relax           // Make a shord coffe brreak
-                ;
-        }EVENT_GenComp; //< These events are handled by the GenComp state machine
-
-    protected:
-        void UpdatePU(AbstractGenComp_PU& PU);
-        GenCompStateMachineType_t flag;
+          protected:
+        void UpdatePU(scAbstractGenComp_PU& PU);
     private:
  };
 
@@ -181,12 +158,11 @@ class ReadyGenCompState : public AbstractGenCompState {
     public:
         ReadyGenCompState(void);
         virtual ~ReadyGenCompState();
-        void Deliver(AbstractGenComp_PU& machine);
-        void Process(AbstractGenComp_PU& machine);
-        void Relax(AbstractGenComp_PU& machine);
-        void Reinitialize(AbstractGenComp_PU& machine);
-        void Synchronize(AbstractGenComp_PU& machine);
-        void HeartBeat(AbstractGenComp_PU& machine);
+        void Deliver();
+        void Process();
+        void Relax();
+        void Reinitialize();
+        void Synchronize();
 };
 
 /**
@@ -200,7 +176,7 @@ class DormantGenCompState : public AbstractGenCompState {
     public:
         DormantGenCompState(void);
         virtual ~DormantGenCompState();
-        void Process(AbstractGenComp_PU& machine);
+        void Process();
 };
 
 /**
@@ -214,7 +190,7 @@ class ProcessingGenCompState : public AbstractGenCompState
     public:
         ProcessingGenCompState(void);
         virtual ~ProcessingGenCompState();
-        void Process(AbstractGenComp_PU& machine);
+        void Process();
 };
 
 /**
@@ -227,7 +203,6 @@ class DeliveringGenCompState : public AbstractGenCompState
     public:
         DeliveringGenCompState(void);
         virtual ~DeliveringGenCompState();
-        void HeartBeat(AbstractGenComp_PU& machine);
 };
 
 /**
@@ -277,7 +252,7 @@ class FailedGenCompState : public AbstractGenCompState
     public:
         FailedGenCompState(void);
         virtual ~FailedGenCompState();
-        void Process(AbstractGenComp_PU& machine);
+        void Process();
 };
 
 #endif //GenCompStates_h

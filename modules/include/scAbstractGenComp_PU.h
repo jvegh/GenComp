@@ -10,24 +10,46 @@
 */
 
 
-#ifndef ABSTRACTGENCOMP_H
-#define ABSTRACTGENCOMP_H
-/** @addtogroup GENCOMP_MODULE_BASIC
+#ifndef SCABSTRACTGENCOMP_H
+#define SCABSTRACTGENCOMP_H
+/** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
-//?#include "AbstractEnumTypes.h"
-#include "scGenCompStates.h"
+#include "GenCompStates.h"
 
-using namespace std;
-
+#include <systemc>
+using namespace sc_core; using namespace sc_dt;
+ using namespace std;
+static vector<AbstractGenCompState*> PU_StateVector;
 
 /*!
- * \class AbstractGenComp_PU
+ * \class scAbstractGenComp_PU
  * \brief  A simple abstract class to deal  with states of a general computing unit
  *
+ * Operating principle of event processing:
  *
+ * "XXX_thread" methods are "sensitive" to specific events. After receiving an event,
+ * the corresponding virtual routine of AbstractGenCompState is called.
+ * If the old and the new states are not compatible, that routine asserts. (wrong event)
+ * Following a normal return, the HW specific operation of the PU is executed,
+ * the time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
+ * Optionally, also the next state is invoked by issuing a EVENT_GenComp.XXX.notify() notification.
+ * The description is valid for methods
+ * - Deliver
+ * - Process
+ * - Relax
+ * - Synchronize
+ *
+ *
+ * @see AbstractGenCompState
+ *
+ * The rest of methods are of technical nature.
+ * - HeartBeat: technical signal to update PU's state (e.g. integrate a signal)
+ * - Fail: sometheing went wrong, retry
+ * - Sleep: if the unit is unused, sends it logically to sleep
+ * - WakeUp: awake it if it was sleeping
  */
-class AbstractGenComp_PU
+class scAbstractGenComp_PU: public sc_core::sc_module
 {
     friend class AbstractGenCompState;
   public:
@@ -37,30 +59,50 @@ class AbstractGenComp_PU
      * Creates an abstract processing unit for the general computing paradigm
      */
 
-    AbstractGenComp_PU(void);
-    virtual ~AbstractGenComp_PU(void); // Must be overridden
-    virtual void Deliver(){assert(0);}
-    virtual void HeartBeat(){assert(0);}
-    virtual void Process(){assert(0);}
-    virtual void Relax(){assert(0);}
-    virtual void Reinitialize(){assert(0);}
-    virtual void Synchronize(){assert(0);}
-    virtual void Fail(){assert(0);}
-    virtual void Sleep(){assert(0);}
-    virtual void WakeUp(){assert(0);}
-    AbstractGenCompState* State_Get(void){return state;}
+    scAbstractGenComp_PU(sc_core::sc_module_name nm);
+    virtual ~scAbstractGenComp_PU(void); // Must be overridden
+    virtual void Deliver_method(){assert(0);}
+    virtual void HeartBeat_method(){assert(0);}
+    virtual void Process_method(){assert(0);}
+    virtual void Relax_method(){assert(0);}
+    virtual void Initialize_method();
+    virtual void Synchronize_method(){assert(0);}
+    virtual void Fail_method(){assert(0);}
+    virtual void Sleep_method(){assert(0);}
+    virtual void WakeUp_method(){assert(0);}
+    GenCompStateMachineType_t StateFlag_Get(void){return StateFlag;}
+     struct{
+        sc_core::sc_event
+                // Operation-related
+            Begin_Computing,        // Time to begin computing
+            End_Compőuting,         // Time to end computing
+            Initialize,             // Put the unit to its ground state
+            Process,                // Make a new processing
+            Relax,                  // Make a short coffe break
+                // HW-related
+            Fail,                   // Computing failed, start over
+            Sleep,                  // Send the HW to sleep
+            Awake;                  // The HW is needed again, awake it
+        }
+        EVENT_GenComp;
   protected:
-    AbstractGenCompState* state;
+    /**
+     * @brief Puts the PU to its default state (just the HW)
+    */
+    virtual void Initialize();
+    AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
+    GenCompStateMachineType_t StateFlag;    ///< preserves last state
+ };// of class scAbstractGenComp_PU
 
- };// of class AbstractGenComp_PU
+
 
 /*!
- * \class TechGenComp_PU
+ * \class scTechGenComp_PU
  * \brief  A simple math class
  *
  * The technical PUs need all arguments at the beginning
  */
-class TechGenComp_PU : public AbstractGenComp_PU
+class scTechGenComp_PU : public scAbstractGenComp_PU
 {
   public:
     /*!
@@ -69,8 +111,8 @@ class TechGenComp_PU : public AbstractGenComp_PU
      *
      */
 
-    TechGenComp_PU(int32_t No);
-    virtual ~TechGenComp_PU(); // Must be overridden
+    scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No);
+    virtual ~scTechGenComp_PU(); // Must be overridden
     /**
      * @brief Process
      */
@@ -78,14 +120,14 @@ class TechGenComp_PU : public AbstractGenComp_PU
 
   protected:
     int32_t mNoOfArgs;    // The number of args before computation can start
- };// of class TechGenComp_PU
+ };// of class scTechGenComp_PU
 
 /*!
- * \class BioGenComp_PU
+ * \class scBioGenComp_PU
  * \brief  Implements a general biological-type computing
  *
  */
-class BioGenComp_PU : public AbstractGenComp_PU
+class scBioGenComp_PU : public scAbstractGenComp_PU
 {
   public:
     /*!
@@ -94,8 +136,8 @@ class BioGenComp_PU : public AbstractGenComp_PU
      * Creates an abstract biological computing unit
      */
 
-    BioGenComp_PU(void);
-    virtual ~BioGenComp_PU(void); // Must be overridden
+    scBioGenComp_PU(sc_core::sc_module_name nm);
+    virtual ~scBioGenComp_PU(void); // Must be overridden
 /*    virtual void Deliver(){assert(0);}
     virtual void HeartBeat(){assert(0);}*/
     /**
@@ -110,7 +152,7 @@ class BioGenComp_PU : public AbstractGenComp_PU
     virtual void Fail(){assert(0);}
 */
   protected:
- };// of class BioGenComp_PU
+ };// of class scBioGenComp_PU
 /** @}*/
 
-#endif // ABSTRACTGENCOMP_H
+#endif // SCABSTRACTGENCOMP_H
