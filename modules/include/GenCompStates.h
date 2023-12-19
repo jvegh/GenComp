@@ -22,10 +22,10 @@ class scAbstractGenComp_PU;
  * with internal state variables.
  * The states are used in AbstractGenComp_PU.
  @verbatim
-  Dormant    - waiting for activation;
+  Sleeping   - waiting for activation;
                Goes to Ready
-  Ready      - everything is prepared, variables available, activated from dormant state;
-               Normally goes to Processing; After some inactivity goes to Dormant;
+  Ready      - everything is prepared, variables available, activated from Seeping state;
+               Normally goes to Processing; After some inactivity goes to Sleeping;
                The abstract units are generated to this state.
   Processing - receives inputs (computes), runs timed functions;
                Normallygoes to Delivering its result; it may also fail and go to Relaxing
@@ -36,7 +36,7 @@ class scAbstractGenComp_PU;
 
   The General Computing Unit's abstract state machine
 
-                    Dormant<-------> Ready   <---Initially
+                   Slepping<-------> Ready   <---Initially
                                    ^      \
                                   /        \
                                  /          v
@@ -48,11 +48,11 @@ class scAbstractGenComp_PU;
  @endverbatim
  *
  * The states of the general computing unit's state machine
- * - Dormant: just a technical state, unused units can be switched off
+ * - Sleeping: just a technical state, unused units can be switched off
  *   - Can be activated explicitely (after 3 processor clock signals delay)
  *   - Can be activaed implicitely ((after 3 processor clock signals delay)
  * - Ready: The unit is ready, waiting for 'Begin Computing';
- *   - after some inactivity, can pass to Dormant
+ *   - after some inactivity, can pass to Sleeping
  *   - after receiving 'Begin Computing' passes to Processing
  * - Processing: The unit is computing (takes time $T_P$)
  *   - in synchronized technical mode: received synchron signal
@@ -66,7 +66,7 @@ class scAbstractGenComp_PU;
  *      then goes to Relaxing
  * - Relaxing: Resets state and passes to 'Computing'
  */
-typedef enum {gcsm_Dormant, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing, gcsm_Syncronizing, gcsm_Failed}
+typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing, gcsm_Syncronizing, gcsm_Failed}
               GenCompStateMachineType_t;
 
 
@@ -109,9 +109,10 @@ class AbstractGenCompState
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
          *
+         * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void Initialize();
+        virtual void Initialize(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
@@ -125,13 +126,14 @@ class AbstractGenCompState
 
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
+         * @param PU The HW to set
          */
-        virtual void Sleep();
+        virtual void Sleep(scAbstractGenComp_PU *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          */
-        virtual void WakeUp();
+        virtual void Wakeup(scAbstractGenComp_PU *PU);
         /**
          * @brief State_Set Set the state of PU to st
          * @param PU The HW to set
@@ -166,16 +168,16 @@ class ReadyGenCompState : public AbstractGenCompState {
 };
 
 /**
- * @brief The DormantGenCompState class
+ * @brief The SleepingGenCompState class
  *
  * The PU is going to economize power
  *
  */
 
-class DormantGenCompState : public AbstractGenCompState {
+class SleepingGenCompState : public AbstractGenCompState {
     public:
-        DormantGenCompState(void);
-        virtual ~DormantGenCompState();
+        SleepingGenCompState(void);
+        virtual ~SleepingGenCompState();
         void Process();
 };
 

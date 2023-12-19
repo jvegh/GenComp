@@ -6,14 +6,15 @@
  *  @author János Végh (jvegh)
  *  @bug No known bugs.
 */
+
+#include "scAbstractGenComp_PU.h"
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
 //#define DEBUG_EVENTS    ///< Print event debug messages  for this module
 //#define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
-#include "DebugMacros.h"
 
-#include "scAbstractGenComp_PU.h"
+#include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
@@ -26,10 +27,40 @@ scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,MachineState (&TheAbstractGenCompState)
     ,StateFlag(gcsm_Ready)
 {
- /*   SC_METHOD(Initialize_method);
-    sensitive << EVENT_GenComp.Initialize;*/
-    // dont_initialize(); Execute the processn
-}
+    typedef scAbstractGenComp_PU SC_CURRENT_USER_MODULE;
+    // Intialize the module with generating an event
+    SC_METHOD(Initialize_method);
+    sensitive << EVENT_GenComp.Initialize;
+    dont_initialize();
+    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+    /*
+    // Operating
+    SC_METHOD(Process_method);
+    sensitive << EVENT_GenComp.Process;
+    SC_METHOD(Deliver_method);
+    dont_initialize();
+    sensitive << EVENT_GenComp.Deliver;
+    SC_METHOD(Heartbeat_method);
+    sensitive << EVENT_GenComp.HeartBeat;
+    dont_initialize();
+    SC_METHOD(Relax_method);
+    dont_initialize();
+    // Power handling
+ */   SC_METHOD(Sleep_method);
+    sensitive << EVENT_GenComp.Sleep;
+    dont_initialize();
+     /*
+    SC_METHOD(Wakeup_method);
+    sensitive << EVENT_GenComp.Wakeup;
+    dont_initialize();
+    SC_METHOD(Fail_method);
+    sensitive << EVENT_GenComp.Fail;
+    dont_initialize();
+    SC_METHOD(Synchronize_method);
+    sensitive << EVENT_GenComp.Synchronize;
+    dont_initialize();
+*/
+ }
 scAbstractGenComp_PU::
 ~scAbstractGenComp_PU(void)
 {
@@ -39,11 +70,61 @@ scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     Initialize_method(void)
 {
-    MachineState->Initialize();   // Change status to 'Initial'
-    Initialize(); // Initialize the unit, mainly HW
-
+    MachineState->Initialize(this);   // Change status to 'Initial'
+    Initialize(); // Initialize the unit, HW and temporary variables
     // Put PU in its default state
 }
+
+void scAbstractGenComp_PU::
+    Process_method(void)
+{
+    //    MachineState->Sleep();   // Change status to 'Initial'
+}
+
+void scAbstractGenComp_PU::
+    Deliver_method(void)
+{
+    //    MachineState->Sleep();   // Change status to 'Initial'
+}
+
+
+void scAbstractGenComp_PU::
+   Relax_method(void)
+{
+    //    MachineState->Sleep();   // Change status to 'Initial'
+}
+
+void scAbstractGenComp_PU::
+    Synchronize_method(void)
+{
+    //    MachineState->Sleep();   // Change status to 'Initial'
+}
+
+void scAbstractGenComp_PU::
+    Heartbeat_method(void)
+{
+    //    MachineState->Sleep();   // Change status to 'Initial'
+}
+
+
+void scAbstractGenComp_PU::
+    Sleep_method(void)
+{
+    MachineState->Sleep(this);   // Change status to 'Ready'
+}
+
+void scAbstractGenComp_PU::
+    Wakeup_method(void)
+{
+    MachineState->Wakeup(this);   // Change status to 'Ready'
+}
+
+void scAbstractGenComp_PU::
+    Fail_method(void)
+{
+    MachineState->Fail();   // Change status to 'Initial'
+}
+
 
 void scAbstractGenComp_PU::
     Initialize(void)
@@ -63,7 +144,7 @@ scBioGenComp_PU(sc_core::sc_module_name nm):
 }
 
     void scBioGenComp_PU::
-Process(void)
+Process_method(void)
 {
  //   int32_t i = State_Get()->Flag_Get();
 }
@@ -81,7 +162,7 @@ scTechGenComp_PU::
 }
 
 void scTechGenComp_PU::
-    Process(void)
+    Process_method(void)
 {
  //   int32_t i = State_Get()->Flag_Get();
 }

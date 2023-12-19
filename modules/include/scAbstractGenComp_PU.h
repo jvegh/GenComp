@@ -22,6 +22,9 @@ using namespace sc_core; using namespace sc_dt;
  using namespace std;
 static vector<AbstractGenCompState*> PU_StateVector;
 
+#ifndef SCBIOGENCOMP_H
+#ifndef SCTECHGENCOMP_H // Just to exclude for Doxygen
+
 /*!
  * \class scAbstractGenComp_PU
  * \brief  A simple abstract class to deal  with states of a general computing unit
@@ -47,8 +50,10 @@ static vector<AbstractGenCompState*> PU_StateVector;
  * - HeartBeat: technical signal to update PU's state (e.g. integrate a signal)
  * - Fail: sometheing went wrong, retry
  * - Sleep: if the unit is unused, sends it logically to sleep
- * - WakeUp: awake it if it was sleeping
+ * - Wakeup: awake it if it was sleeping
  */
+#endif //SCTECHGENCOMP_H
+#endif //SCBIOGENCOMP_H
 class scAbstractGenComp_PU: public sc_core::sc_module
 {
     friend class AbstractGenCompState;
@@ -57,32 +62,47 @@ class scAbstractGenComp_PU: public sc_core::sc_module
      * \brief
      *
      * Creates an abstract processing unit for the general computing paradigm
+     * @param nm the SystemC name of the module
+      *
      */
 
     scAbstractGenComp_PU(sc_core::sc_module_name nm);
+
     virtual ~scAbstractGenComp_PU(void); // Must be overridden
-    virtual void Deliver_method(){assert(0);}
-    virtual void HeartBeat_method(){assert(0);}
-    virtual void Process_method(){assert(0);}
-    virtual void Relax_method(){assert(0);}
+    virtual void Deliver_method();
+    virtual void Heartbeat_method();
+    virtual void Process_method();
+    virtual void Relax_method();
     virtual void Initialize_method();
-    virtual void Synchronize_method(){assert(0);}
-    virtual void Fail_method(){assert(0);}
-    virtual void Sleep_method(){assert(0);}
-    virtual void WakeUp_method(){assert(0);}
+    virtual void Synchronize_method();
+    virtual void Fail_method();
+    /*!
+     * \brief Sleep_method: the unit can auto-power-off if idle for a longer time.
+     * It must be previously in 'Ready' state
+     *
+     */
+    virtual void Sleep_method();
+    virtual void Wakeup_method();
+    void StateFlag_Set(GenCompStateMachineType_t S){    StateFlag = S;}
     GenCompStateMachineType_t StateFlag_Get(void){return StateFlag;}
      struct{
         sc_core::sc_event
                 // Operation-related
             Begin_Computing,        // Time to begin computing
-            End_Compőuting,         // Time to end computing
+            End_Computing,          // Time to end computing
+            Begin_Transmission,     // Start to send the result
+            End_Transmission,       // Feedback from transmission unit
             Initialize,             // Put the unit to its ground state
+            Synchronize,            // External synhronize signal
             Process,                // Make a new processing
+            Deliver,                // Deliver result tp the 'output section'
             Relax,                  // Make a short coffe break
                 // HW-related
+            HeartBeat,              // Internal timekeeping
             Fail,                   // Computing failed, start over
             Sleep,                  // Send the HW to sleep
-            Awake;                  // The HW is needed again, awake it
+            Awaken,                 // Signals that is ready to use
+            Wakeup;                  // The HW is needed again, awake it
         }
         EVENT_GenComp;
   protected:
@@ -95,10 +115,9 @@ class scAbstractGenComp_PU: public sc_core::sc_module
  };// of class scAbstractGenComp_PU
 
 
-
 /*!
  * \class scTechGenComp_PU
- * \brief  A simple math class
+ * \brief  Implements a general technical-type computing
  *
  * The technical PUs need all arguments at the beginning
  */
@@ -107,7 +126,8 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
   public:
     /*!
      * \brief Implements a general technical-type computing
-     *
+     * @param nm the SystemC name of the module
+     * @param No Number of parameters to compute with
      *
      */
 
@@ -116,7 +136,7 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
     /**
      * @brief Process
      */
-    virtual void Process();
+    virtual void Process_method();
 
   protected:
     int32_t mNoOfArgs;    // The number of args before computation can start
@@ -132,7 +152,8 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
   public:
     /*!
      * \brief Creates a biological abstract processing unit
-     *
+     * @param nm the SystemC name of the module
+      *
      * Creates an abstract biological computing unit
      */
 
@@ -145,7 +166,7 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
      *
      * In biological computing,
      */
-    virtual void Process();
+    virtual void Process_method();
 /*    virtual void Relax(){assert(0);}
     virtual void Reinitialize(){assert(0);}
     virtual void Synchronize(){assert(0);}

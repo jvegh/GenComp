@@ -22,9 +22,6 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing
 AbstractGenCompState::
     AbstractGenCompState(void)
 {
- //   SC_METHOD(Reinitialize_method);
- //   sensitive << EVENT_GenComp.GenComp_ReInitialize;
-    //!! dont_initialize(); Should be initialized!!
 }
 AbstractGenCompState::
     ~AbstractGenCompState(void)
@@ -33,7 +30,7 @@ AbstractGenCompState::
 
 // Overload if want to use "dormant" state
    void AbstractGenCompState::
-WakeUp(void)
+Wakeup(scAbstractGenComp_PU *PU)
 {
  //   State_Set(machine, new ReadyGenCompState(name()));
  //   machine.WakeUp();
@@ -47,11 +44,13 @@ Deliver(void)
 }
 
 // Put the PU electronics to low-power mode
+// Must come from 'Ready' state; otherwise fail
     void AbstractGenCompState::
-Sleep(void)
+Sleep(scAbstractGenComp_PU* PU)
 {
- //   State_Set(machine, new DormantGenCompState(name()));
- }
+    assert(gcsm_Sleeping != PU->StateFlag_Get());
+    PU->StateFlag_Set(gcsm_Sleeping);
+}
 
     void AbstractGenCompState::
 Process()
@@ -67,12 +66,9 @@ Relax()
 }
 // Although a method thread, is invoked from the constructor
     void AbstractGenCompState::
-Initialize(void)
+Initialize(scAbstractGenComp_PU* PU)
 {
- //   State_Set(machine, new ReadyGenCompState(name()));
- //   machine->Reinitialize();  //Must be implemented in AbstractGenComp_PU subclasses
-//    wait(10,SC_NS);
- //   next_trigger(EVENT_GenComp.GenComp_ReInitialize);
+        PU-> StateFlag = gcsm_Ready;
 }
 
 
@@ -95,31 +91,32 @@ State_Set(scAbstractGenComp_PU* PU, GenCompStateMachineType_t& State)
     PU-> StateFlag = State;
  }
 
-ReadyGenCompState::
-    ReadyGenCompState(void):
+    ReadyGenCompState::
+ReadyGenCompState(void):
     AbstractGenCompState()
 {  }
 
     ReadyGenCompState::
 ~ReadyGenCompState(){}
 
-    DormantGenCompState::
-DormantGenCompState(void):
+    SleepingGenCompState::
+SleepingGenCompState(void):
         AbstractGenCompState()
-{  }
-
-    DormantGenCompState::
-~DormantGenCompState(){}
-
-    void DormantGenCompState::
-Process(void)
-    {
-    assert(0);     // Process signal while sleeping
-    // wake it up first
+{
     }
 
+    SleepingGenCompState::
+~SleepingGenCompState(){}
 
-     void ReadyGenCompState::
+    void SleepingGenCompState::
+Process(void)
+{
+    assert(0);     // Process signal while sleeping
+    // wake it up first
+}
+
+
+    void ReadyGenCompState::
 Process(void)
  {
   //  State_Set(machine, new ProcessingGenCompState(name()));
@@ -133,16 +130,16 @@ Deliver(void)
 //     machine.Deliver();   //Must be implemented in AbstractGenComp_PU subclasses
  }
 
- void ReadyGenCompState::
-     Relax()
+    void ReadyGenCompState::
+ Relax()
  {
   //   State_Set(machine, new RelaxingGenCompState(name()));
  //   machine.Relax();   //Must be implemented in AbstractGenComp_PU subclasses
  }
 
 
-void ReadyGenCompState::
-    Reinitialize()
+    void ReadyGenCompState::
+Reinitialize()
 {
  //    State_Set(machine, new RelaxingGenCompState(name()));
  //    machine.Reinitialize();   //Must be implemented in AbstractGenComp_PU subclasses

@@ -18,8 +18,8 @@ extern bool UNIT_TESTING;		// Switched off by default
 #include "scAbstractGenComp_PU.h"
 
 scAbstractGenComp_PU PU("my");
-scTechGenComp_PU TPU("my",2);
-scBioGenComp_PU BPU("my");
+scTechGenComp_PU TPU("my1",2);
+scBioGenComp_PU BPU("my2");
 
 // A new test class  of these is created for each test
 class GenCompTest : public testing::Test
@@ -41,24 +41,29 @@ public:
  */
 TEST_F(GenCompTest, AbstractPU)
 {
-    EXPECT_EQ( gcsm_Ready,PU.StateFlag_Get());  // The unit is initialized to 'Ready' state
-    EXPECT_DEATH(PU.Process_method(),"");
-    EXPECT_EQ(gcsm_Ready, PU.StateFlag_Get());  // Remains ready, given that AbstractPU.Process failed
+    scAbstractGenComp_PU* MyPU = &PU;
+    EXPECT_EQ( gcsm_Ready,MyPU->StateFlag_Get());  // The unit is initialized to 'Ready' state
+    PU.EVENT_GenComp.Sleep.notify(SC_ZERO_TIME);
+    wait(PU.EVENT_GenComp.Sleep);
+    //Send the unit to sleep in 'Ready' state
+    EXPECT_EQ(gcsm_Sleeping,MyPU->StateFlag_Get()); // Now it is sleeping
+    EXPECT_DEATH(MyPU->Sleep_method(),"");    //Send the unit to sleep again
+ //   EXPECT_EQ(gcsm_Ready, PU.StateFlag_Get());  // Remains ready, given that AbstractPU.Process failed
 }
 
 TEST_F(GenCompTest, BioPU)
 {
-    scBioGenComp_PU BPU("MyB");
-    EXPECT_EQ( gcsm_Ready, BPU.StateFlag_Get());  // The unit is initialized to 'Ready' state
-    BPU.Process();                        // The BPU starts to 'process'
-    EXPECT_EQ( gcsm_Processing, BPU.StateFlag_Get());  // The unit goes to 'Processing' state
+    scBioGenComp_PU* MyBPU = &BPU;
+     EXPECT_EQ( gcsm_Ready, MyBPU->StateFlag_Get());  // The unit is initialized to 'Ready' state
+ //  BPU.Process_method();                        // The BPU starts to 'process'
+     EXPECT_EQ( gcsm_Processing, MyBPU->StateFlag_Get());  // The unit goes to 'Processing' state
 
 }
 
 TEST_F(GenCompTest, TechPU)
 {
-   scTechGenComp_PU TPU("MyT",2);
-     EXPECT_EQ( gcsm_Ready, TPU.StateFlag_Get());  // The unit is initialized to 'Ready' state
-    TPU.Process();                         // The TPU starts to 'process'
-     EXPECT_EQ( gcsm_Processing, TPU.StateFlag_Get());  // The unit is goes to 'Processing' state
+    scTechGenComp_PU* MyTPU = &TPU;
+     EXPECT_EQ( gcsm_Ready, MyTPU->StateFlag_Get());  // The unit is initialized to 'Ready' state
+//   TPU.Process_method();                         // The TPU starts to 'process'
+     EXPECT_EQ( gcsm_Processing, MyTPU->StateFlag_Get());  // The unit is goes to 'Processing' state
 }
