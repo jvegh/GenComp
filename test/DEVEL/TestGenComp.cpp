@@ -16,6 +16,8 @@
 extern bool UNIT_TESTING;		// Switched off by default
 
 #include "scAbstractGenComp_PU.h"
+#include "scBioGenComp_PU.h"
+#include "scTechGenComp_PU.h"
 
 scAbstractGenComp_PU PU("my");
 scTechGenComp_PU TPU("my1",2);
@@ -28,6 +30,7 @@ public:
     virtual void SetUp()
     {
         DEBUG_PRINT("GenCompTest started");
+        UNIT_TESTING = false;
      }
 
     virtual void TearDown()
@@ -47,10 +50,14 @@ TEST_F(GenCompTest, AbstractPU)
     wait(PU.EVENT_GenComp.Sleep);
     //Send the unit to sleep in 'Ready' state
     EXPECT_EQ(gcsm_Sleeping,MyPU->StateFlag_Get()); // Now it is sleeping
-    EXPECT_DEATH(MyPU->Sleep_method(),"");    //Send the unit to sleep again
+    EXPECT_DEATH(MyPU->Sleep_method(),"");    //Attempt to send the unit to sleep again
+
  //   EXPECT_EQ(gcsm_Ready, PU.StateFlag_Get());  // Remains ready, given that AbstractPU.Process failed
 }
 
+/**
+ * Tests the generic biological processing unit
+ */
 TEST_F(GenCompTest, BioPU)
 {
     scBioGenComp_PU* MyBPU = &BPU;
@@ -60,6 +67,9 @@ TEST_F(GenCompTest, BioPU)
 
 }
 
+/**
+ * Tests the generic technical processing unit
+ */
 TEST_F(GenCompTest, TechPU)
 {
     scTechGenComp_PU* MyTPU = &TPU;
