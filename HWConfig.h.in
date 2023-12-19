@@ -9,7 +9,16 @@
 
 #include <assert.h>     /* assert */
 #include <stdint.h>   // The standard 'int' types
+#include <iomanip>      // std::setfill, std::setw
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
+#include <vector>
+#include <cstring>
+#include <string>
 #include <systemc>    // For sc_time at least
+using namespace sc_core; using namespace sc_dt;
+using namespace std;
 // A safety timeout limit for clock cycles
 #define MAX_CLOCK_CYCLES  10000
 
