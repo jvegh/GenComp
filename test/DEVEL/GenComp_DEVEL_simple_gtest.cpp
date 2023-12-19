@@ -40,7 +40,7 @@ int sc_main(int argc, char* argv[]) {
     // We rely on the default clearing of the values of time benchmarking
     chrono::steady_clock::time_point t =chrono::steady_clock::now(),
             absolutestart, start;
-    std::chrono::duration< int64_t, nano> end,x,s=(std::chrono::duration< int64_t, nano>)0;
+    std::chrono::duration< int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
     sc_core::sc_time SC_t, SC_x, SC_s, SC_end;
     BENCHMARK_TIME_RESET(&t,&x,&s);
     absolutestart = t; start = absolutestart;
@@ -50,7 +50,7 @@ int sc_main(int argc, char* argv[]) {
     BENCHMARK_TIME_BEGIN(&t,&x);
       testing::InitGoogleTest(&argc, argv);
     BENCHMARK_TIME_END(&t,&x,&s);
-    std::cerr  << "Elapsed for initializing GTest : " << x.count()/1000 << " usec" << endl;
+    std::cerr  << "  -Elapsed for initializing GTest : " << x.count()/1000 << " usec" << endl;
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
     //Do whatever setup here you will need for your tests here
@@ -58,13 +58,12 @@ int sc_main(int argc, char* argv[]) {
       // Begin testing
     BENCHMARK_TIME_BEGIN(&t,&x);
     GTestModule_simple InitGTest("gtest_simple"); // Set up SystemC related testing
-    int returnValue;
     //Run the Simulation for "MAX_CLOCK_CYCLES  nanosecnds"
     BENCHMARK_TIME_END(&t,&x,&s);
 
-    std::cerr  << "Elapsed for setting up testing : " << x.count()/1000 << " usec" << endl;
+    std::cerr  << "  -Elapsed for setting up testing : " << x.count()/1000 << " usec" << endl;
     // About to start testing wit GTest
-    std::cerr << "INFO: Entering " << PROJECT_NAME << "_DEVEL/simple V" << PROJECT_VERSION << " SystemC unit testing" << endl;
+    std::cerr << ">>> Entering " << PROJECT_NAME << "_DEVEL/simple V" << PROJECT_VERSION << " SystemC unit testing" << endl;
     //
     // Make anything before starting unit testing
     //!! all SC-related object and connections must be established before calling sc_start
@@ -75,9 +74,10 @@ int sc_main(int argc, char* argv[]) {
     // Return here when no more events remained
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
-    std::cerr  << "INFO: Exiting " << PROJECT_NAME << "_DEVEL/simple V" << PROJECT_VERSION << " SystemC unit testing with ";
-    if(GenCompDEVEL_simpleTB->ErrorCode_Get())
-        std::cerr << " error code =" << returnValue << endl;
+    std::cerr  << "<<< Exiting " << PROJECT_NAME << "_DEVEL/simple V" << PROJECT_VERSION << " SystemC unit testing with ";
+    int returnValue = GenCompDEVEL_simpleTB->ErrorCode_Get();
+    if(returnValue)
+        std::cerr << " error code " << returnValue << endl;
     else
         std::cerr << "no error"  << endl;
     std::cerr  << "SystemC unit testing took " << s.count()/1000/1000 << " msec CLOCK time" << "//" << sc_time_to_usec_Get(SC_s) << " usec SIMULATED time" << endl;
