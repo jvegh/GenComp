@@ -7,6 +7,8 @@
  */
 
 #include "Utils.h"
+string SC_TIME_UNIT[] {"ps","ns","us","ms","s"};
+
 /**
  *  @brief  Converts core mask to its sequence number
  *  It is assumed that only one bit of mask is set
@@ -124,6 +126,28 @@ PositionOfFirstZero_Get(SC_GRIDPOINT_MASK_TYPE Mask, const int Length)
         oss << hex << setw((BitWidth+3)/4) << setfill('0') << dec << ID;
         return oss.str();
    }
+/** Convert the simulated time to string
+ *  @param[in] U The unit of the returned number; by default SC_TIME_US
+ *  @param[in] T the sc_time; by sefault sc_time_stamp()
+ *  @param[in] d decimals; by default 2
+ *  @param[in] w field width; by default
+ */
+   string sc_time_Strimg_Get(int32_t U, sc_core::sc_time T, const int32_t d, const int32_t w)
+   {   switch(U)
+        {
+       // case SC_TIME_UNIT_PS: U = 1000*1000*1000*1000; break;
+        case SC_TIME_UNIT_NS: U = 1000*1000*1000; break;
+        case SC_TIME_UNIT_US: U = 1000*1000; break;
+        case SC_TIME_UNIT_MS: U = 1000; break;
+        case SC_TIME_UNIT_S : U = 1; break;
+        default: U=-1;
+        };
+        if(T == sc_core::SC_ZERO_TIME) T = sc_core::sc_time_stamp();
+        ostringstream oss;
+        oss << std::fixed << std::setprecision(d) << std::setw(w) << sc_core::sc_time_stamp().to_seconds()*U;
+        return oss.str();
+}
+
  // Convert simulated time to nsecs
 string sc_time_to_nsec_Get(sc_core::sc_time T, const int d, const int w)
 {
@@ -132,6 +156,18 @@ string sc_time_to_nsec_Get(sc_core::sc_time T, const int d, const int w)
     oss << std::fixed << std::setprecision(d) << std::setw(w) << T.to_seconds()*1000.*1000*1000;
     return oss.str();
 }
+
+
+/*
+// Convert simulated time to string
+string sc_time_Get(int32_t U, sc_core::sc_time T, const int d, const int w)
+{
+    if(T == sc_core::SC_ZERO_TIME) T = sc_core::sc_time_stamp();
+    ostringstream oss;
+    oss << std::fixed << std::setprecision(d) << std::setw(w) << T.to_seconds()*1000.*1000*1000;
+    return oss.str();
+}
+*/
 
 // Convert simulated time to nsecs
 string sc_time_to_usec_Get(sc_core::sc_time T, const int d, const int w)

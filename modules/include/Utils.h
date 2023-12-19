@@ -10,16 +10,7 @@
 
 #ifndef EMPA_UTILS_H
 #define EMPA_UTILS_H
-#include <iomanip>      // std::setfill, std::setw
-#include <iostream>
-#include <sstream>
-#include <cstdlib>
-#include <vector>
-#include <cstring>
-#include <string>
 #include "HWConfig.h"
-
-
 using namespace std;
 
     int
@@ -59,12 +50,26 @@ int moduloN(int x,int N);
     int
 YFromPosition_Get(int x, int y);
 
+    // Define sc_time unit
+
+#define SC_TIME_UNIT_PS 0
+#define SC_TIME_UNIT_NS 1
+#define SC_TIME_UNIT_US 2
+#define SC_TIME_UNIT_MS 3
+#define SC_TIME_UNIT_S  4
+#define SC_TIME_UNIT_DEFAULT SC_TIME_UNIT_US
 
     string
-sc_time_to_nsec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int d = 2, const int w=6);
+sc_time_String_Get(int32_t U, sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 2, const int32_t w=6);
+
+    string
+sc_time_to_nsec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 2, const int32_t w=6);
 
      string
 sc_time_to_usec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int d = 0, const int w=6);
+
+    string
+sc_time_to_msec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int d = 0, const int w=6);
 
      string  /// Return the string describing the time
 StringOfTime_Get(void);

@@ -1,10 +1,10 @@
 // Basically, the debug and log messages have two operating modes
 ///  @ingroup GENCOMP_MODULE_PROCESS
+#ifndef DEBUG_MACROS_H
+#define DEBUG_MACROS_H
 
 // During unit testing, all log messages are suppressed
-//#include "Utils.h"
-//#include <iostream>
-#include <iomanip>      // std::setfill, std::setw
+#include "Utils.h"
 
 // Do not produce log messages during unit testing or if explicitly suppressed
 #ifdef SUPPRESS_LOGGING
@@ -97,11 +97,24 @@ using namespace std;
 
 */
 
+extern    string SC_TIME_UNIT[];
+
+#define DEBUG_SC_TIME sc_time_to_msec_Get() << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << dec << ", line " << __LINE__
+#ifdef DEBUG_EVENTS
+    #define DEBUG_SC_EVENT(x)  std::cerr << "-!-EVT@"<< DEBUG_SC_TIME << " : " << __func__ << " \"" << x << "\" //" << DEBUG_LOCATION << std::endl
+#else
+    #define DEBUG_SC_EVENT(x)
+#endif
+#ifdef DEBUG_PRINTS
+#define DEBUG_SC_PRINT(x)  std::cerr << ">  DBG@"<< DEBUG_SC_TIME << " : " << __func__ << "." << x << " //" << DEBUG_LOCATION << std::endl
+#else
+#define DEBUG_SC_PRINT(x)
+#endif
 // During unit testing, all event tracing messages are suppressed
-#define DEBUG_LOCATION " //<" <<  string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << ':'  << dec << __LINE__  
 #ifdef DEBUG_EVENTS
 //    #define DEBUG_EVENT_OBJECT(x)    if(!UNIT_TESTING)
-//        std::cerr   << "EVT@"<< sc_time_to_nsec_Get().c_str() << ": " << PrologString_Get().c_str() << " " << x  << DEBUG_LOCATION << std::endl
+  //      std::cerr   << "EVT@"<< sc_time_to_nsec_Get().c_str() << ": " << PrologString_Get().c_str() << " " << x  << DEBUG_LOCATION << std::endl
     #define DEBUG_EVENT_PROC(x)    if(!UNIT_TESTING) \
     std::cerr   << "EVT_PRC@"<< sc_time_to_nsec_Get().c_str() << ": " << PrologString_Get().c_str() << " " << x  << DEBUG_LOCATION << std::endl
     #define DEBUG_EVENT_GRID(x)    if(!UNIT_TESTING) \
@@ -158,7 +171,7 @@ using namespace std;
     #define DEBUG_PRINT_IGP_MESSAGE(x)  if(!UNIT_TESTING) \
         {std::cerr  << "DBG" << " IGP MESSAGE " << " "  << x << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_SC(x)  if(!UNIT_TESTING) \
-        {std::cerr  << "DBG@" << sc_time_to_nsec_Get().c_str() << sc_core::name() << ": " <<  x  << DEBUG_LOCATION  << std::endl;}
+        {std::cerr  << "DBG@" << sc_time_to_nsec_Get().c_str() << name() << ": " <<  x  << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT(x)  if(!UNIT_TESTING) \
         {std::cerr  << "DBG@" << sc_time_to_nsec_Get().c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
@@ -233,3 +246,4 @@ using namespace std;
 
 // At the end, undefine all used macros
 #undef DEBUG_PRINTS
+#endif //DEBUG_MACROS_H
