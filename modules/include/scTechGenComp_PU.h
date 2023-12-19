@@ -1,4 +1,4 @@
-/** @file scAbstractGenComp_PU.h
+/** @file scTechGenComp_PU.h
  *  @ingroup GENCOMP_MODULE_PROCESS
 
  *  @brief Function prototypes for the computing module
@@ -15,8 +15,9 @@
 /** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
-#include "scAbstractGenComp_PU.h""
-static vector<AbstractGenCompState*> PU_StateVector;
+#include "scAbstractGenComp_PU.h"
+#include "TechGenCompStates.h"
+static vector<AbstractGenCompState*> TechPU_StateVector;
 
 /* !
  * \class scTechGenComp_PU
@@ -76,4 +77,32 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
 
 /** @}*/
 
+#ifdef Something
+ /*!
+ * \class scTechGenComp_PU
+ * \brief  Implements a general technical-type computing
+ *
+ * The technical PUs need all arguments at the beginning
+ */
+ class scTechGenComp_PU : public scAbstractGenComp_PU
+ {
+public:
+    /*!
+     * \brief Implements a general technical-type computing
+     * @param nm the SystemC name of the module
+     * @param No Number of parameters to compute with
+     *
+     */
+
+    scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No);
+    virtual ~scTechGenComp_PU(); // Must be overridden
+    /**
+     * @brief Process
+     */
+    virtual void Process_method();
+
+protected:
+    int32_t mNoOfArgs;    // The number of args before computation can start
+ };// of class scTechGenComp_PU
+#endif
 #endif // SCTECHGENCOMP_H

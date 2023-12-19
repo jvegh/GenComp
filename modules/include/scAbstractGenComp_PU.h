@@ -20,7 +20,8 @@
 #include <systemc>
 using namespace sc_core; using namespace sc_dt;
  using namespace std;
-static vector<AbstractGenCompState*> PU_StateVector;
+static vector<AbstractGenCompState*> AbsPU_StateVector;
+
 
 #ifndef SCBIOGENCOMP_H
 #ifndef SCTECHGENCOMP_H // Just to exclude for Doxygen
@@ -59,11 +60,9 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     friend class AbstractGenCompState;
   public:
     /*!
-     * \brief
-     *
-     * Creates an abstract processing unit for the general computing paradigm
+     * \brief Create an abstract processing unit for the general computing paradigm
      * @param nm the SystemC name of the module
-      *
+     *
      */
 
     scAbstractGenComp_PU(sc_core::sc_module_name nm);
@@ -74,16 +73,50 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     virtual void Process_method();
     virtual void Relax_method();
     virtual void Initialize_method();
+    virtual void InputReceived_method();
+    /**
+     * @brief Receving an input a momentary action, just administer its processing.
+     * It is possible only in 'Ready' and 'Processing' states
+     */
+    virtual void ReceiveInput();
+    /**
+     * @brief Synchronize the PU to some external condition
+     * - In biological computing, it results in issuing 'End Computing' (immediate spiking; passing to 'Delivering')
+     * - In technical computing, it results in issuing 'Begin Computing' (starting computing; passing to 'Processing')
+    */
     virtual void Synchronize_method();
+    /**
+     * @brief In 'Processing' state the unit can issue a signal 'fail'
+     */
     virtual void Fail_method();
+    /**
+     * @brief Fail
+     * - In biological computing, it means a failed charging-up; passes to 'Ready state'
+     * - In technical computing, it results a failed operation
+     */
+    virtual void Fail();
+
+#ifdef USE_PU_HWSLEEPING
     /*!
      * \brief Sleep_method: the unit can auto-power-off if idle for a longer time.
      * It must be previously in 'Ready' state
      *
      */
     virtual void Sleep_method();
+    /**
+     * @brief The unit can be powered on
+     * - On demand when in state  'Processing'
+     * - Explicitely when in state 'Sleeping'
+     */
     virtual void Wakeup_method();
-    void StateFlag_Set(GenCompStateMachineType_t S){    StateFlag = S;}
+    virtual void Wakeup();
+    /**
+     * @brief Drives Sleep/Awake activity
+     * Advances counters in the PU
+     */
+    virtual void Clock_method();
+#endif //USE_PU_HWSLEEPING
+     void StateFlag_Set(GenCompStateMachineType_t S){    StateFlag = S;}
     GenCompStateMachineType_t StateFlag_Get(void){return StateFlag;}
      struct{
         sc_core::sc_event
@@ -93,6 +126,7 @@ class scAbstractGenComp_PU: public sc_core::sc_module
             Begin_Transmission,     // Start to send the result
             End_Transmission,       // Feedback from transmission unit
             Initialize,             // Put the unit to its ground state
+            InputReceived,          // New input received
             Synchronize,            // External synhronize signal
             Process,                // Make a new processing
             Deliver,                // Deliver result tp the 'output section'
@@ -107,73 +141,15 @@ class scAbstractGenComp_PU: public sc_core::sc_module
         EVENT_GenComp;
   protected:
     /**
-     * @brief Puts the PU to its default state (just the HW)
+     * @brief Puts the PU to its default state (just the HW).
     */
     virtual void Initialize();
+     string
+    PrologString_Get(void);
     AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
     GenCompStateMachineType_t StateFlag;    ///< preserves last state
  };// of class scAbstractGenComp_PU
 
-
-/*!
- * \class scTechGenComp_PU
- * \brief  Implements a general technical-type computing
- *
- * The technical PUs need all arguments at the beginning
- */
-class scTechGenComp_PU : public scAbstractGenComp_PU
-{
-  public:
-    /*!
-     * \brief Implements a general technical-type computing
-     * @param nm the SystemC name of the module
-     * @param No Number of parameters to compute with
-     *
-     */
-
-    scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No);
-    virtual ~scTechGenComp_PU(); // Must be overridden
-    /**
-     * @brief Process
-     */
-    virtual void Process_method();
-
-  protected:
-    int32_t mNoOfArgs;    // The number of args before computation can start
- };// of class scTechGenComp_PU
-
-/*!
- * \class scBioGenComp_PU
- * \brief  Implements a general biological-type computing
- *
- */
-class scBioGenComp_PU : public scAbstractGenComp_PU
-{
-  public:
-    /*!
-     * \brief Creates a biological abstract processing unit
-     * @param nm the SystemC name of the module
-      *
-     * Creates an abstract biological computing unit
-     */
-
-    scBioGenComp_PU(sc_core::sc_module_name nm);
-    virtual ~scBioGenComp_PU(void); // Must be overridden
-/*    virtual void Deliver(){assert(0);}
-    virtual void HeartBeat(){assert(0);}*/
-    /**
-     * @brief Process
-     *
-     * In biological computing,
-     */
-    virtual void Process_method();
-/*    virtual void Relax(){assert(0);}
-    virtual void Reinitialize(){assert(0);}
-    virtual void Synchronize(){assert(0);}
-    virtual void Fail(){assert(0);}
-*/
-  protected:
- };// of class scBioGenComp_PU
 /** @}*/
 
 #endif // SCABSTRACTGENCOMP_H

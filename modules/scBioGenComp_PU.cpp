@@ -8,7 +8,7 @@
 */
 
 #include "scBioGenComp_PU.h"
-// This section configures debug and log printing
+// This section configures debug and log printing; must be located AFTER the other includes
 //#define SUPPRESS_LOGGING // Suppress all log messages
 //#define DEBUG_EVENTS    ///< Print event debug messages  for this module
 //#define DEBUG_PRINTS    ///< Print general debug messages for this module
@@ -18,7 +18,7 @@
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
-static BioGenCompState TheBioGenCompState = AbstractGenCompState();
+static BioGenCompState TheBioGenCompState = BioGenCompState();
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 

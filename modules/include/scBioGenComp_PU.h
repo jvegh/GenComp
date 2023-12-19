@@ -16,11 +16,12 @@
  *  @{
  */
 #include "scAbstractGenComp_PU.h"
+#include "BioGenCompStates.h"
 
-static vector<AbstractGenCompState*> BioPU_StateVector;
+static vector<BioGenCompState*> BioPU_StateVector;
 
 /*
- * \class scAbstractGenComp_PU
+ * \class scBioGenComp_PU
  * \brief  A simple abstract class to deal  with states of a general computing unit
  *
  * Operating principle of event processing:
@@ -56,7 +57,7 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
 {
   public:
     /*!
-     * \brief Creates a biological abstract processing unit
+     * \brief Creates a biological general computing unit
      * @param nm the SystemC name of the module
       *
      * Creates an abstract biological computing unit
@@ -81,4 +82,40 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
  };// of class scBioGenComp_PU
 /** @}*/
 
+#ifdef something
+
+
+ /*!
+ * \class scBioGenComp_PU
+ * \brief  Implements a general biological-type computing
+ *
+ */
+ class scBioGenComp_PU : public scAbstractGenComp_PU
+ {
+  public:
+      /*!
+     * \brief Creates a biological abstract processing unit
+     * @param nm the SystemC name of the module
+      *
+     * Creates an abstract biological computing unit
+     */
+
+      scBioGenComp_PU(sc_core::sc_module_name nm);
+      virtual ~scBioGenComp_PU(void); // Must be overridden
+      /*    virtual void Deliver(){assert(0);}
+    virtual void HeartBeat(){assert(0);}*/
+      /**
+     * @brief Process
+     *
+     * In biological computing,
+     */
+      virtual void Process_method();
+      /*    virtual void Relax(){assert(0);}
+    virtual void Reinitialize(){assert(0);}
+    virtual void Synchronize(){assert(0);}
+    virtual void Fail(){assert(0);}
+*/
+  protected:
+ };// of class scBioGenComp_PU
+#endif //something
 #endif // SCBIOGENCOMP_H
