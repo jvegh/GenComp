@@ -1,29 +1,29 @@
-/** @file GenCompStates.h
+/** @file BioGenCompStates.h
  *  @ingroup GENCOMP_MODULE_PROCESS
- *  @brief Working states of the archetypes of processing units
+ *  @brief Working states of the archetypes of biological processing units
  */
  /*  @author János Végh (jvegh)
  *  @bug No known bugs.
  */
 
-#ifndef GenCompStates_h
-#define GenCompStates_h
+#ifndef BioGenCompStates_h
+#define BioGenCompStates_h
 
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
 // must not be taken as in SystemC no new electronic module can be created.
-// So, AbstractGenComp_PU handles the events and calls the corresponding
+// So, scBioGenComp_PU handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
-class scAbstractGenComp_PU;
+class scBioGenComp_PU;
 
 // This define in only temporarily here,  should go to HWConfig.h
 #define USE_PU_HWSLEEPING
 
 
-/*! \var typedef  GenCompStateMachineType_t
+/* ! \var typedef  GenCompStateMachineType_t
  * The operation of an elementary computing unit of general computing is modelled as a multiple-state machine,
  * with internal state variables.
- * The states are used in AbstractGenComp_PU.
+ * The states are used in scBioGenComp_PU.
  @verbatim
   Sleeping   - waiting for activation;
                Goes to Ready
@@ -72,49 +72,49 @@ class scAbstractGenComp_PU;
  *      then goes to Relaxing
  * - Relaxing: Resets state and passes to 'Computing'
  * - Synchronizing: deliver result, anyhow ;  (a momentary state)
- *   - in biologycal mode, deliver immediate spike
+ *   - in biological mode, deliver immediate spike
  *   - in technical mode, deliver immediate result
  *   Passes to Relaxing (after issuing 'End Computing)
  */
-typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing, gcsm_Syncronizing, gcsm_Failed}
-              GenCompStateMachineType_t;
+//typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing, gcsm_Syncronizing, gcsm_Failed}
+  //            GenCompStateMachineType_t;
 
 
 /*!
  * \brief
- * This class implements an abstract computing unit; base for technical and biological computing
+ * This class implements states for an biological computing unit; base for biological computing
  *
- * The general computing is event-driven, i.e. events are received by the abstract state machine
- * and are processed by a technical or biological abstract processing unit.
+ * The general computing is event-driven, i.e. events are received by the biological state machine
+ * and are processed by a technical or biological biological processing unit.
  * The PU is generated in Ready (ready to process) state.
  *
- * @see AbstractGenCompState#EVENT_GenComp
- * @see GenCompStateMachineType_t
+ * @see BioGenCompState#EVENT_GenComp
+ * @see BioGenCompStateMachineType_t
  */
 
-class AbstractGenCompState
+class BioGenCompState : public AbstractGenCompState
 {
     public:
         /**
-         * @brief Puts the PU state to 'Ready' (called by the AbstractGenComp_PU's constructor)
+         * @brief Puts the PU state to 'Ready' (called by the BioGenComp_PU's constructor)
          * and sets up its event handling
          */
-        AbstractGenCompState(void);
-        virtual ~AbstractGenCompState(void);
+        BioGenCompState(void);
+        virtual ~BioGenCompState(void);
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
          */
-        virtual void Deliver();
+        virtual void Deliver(scBioGenComp_PU *PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
          */
-        virtual void Process(void);
+        virtual void Process(scBioGenComp_PU *PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          */
-        virtual void Relax();
+        virtual void Relax(scBioGenComp_PU *PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
@@ -122,7 +122,7 @@ class AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void Initialize(scAbstractGenComp_PU* PU);
+        virtual void Initialize(scBioGenComp_PU* PU);
 
         /**
          * @brief InputReceived: The machine received new input, administer it
@@ -130,38 +130,38 @@ class AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void InputReceived(scAbstractGenComp_PU* PU);
+        virtual void InputReceived(scBioGenComp_PU* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          */
-        virtual void Synchronize();
+        virtual void Synchronize(scBioGenComp_PU *PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
          * @param PU The HW that failed
          */
-        virtual void Fail(scAbstractGenComp_PU* PU);
-        void State_Set(scAbstractGenComp_PU* PU, GenCompStateMachineType_t& State);
+        virtual void Fail(scBioGenComp_PU* PU);
+        void State_Set(scBioGenComp_PU* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
          * @param PU The HW to set
          */
-        virtual void Sleep(scAbstractGenComp_PU *PU);
+        virtual void Sleep(scBioGenComp_PU *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          */
-        virtual void Wakeup(scAbstractGenComp_PU *PU);
+        virtual void Wakeup(scBioGenComp_PU *PU);
         /**
          * @brief State_Set Set the state of PU to st
          * @param PU The HW to set
          */
 #endif // USE_PU_HWSLEEPING
     protected:
-        void UpdatePU(scAbstractGenComp_PU& PU);
+        void UpdatePU(scBioGenComp_PU& PU);
     private:
  };
 
@@ -175,105 +175,105 @@ class AbstractGenCompState
  *
  * The PU is ready to operate, is waiting for a 'Begin computing' signal
  */
-class ReadyGenCompState : public AbstractGenCompState {
+class ReadyBioGenCompState : public BioGenCompState {
     public:
-        ReadyGenCompState(void);
-        virtual ~ReadyGenCompState();
-        void Deliver();
-        void Process();
-        void Relax();
-        void Reinitialize();
-        void Synchronize();
+        ReadyBioGenCompState(void);
+        virtual ~ReadyBioGenCompState();
+        void Deliver(scBioGenComp_PU *PU);
+        void Process(scBioGenComp_PU *PU);
+        void Relax(scBioGenComp_PU *PU);
+        void Reinitialize(scBioGenComp_PU *PU);
+        void Synchronize(scBioGenComp_PU *PU);
 };
 
 /**
- * @brief The SleepingGenCompState class
+ * @brief The SleepingBioGenCompState class
  *
  * The PU is going to economize power
  *
  */
 
-class SleepingGenCompState : public AbstractGenCompState {
+class SleepingBioGenCompState : public BioGenCompState {
     public:
-        SleepingGenCompState(void);
-        virtual ~SleepingGenCompState();
-        void Process();
+        SleepingBioGenCompState(void);
+        virtual ~SleepingBioGenCompState();
+        void Process(scBioGenComp_PU *PU);
 };
 
 /**
- * @brief The ProcessingGenCompState class
+ * @brief The ProcessingBioGenCompState class
  *
  * The PU starts to process the data
  */
 
-class ProcessingGenCompState : public AbstractGenCompState
+class ProcessingBioGenCompState : public BioGenCompState
 {
     public:
-        ProcessingGenCompState(void);
-        virtual ~ProcessingGenCompState();
-        void Process();
+        ProcessingBioGenCompState(void);
+        virtual ~ProcessingBioGenCompState();
+        void Process(scBioGenComp_PU *PU);
 };
 
 /**
- * @brief The DeliveringGenCompState class
+ * @brief The DeliveringBioGenCompState class
  *
  * The PU deliver its result to the 'output section'
  */
-class DeliveringGenCompState : public AbstractGenCompState
+class DeliveringBioGenCompState : public BioGenCompState
 {
     public:
-        DeliveringGenCompState(void);
-        virtual ~DeliveringGenCompState();
+        DeliveringBioGenCompState(void);
+        virtual ~DeliveringBioGenCompState();
 };
 
 /**
- * @brief The RelaxingGenCompState class
+ * @brief The RelaxingBioGenCompState class
  *
  * The PU recovers its operating state
  */
-class RelaxingGenCompState : public AbstractGenCompState
+class RelaxingBioGenCompState : public BioGenCompState
 {
     public:
-        RelaxingGenCompState(void);
-        virtual ~RelaxingGenCompState();
+        RelaxingBioGenCompState(void);
+        virtual ~RelaxingBioGenCompState();
 };
 
 /**
- * @brief The AwakingGenCompState class
+ * @brief The AwakingBioGenCompState class
  *
  * The sleeping (for economizing power) unit is activated
  */
-class AwakingGenCompState : public AbstractGenCompState
+class AwakingBioGenCompState : public BioGenCompState
 {
     public:
-        AwakingGenCompState(void);
-        virtual ~AwakingGenCompState();
+        AwakingBioGenCompState(void);
+        virtual ~AwakingBioGenCompState();
 };
 
 /**
- * @brief The ResettingGenCompState class
+ * @brief The ResettingBioGenCompState class
  *
  * The PU is set to its default state
  */
-class ResettingGenCompState : public AbstractGenCompState
+class ResettingBioGenCompState : public BioGenCompState
 {
     public:
-        ResettingGenCompState(void);
-        virtual ~ResettingGenCompState();
+        ResettingBioGenCompState(void);
+        virtual ~ResettingBioGenCompState();
 };
 
 /**
- * @brief The FailedGenCompState class
+ * @brief The FailedBioGenCompState class
  *
  * Some error happened or synchronization received
  */
 
-class FailedGenCompState : public AbstractGenCompState
+class FailedBioGenCompState : public BioGenCompState
 {
     public:
-        FailedGenCompState(void);
-        virtual ~FailedGenCompState();
-        void Process();
+        FailedBioGenCompState(void);
+        virtual ~FailedBioGenCompState();
+        void Process(scBioGenComp_PU *PU);
 };
 
-#endif //GenCompStates_h
+#endif //BioGenCompStates_h

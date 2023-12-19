@@ -18,6 +18,7 @@
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 // The units of general computing work in the same way, using general events
+// The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK
 
 AbstractGenCompState::
     AbstractGenCompState(void)
@@ -68,21 +69,37 @@ Relax()
     void AbstractGenCompState::
 Initialize(scAbstractGenComp_PU* PU)
 {
-        PU-> StateFlag = gcsm_Ready;
+    PU-> StateFlag = gcsm_Ready;
+}
+
+/*
+ *  The machine PU received new input, administer it
+ *  Input can be received only in 'Ready' and 'Processing' states
+ */
+void AbstractGenCompState::
+    InputReceived(scAbstractGenComp_PU* PU)
+{
+    if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
+        PU->ReceiveInput();
+    // Otherwise neglect it
 }
 
 
-    void AbstractGenCompState::
-Synchronize()
+void AbstractGenCompState::
+    Synchronize()
 {
  //   State_Set(machine, new ReadyGenCompState(name()));
 //    machine.Synchronize();   //Must be implemented in AbstractGenComp_PU subclasses
 }
 
+//Can happen only in Processing state; passes to Relaxing state
     void AbstractGenCompState::
-Fail()
+Fail(scAbstractGenComp_PU* PU)
 {
-//    State_Set(machine, new FailedGenCompState(name()));
+    if(gcsm_Processing== PU->StateFlag_Get())
+        PU->Fail();
+    // Otherwise neglect it
+
 }
 
     void AbstractGenCompState::
