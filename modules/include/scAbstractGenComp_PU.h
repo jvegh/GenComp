@@ -139,6 +139,7 @@ class scAbstractGenComp_PU: public sc_core::sc_module
             Wakeup;                  // The HW is needed again, awake it
         }
         EVENT_GenComp;
+     AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
   protected:
     /**
      * @brief Puts the PU to its default state (just the HW).
@@ -146,7 +147,6 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     virtual void Initialize();
      string
     PrologString_Get(void);
-    AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
     GenCompStateMachineType_t StateFlag;    ///< preserves last state
  };// of class scAbstractGenComp_PU
 

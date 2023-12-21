@@ -100,14 +100,14 @@ using namespace std;
 extern    string SC_TIME_UNIT[];
 
 #define DEBUG_SC_TIME sc_time_to_msec_Get() << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
-#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << dec << ", line " << __LINE__
+#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
 #ifdef DEBUG_EVENTS
-    #define DEBUG_SC_EVENT(x)  std::cerr << "-!-EVT@"<< DEBUG_SC_TIME << " : " << __func__ << " \"" << x << "\" //" << DEBUG_LOCATION << std::endl
+#define DEBUG_SC_EVENT(x)  std::cerr << "-!-EVT@ \"" << x << "\" @" << DEBUG_LOCATION << " ;" << DEBUG_SC_TIME << std::endl
 #else
     #define DEBUG_SC_EVENT(x)
 #endif
 #ifdef DEBUG_PRINTS
-#define DEBUG_SC_PRINT(x)  std::cerr << ">  DBG@"<< DEBUG_SC_TIME << " : " << __func__ << "." << x << " //" << DEBUG_LOCATION << std::endl
+#define DEBUG_SC_PRINT(x)  std::cerr << ">  DBG: \"" << x << "\" @" << DEBUG_LOCATION << " ;" << DEBUG_SC_TIME << std::endl
 #else
 #define DEBUG_SC_PRINT(x)
 #endif

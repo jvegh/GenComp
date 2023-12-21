@@ -11,28 +11,30 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in un
 
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
-//#define DEBUG_EVENTS    ///< Print event debug event for this module
+#define DEBUG_EVENTS    ///< Print event debug event for this module
 #define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 
 #include "DebugMacros.h"
 #include "scAbstractGenComp_PU.h"
 
-
-static AbstractGenCompState TheAbstractGenCompState = AbstractGenCompState();
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 
+AbstractGenCompState* TheAbstractGenCompState;
     scAbstractGenComp_PU::
 scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
-    ,MachineState (&TheAbstractGenCompState)
     ,StateFlag(gcsm_Ready)
 {
+        if(!TheAbstractGenCompState)
+            TheAbstractGenCompState = new AbstractGenCompState();
+        MachineState = TheAbstractGenCompState;
     typedef scAbstractGenComp_PU SC_CURRENT_USER_MODULE;
     // Intialize the module with generating an event
     SC_METHOD(Initialize_method);
     sensitive << EVENT_GenComp.Initialize;
-    // dont_initialize(); Simply execute initialization, without an event
+//    dont_initialize(); //Simply execute initialization, without an event
+//    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     SC_METHOD(InputReceived_method);
     sensitive << EVENT_GenComp.InputReceived;
     dont_initialize();

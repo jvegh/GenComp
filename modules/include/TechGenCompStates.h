@@ -14,6 +14,7 @@
 // So, scTechGenComp_PU handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
+#include "GenCompStates.h"
 class scTechGenComp_PU;
 
 // This define in only temporarily here,  should go to HWConfig.h
@@ -92,7 +93,7 @@ class scTechGenComp_PU;
  * @see TechGenCompStateMachineType_t
  */
 
-class TechGenCompState
+class TechGenCompState: public AbstractGenCompState
 {
     public:
         /**
@@ -164,6 +165,7 @@ class TechGenCompState
         void UpdatePU(scTechGenComp_PU& PU);
     private:
  };
+
 
 /*
  * The subclasses define the behavior *in the actual state*

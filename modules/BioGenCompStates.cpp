@@ -12,12 +12,13 @@
 
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
-//#define DEBUG_EVENTS    ///< Print event debug messages  for this module
+#define DEBUG_EVENTS    ///< Print event debug messages  for this module
 //#define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
+
 
 // The units of general computing work in the same way, using general events
 // The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK

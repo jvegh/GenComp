@@ -10,30 +10,45 @@
 #include "scTechGenComp_PU.h"
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
-//#define DEBUG_EVENTS    ///< Print event debug messages  for this module
-//#define DEBUG_PRINTS    ///< Print general debug messages for this module
+#define DEBUG_EVENTS    ///< Print event debug messages  for this module
+#define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
-static TechGenCompState TheTechGenCompState = TechGenCompState();
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 
-
+TechGenCompState* TheTechGenCompState;
     scTechGenComp_PU::
 scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No):
-    scAbstractGenComp_PU(nm),
-    mNoOfArgs(No)
+    scAbstractGenComp_PU(nm)
+     ,mNoOfArgs(No)
 {
+        if(!TheTechGenCompState)
+            TheTechGenCompState = new TechGenCompState();
+        MachineState = TheTechGenCompState;
 }
 
 scTechGenComp_PU::
     ~scTechGenComp_PU(void)
 {
 }
+
+// Puts the PU in its default state
+void scTechGenComp_PU::
+    Initialize_method(void)
+{
+        DEBUG_SC_EVENT("Intializing");
+        DEBUG_SC_PRINT("Enter EVENT_GenComp.Initialize");
+        MachineState->Initialize(this);   // Change status to 'Initial'
+        Initialize(); // Initialize the unit, HW and temporary variables
+        // Put PU in its default state
+        //DEBUG_PRINT_SC("Exit  EVENT_GenComp.Initialize");
+}
+
 
 void scTechGenComp_PU::
     Process_method(void)

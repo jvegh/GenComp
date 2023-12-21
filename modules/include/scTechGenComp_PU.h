@@ -70,6 +70,7 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
      * @brief Process
      */
     virtual void Process_method();
+    virtual void Initialize_method();
 
   protected:
     int32_t mNoOfArgs;    // The number of args before computation can start

@@ -18,7 +18,7 @@
 #include "scAbstractGenComp_PU.h"
 #include "BioGenCompStates.h"
 
-static vector<BioGenCompState*> BioPU_StateVector;
+//static vector<BioGenCompState*> BioPU_StateVector;
 
 /*
  * \class scBioGenComp_PU
@@ -65,6 +65,7 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
 
     scBioGenComp_PU(sc_core::sc_module_name nm);
     virtual ~scBioGenComp_PU(void); // Must be overridden
+    virtual void Initialize_method();
 /*    virtual void Deliver(){assert(0);}
     virtual void HeartBeat(){assert(0);}*/
     /**
@@ -79,6 +80,10 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
     virtual void Fail(){assert(0);}
 */
   protected:
+    /**
+     * @brief Puts the PU to its default state (just the HW).
+    */
+    virtual void Initialize();
  };// of class scBioGenComp_PU
 /** @}*/
 

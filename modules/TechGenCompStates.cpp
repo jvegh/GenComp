@@ -17,12 +17,13 @@
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
-
+static TechGenCompState* TheTechGenCompState = new TechGenCompState();
 // The units of general computing work in the same way, using general events
 // The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK
 
 TechGenCompState::
-    TechGenCompState(void)
+    TechGenCompState(void):
+    AbstractGenCompState()
 {
 }
 TechGenCompState::

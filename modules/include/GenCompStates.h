@@ -164,6 +164,7 @@ class AbstractGenCompState
         void UpdatePU(scAbstractGenComp_PU& PU);
     private:
  };
+;
 
 /*
  * The subclasses define the behavior *in the actual state*

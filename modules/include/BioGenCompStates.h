@@ -164,6 +164,7 @@ class BioGenCompState : public AbstractGenCompState
         void UpdatePU(scBioGenComp_PU& PU);
     private:
  };
+;
 
 /*
  * The subclasses define the behavior *in the actual state*
