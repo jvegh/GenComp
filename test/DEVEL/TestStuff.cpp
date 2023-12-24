@@ -49,7 +49,7 @@ TEST_F(StuffTest, Tools)
     EXPECT_EQ(0 , IDtoMask(MAX_GRIDPOINTS) );
     string MySimpleFileName = "asum.Eyo";
     string MyRelativeFileName = "~MyPath/../files/asum.Eyo";
-    string ExpectedName = GetAppName() + "_" + "asum" + "_tst";
+    string ExpectedName = GetAppName() + "_txt" + "_asum";
     size_t found = ExpectedName.find(" "); // Replace " " with "-" in file name
     ExpectedName.replace(found,1,"-");
     EXPECT_EQ(ExpectedName, GetFileNameRoot(MyRelativeFileName));

@@ -132,7 +132,7 @@ PositionOfFirstZero_Get(SC_GRIDPOINT_MASK_TYPE Mask, const int Length)
  *  @param[in] d decimals; by default 2
  *  @param[in] w field width; by default
  */
-   string sc_time_Strimg_Get(int32_t U, sc_core::sc_time T, const int32_t d, const int32_t w)
+   string sc_time_String_Get(int32_t U, sc_core::sc_time T, const int32_t d, const int32_t w)
    {   switch(U)
         {
        // case SC_TIME_UNIT_PS: U = 1000*1000*1000*1000; break;

@@ -57,7 +57,7 @@ YFromPosition_Get(int x, int y);
 #define SC_TIME_UNIT_US 2
 #define SC_TIME_UNIT_MS 3
 #define SC_TIME_UNIT_S  4
-#define SC_TIME_UNIT_DEFAULT SC_TIME_UNIT_US
+#define SC_TIME_UNIT_DEFAULT SC_TIME_UNIT_MS
 
     string
 sc_time_String_Get(int32_t U, sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 2, const int32_t w=6);
