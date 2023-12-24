@@ -31,6 +31,7 @@ GenCompDEVEL_simpleTB_t* GenCompDEVEL_simpleTB;
 
 bool UNIT_TESTING = true;	// Whether in course of unit testing
 //extern bool OBJECT_FILE_PRINTED;
+extern    string SC_TIME_UNIT[];
 
 using namespace std; using namespace sc_core;
 string simulation_name = "Test GenComp units without using a bus";
@@ -41,7 +42,7 @@ int sc_main(int argc, char* argv[]) {
     chrono::steady_clock::time_point t =chrono::steady_clock::now(),
             absolutestart, start;
     std::chrono::duration< int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
-    sc_core::sc_time SC_t, SC_x, SC_s, SC_end;
+    sc_core::sc_time SC_t, SC_x, SC_s;
     BENCHMARK_TIME_RESET(&t,&x,&s);
     absolutestart = t; start = absolutestart;
     sc_core::sc_report_handler::set_actions( "/IEEE_Std_1666/deprecated",
@@ -68,8 +69,8 @@ int sc_main(int argc, char* argv[]) {
     // Make anything before starting unit testing
     //!! all SC-related object and connections must be established before calling sc_start
     //
-    BENCHMARK_TIME_BEGIN(&t,&s);
-    SC_BENCHMARK_TIME_BEGIN(&SCt,&SCs);
+    BENCHMARK_TIME_BEGIN(&t,&x);
+    SC_BENCHMARK_TIME_BEGIN(&SC_t,&SC_x);
     sc_start(MAX_CLOCK_CYCLES ,SC_US);
     // Return here when no more events remained
     BENCHMARK_TIME_END(&t,&x,&s);
@@ -80,7 +81,7 @@ int sc_main(int argc, char* argv[]) {
         std::cerr << " error code " << returnValue << endl;
     else
         std::cerr << "no error"  << endl;
-    std::cerr  << "SystemC unit testing took " << s.count()/1000/1000 << " msec CLOCK time" << "//" << sc_time_to_usec_Get(SC_s) << " usec SIMULATED time" << endl;
+    std::cerr  << "SystemC unit testing took " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     return(returnValue);
 }
 
