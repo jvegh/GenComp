@@ -27,9 +27,10 @@ scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No):
     scAbstractGenComp_PU(nm)
      ,mNoOfArgs(No)
 {
-        if(!TheTechGenCompState)
-            TheTechGenCompState = new TechGenCompState();
-        MachineState = TheTechGenCompState;
+    typedef scTechGenComp_PU SC_CURRENT_USER_MODULE;
+    if(!TheTechGenCompState)
+        TheTechGenCompState = new TechGenCompState();
+    MachineState = TheTechGenCompState;
 }
 
 scTechGenComp_PU::
@@ -43,14 +44,10 @@ void scTechGenComp_PU::
 {
         DEBUG_SC_EVENT("Intializing");
         DEBUG_SC_PRINT("Enter EVENT_GenComp.Initialize");
+        scAbstractGenComp_PU::Initialize_method();
         MachineState->Initialize(this);   // Change status to 'Initial'
         Initialize(); // Initialize the unit, HW and temporary variables
         // Put PU in its default state
         //DEBUG_PRINT_SC("Exit  EVENT_GenComp.Initialize");
 }
 
-
-void scTechGenComp_PU::
-    Process_method(void)
-{
-}

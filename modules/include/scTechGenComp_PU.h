@@ -66,11 +66,12 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
 
     scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No);
     virtual ~scTechGenComp_PU(); // Must be overridden
-    /**
-     * @brief Process
-     */
-    virtual void Process_method();
     virtual void Initialize_method();
+    /**
+      * @brief Check if we can begin processing
+      * @return true if we can begin processing
+      */
+    virtual bool CanBeginProcessing(void);
 
   protected:
     int32_t mNoOfArgs;    // The number of args before computation can start
@@ -78,32 +79,4 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
 
 /** @}*/
 
-#ifdef Something
- /*!
- * \class scTechGenComp_PU
- * \brief  Implements a general technical-type computing
- *
- * The technical PUs need all arguments at the beginning
- */
- class scTechGenComp_PU : public scAbstractGenComp_PU
- {
-public:
-    /*!
-     * \brief Implements a general technical-type computing
-     * @param nm the SystemC name of the module
-     * @param No Number of parameters to compute with
-     *
-     */
-
-    scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No);
-    virtual ~scTechGenComp_PU(); // Must be overridden
-    /**
-     * @brief Process
-     */
-    virtual void Process_method();
-
-protected:
-    int32_t mNoOfArgs;    // The number of args before computation can start
- };// of class scTechGenComp_PU
-#endif
 #endif // SCTECHGENCOMP_H
