@@ -100,16 +100,20 @@ using namespace std;
 extern    string SC_TIME_UNIT[];
 
 #define DEBUG_SC_TIME sc_time_to_msec_Get() << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+#define DEBUG_SC_RELATIVE_TIME(x) sc_time_String_Get(SC_TIME_UNIT_DEFAULT,sc_time_stamp()-x) << ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
 #define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
+#define DEBUG_SC_RELATIVE_PROLOG(P,T) P << name() << "@" << DEBUG_SC_RELATIVE_TIME(T) << " : \""
 #ifdef DEBUG_EVENTS
-#define DEBUG_SC_EVENT(x)  std::cerr << "-!-EVT@ \"" << x << "\" @" << DEBUG_LOCATION << " ;" << DEBUG_SC_TIME << std::endl
+    #define DEBUG_SC_EVENT(x)  std::cerr << "!-EVT>" << name() << "@" << DEBUG_SC_TIME << " : \"" << x << "\" //" << DEBUG_LOCATION  << std::endl
+    #define DEBUG_SC_LOCAL_EVENT(P, T, X)  std::cerr << DEBUG_SC_RELATIVE_PROLOG(P,T) << X << "\" //" << DEBUG_LOCATION  << std::endl
 #else
     #define DEBUG_SC_EVENT(x)
+    #define DEBUG_SC_LOCAL_EVENT(p,t,x)
 #endif
 #ifdef DEBUG_PRINTS
-#define DEBUG_SC_PRINT(x)  std::cerr << ">  DBG: \"" << x << "\" @" << DEBUG_LOCATION << " ;" << DEBUG_SC_TIME << std::endl
+    #define DEBUG_SC_PRINT(x)  std::cerr << "> DBG>"<< DEBUG_SC_TIME << ": \" " << x << " \" //" << DEBUG_LOCATION  << std::endl
 #else
-#define DEBUG_SC_PRINT(x)
+    #define DEBUG_SC_PRINT(x)
 #endif
 // During unit testing, all event tracing messages are suppressed
 #ifdef DEBUG_EVENTS
@@ -170,9 +174,7 @@ extern    string SC_TIME_UNIT[];
         {std::cerr  << "DBG" << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_IGP_MESSAGE(x)  if(!UNIT_TESTING) \
         {std::cerr  << "DBG" << " IGP MESSAGE " << " "  << x << DEBUG_LOCATION  << std::endl;}
-    #define DEBUG_PRINT_SC(x)  if(!UNIT_TESTING) \
-        {std::cerr  << "DBG@" << sc_time_to_nsec_Get().c_str() << name() << ": " <<  x  << DEBUG_LOCATION  << std::endl;}
-    #define DEBUG_PRINT(x)  if(!UNIT_TESTING) \
+     #define DEBUG_PRINT(x)  if(!UNIT_TESTING) \
         {std::cerr  << "DBG@" << sc_time_to_nsec_Get().c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
          {if(A!=B) std::cerr  << "DBG@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
