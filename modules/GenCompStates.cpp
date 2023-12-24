@@ -37,12 +37,18 @@ Wakeup(scAbstractGenComp_PU *PU)
  //   machine.WakeUp();
 }
 
+/*
+ *  Called twice:
+ *  1st time, the system must be in state 'Processing',
+ *  2nd time in state 'Delivering'
+ */
     void AbstractGenCompState::
-Deliver(void)
+Deliver(scAbstractGenComp_PU* PU)
 {
- //   State_Set(machine, new DeliveringGenCompState(name()));
- //   machine.Deliver();   //Must be implemented in AbstractGenComp_PU subclasses
-}
+    if((gcsm_Processing == PU->StateFlag_Get()) || (gcsm_Delivering== PU->StateFlag_Get()))
+        PU->Deliver();
+    else assert(0);
+ }
 
 // Put the PU electronics to low-power mode
 // Must come from 'Ready' state; otherwise fail
@@ -54,13 +60,21 @@ Sleep(scAbstractGenComp_PU* PU)
 }
 
     void AbstractGenCompState::
-Process()
+Process(scAbstractGenComp_PU* PU)
 {
-//    State_Set(machine, new ProcessingGenCompState(name()));
+    if(gcsm_Ready == PU->StateFlag_Get())
+    {   // Legally received a 'Begin computing' signal
+        PU->StateFlag_Set(gcsm_Processing);
+    }
+    else if (gcsm_Processing == PU->StateFlag_Get())
+    {   // Legally received an 'End computing' signal
+        PU->StateFlag_Set(gcsm_Delivering);
+    }
+    else assert(0); // No other case allowed
 }
 
     void AbstractGenCompState::
-Relax()
+Relax(scAbstractGenComp_PU* PU)
 {
  //   State_Set(machine, new RelaxingGenCompState(name()));
  //   machine.Relax();  //Must be implemented in AbstractGenComp_PU subclasses
@@ -69,7 +83,7 @@ Relax()
     void AbstractGenCompState::
 Initialize(scAbstractGenComp_PU* PU)
 {
-    PU-> StateFlag = gcsm_Ready;
+    PU-> StateFlag_Set(gcsm_Ready);
 }
 
 /*
@@ -79,14 +93,16 @@ Initialize(scAbstractGenComp_PU* PU)
 void AbstractGenCompState::
     InputReceived(scAbstractGenComp_PU* PU)
 {
+    DEBUG_SC_EVENT("   >>>");
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
         PU->ReceiveInput();
     // Otherwise neglect it
+    DEBUG_SC_EVENT("   >>>");
 }
 
 
 void AbstractGenCompState::
-    Synchronize()
+    Synchronize(scAbstractGenComp_PU* PU)
 {
  //   State_Set(machine, new ReadyGenCompState(name()));
 //    machine.Synchronize();   //Must be implemented in AbstractGenComp_PU subclasses
@@ -101,13 +117,14 @@ Fail(scAbstractGenComp_PU* PU)
     // Otherwise neglect it
 
 }
-
+/*
     void AbstractGenCompState::
 State_Set(scAbstractGenComp_PU* PU, GenCompStateMachineType_t& State)
 {
-    PU-> StateFlag = State;
- }
-
+    PU-> StateFlag_Set(State);
+}
+*/
+#if 0
     ReadyGenCompState::
 ReadyGenCompState(void):
     AbstractGenCompState()
@@ -216,3 +233,4 @@ void FailedGenCompState::
 {
      assert(0);     // Process signal during processing
 }
+#endif // 0

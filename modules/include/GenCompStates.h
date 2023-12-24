@@ -103,18 +103,21 @@ class AbstractGenCompState
         virtual ~AbstractGenCompState(void);
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
+         *
+         * Called twice: 1st time, the system must be in state 'Processing',
+         * 2nd time in state 'Delivering'
          */
-        virtual void Deliver();
+        virtual void Deliver(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
          */
-        virtual void Process(void);
+        virtual void Process(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          */
-        virtual void Relax();
+        virtual void Relax(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
@@ -135,7 +138,7 @@ class AbstractGenCompState
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          */
-        virtual void Synchronize();
+        virtual void Synchronize(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
@@ -166,6 +169,7 @@ class AbstractGenCompState
  };
 ;
 
+#if 0
 /*
  * The subclasses define the behavior *in the actual state*
  *
@@ -277,4 +281,8 @@ class FailedGenCompState : public AbstractGenCompState
         void Process();
 };
 
+
+
+
+#endif //0
 #endif //GenCompStates_h
