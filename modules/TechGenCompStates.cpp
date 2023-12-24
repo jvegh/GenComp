@@ -17,7 +17,6 @@
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
-static TechGenCompState* TheTechGenCompState = new TechGenCompState();
 // The units of general computing work in the same way, using general events
 // The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK
 
@@ -102,109 +101,4 @@ Fail(scTechGenComp_PU* PU)
 State_Set(scTechGenComp_PU* PU, GenCompStateMachineType_t& State)
 {
     PU-> StateFlag_Set( State );
-}
-/*
-    ReadyTechGenCompState::
-     ReadyTechGenCompState:
-    TechGenCompState()
-{  }
-
-    ReadyTechGenCompState::
-~ReadyTechGenCompState(){}
-
-    SleepingTechGenCompState::
-    SleepingTechGenCompState:
-        TechGenCompState()
-{
-    }
-
-    SleepingTechGenCompState::
-~SleepingTechGenCompState(){}
-
-    void SleepingTechGenCompState::
-Process(void)
-{
-    assert(0);     // Process signal while sleeping
-    // wake it up first
-}
-
-*/
-    void ReadyTechGenCompState::
-Process(void)
- {
-  //  State_Set(machine, new ProcessingGenCompState(name()));
-    // Do some processing
- }
-
-    void ReadyTechGenCompState::
-Deliver(void)
- {
- //    State_Set(machine, new DeliveringGenCompState(name()));
-//     machine.Deliver();   //Must be implemented in AbstractGenComp_PU subclasses
- }
-
-    void ReadyTechGenCompState::
- Relax()
- {
- }
-
-
-    void ReadyTechGenCompState::
-Reinitialize()
-{
-}
-
-
-void ReadyTechGenCompState::
-    Synchronize()
-{
-}
-
-
-DeliveringTechGenCompState::
-    DeliveringTechGenCompState(void):
-    TechGenCompState()
-{
- }
-
-
-DeliveringTechGenCompState::
-    ~DeliveringTechGenCompState(){}
-
-ProcessingTechGenCompState::
-    ProcessingTechGenCompState(void):
-    TechGenCompState()
-{ }
-
-void ProcessingTechGenCompState::
-    Process()
-{
-     assert(0);     // Process signal during processing
-}
-
-ProcessingTechGenCompState::
-    ~ProcessingTechGenCompState(){}
-
-RelaxingTechGenCompState::
-    RelaxingTechGenCompState(void):
-    TechGenCompState()
-{   }
-
-RelaxingTechGenCompState::
-    ~RelaxingTechGenCompState(){}
-
-FailedTechGenCompState::
-    FailedTechGenCompState(void):
-    TechGenCompState()
-{
-    //flag = gcsm_Ready;
-}
-
-FailedTechGenCompState::
-    ~FailedTechGenCompState(){}
-
-void FailedTechGenCompState::
-    Process(void)
-{
-     assert(0);     // Process signal during processing
 }
