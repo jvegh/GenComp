@@ -68,11 +68,22 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     scAbstractGenComp_PU(sc_core::sc_module_name nm);
 
     virtual ~scAbstractGenComp_PU(void); // Must be overridden
-    virtual void Deliver_method();
-    virtual void Heartbeat_method();
-    virtual void Process_method();
+
+     /**
+      * @brief The physical delivery method
+      *
+      * The delivery method is called twice; at the beginning and at the end of the delivery phase
+      * The first phase is executed in state 'Processing', the 2nd one in state 'Delivering'
+      * The routine is actived by EVENT_GenComp.End_Computing
+      */
+    virtual void Deliver();
     virtual void Relax_method();
     virtual void Initialize_method();
+    /**
+     * @brief InputReceived_method
+     *
+     * An external partner signalled that an input was sent
+     */
     virtual void InputReceived_method();
     /**
      * @brief Receving an input a momentary action, just administer its processing.
@@ -116,38 +127,51 @@ class scAbstractGenComp_PU: public sc_core::sc_module
      */
     virtual void Clock_method();
 #endif //USE_PU_HWSLEEPING
-     void StateFlag_Set(GenCompStateMachineType_t S){    StateFlag = S;}
-    GenCompStateMachineType_t StateFlag_Get(void){return StateFlag;}
+    void StateFlag_Set(GenCompStateMachineType_t S){    mStateFlag = S; }
+    GenCompStateMachineType_t StateFlag_Get(void){return mStateFlag;}
      struct{
         sc_core::sc_event
                 // Operation-related
-            Begin_Computing,        // Time to begin computing
-            End_Computing,          // Time to end computing
+            Begin_Computing,        // To begin computing
+            End_Computing,          // To end computing
             Begin_Transmission,     // Start to send the result
             End_Transmission,       // Feedback from transmission unit
+
+            Begin_Sleeping,
+            End_Sleeping,
             Initialize,             // Put the unit to its ground state
             InputReceived,          // New input received
             Synchronize,            // External synhronize signal
-            Process,                // Make a new processing
-            Deliver,                // Deliver result tp the 'output section'
             Relax,                  // Make a short coffe break
+            HeartBeat,             // Refresh PU's state
                 // HW-related
-            HeartBeat,              // Internal timekeeping
             Fail,                   // Computing failed, start over
             Sleep,                  // Send the HW to sleep
             Awaken,                 // Signals that is ready to use
+            Relaxed,               // Signals that the unit reached its resting potential
             Wakeup;                  // The HW is needed again, awake it
         }
         EVENT_GenComp;
-     AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
+     /**
+     * @brief scLocalTime_Get
+     * @return The simulated time since the beginning of the recent operation
+     */
+    sc_core::sc_time scLocalTime_Get(){return sc_core::sc_time_stamp()-mLocalTimeBase;}
+    /**
+     * @brief scLocalTime_Set
+     * @param T The beginning of the simulated time of the recent operation
+     */
+    void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
   protected:
+    AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
     /**
      * @brief Puts the PU to its default state (just the HW).
     */
     virtual void Initialize();
-     string
-    PrologString_Get(void);
-    GenCompStateMachineType_t StateFlag;    ///< preserves last state
+    GenCompStateMachineType_t mStateFlag;    ///< preserves last state
+    int32_t mNoOfInputsReceived;
+    int32_t mNoOfInputsNeeded;
+    sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
  };// of class scAbstractGenComp_PU
 
 /** @}*/
