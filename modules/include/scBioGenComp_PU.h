@@ -18,17 +18,21 @@
 #include "scAbstractGenComp_PU.h"
 #include "BioGenCompStates.h"
 
+#define BIO_HEARTBEAT_TIME sc_core::sc_time(10,SC_US)
+
+
+
 //static vector<BioGenCompState*> BioPU_StateVector;
 
 /*
  * \class scBioGenComp_PU
- * \brief  A simple abstract class to deal  with states of a general computing unit
+ * \brief  A simple abstract class to implement the operation of a general bio computing unit
  *
  * Operating principle of event processing:
  *
- * "XXX_thread" methods are "sensitive" to specific events. After receiving an event,
+ * "XXX_moethod"s are "sensitive" to specific events. After receiving such an an event,
  * the corresponding virtual routine of AbstractGenCompState is called.
- * If the old and the new states are not compatible, that routine asserts. (wrong event)
+ * If the unit's state and the call are not compatible, that routine asserts. (wrong event)
  * Following a normal return, the HW specific operation of the PU is executed,
  * the time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
  * Optionally, also the next state is invoked by issuing a EVENT_GenComp.XXX.notify() notification.
@@ -66,14 +70,35 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
     scBioGenComp_PU(sc_core::sc_module_name nm);
     virtual ~scBioGenComp_PU(void); // Must be overridden
     virtual void Initialize_method();
-/*    virtual void Deliver(){assert(0);}
-    virtual void HeartBeat(){assert(0);}*/
     /**
-     * @brief Process
+     * @brief A new spike received
      *
-     * In biological computing,
+     * A spike arrived, store spike parameters;
+     * If it was the first spike, issue 'Begin_Computing'
      */
-    virtual void Process_method();
+    virtual void InputReceived_method();
+    /**
+     * @brief Receving an input a momentary action, just administer its processing.
+     * It is possible only in 'Ready' and 'Processing' states
+     */
+    virtual void ReceiveInput();
+    /**
+     * @brief Deliver
+     */
+    virtual void Deliver();
+
+    /**
+     * @brief Heartbeat_method
+     *
+     * A periodic  signal as a timebase for solving differential equations.
+     *
+     * - To economize resources, a central signal is used, but it is NOT a central clock signal
+     * - The unit receives a signal EVENT_GenComp.HeartBeat
+     * - If in 'Processing' mode
+     *   - The sensitivity is ON from EVENT_GenComp.Begin_Computing in 'Processing' mode
+     *   - The sensitivity if OFF from EVENT_GenComp.Relaxed in "Ready" mode
+     */
+    virtual void Heartbeat_method();
 /*    virtual void Relax(){assert(0);}
     virtual void Reinitialize(){assert(0);}
     virtual void Synchronize(){assert(0);}
@@ -84,43 +109,24 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
      * @brief Puts the PU to its default state (just the HW).
     */
     virtual void Initialize();
- };// of class scBioGenComp_PU
+//    virtual bool CanBeginProcessing(void);
+    /**
+     * @brief Heartbeat
+     *
+     * The state of the biological computing is re-calculated (as the simulation time passes)
+     * - If called in 'Processing' mode
+     *   Re-issues EVENT_GenComp.Heartbeat until membrane potential reaches its threshold value
+     *   Issues EVENT_GenComp.Begin_Computing upon the arrival of the first spike
+     *   Issues EVENT_GenComp.End_Computing upon arriving the threshold potential (and passes to 'Delivering')
+     *   Issues EVENT_GenComp.Fail upon decreasing the membrane potential
+     * - if called in 'Ready' mode
+     *   Re-issues EVENT_GenComp.Hearbeat until membrane potential decreased to its resting value
+     * Generate
+     */
+    virtual void Heartbeat();
+private:
+    vector<int32_t> Inputs; // Stores reference to input source
+  };// of class scBioGenComp_PU
 /** @}*/
 
-#ifdef something
-
-
- /*!
- * \class scBioGenComp_PU
- * \brief  Implements a general biological-type computing
- *
- */
- class scBioGenComp_PU : public scAbstractGenComp_PU
- {
-  public:
-      /*!
-     * \brief Creates a biological abstract processing unit
-     * @param nm the SystemC name of the module
-      *
-     * Creates an abstract biological computing unit
-     */
-
-      scBioGenComp_PU(sc_core::sc_module_name nm);
-      virtual ~scBioGenComp_PU(void); // Must be overridden
-      /*    virtual void Deliver(){assert(0);}
-    virtual void HeartBeat(){assert(0);}*/
-      /**
-     * @brief Process
-     *
-     * In biological computing,
-     */
-      virtual void Process_method();
-      /*    virtual void Relax(){assert(0);}
-    virtual void Reinitialize(){assert(0);}
-    virtual void Synchronize(){assert(0);}
-    virtual void Fail(){assert(0);}
-*/
-  protected:
- };// of class scBioGenComp_PU
-#endif //something
 #endif // SCBIOGENCOMP_H
