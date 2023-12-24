@@ -20,12 +20,13 @@
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 
-// The units of general computing work in the same way, using general events
+// The units of biological general computing work in the same way, using general events
 // The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK
 
 BioGenCompState::
     BioGenCompState(void): AbstractGenCompState()
 {}
+
 BioGenCompState::
     ~BioGenCompState(void)
 {
@@ -79,9 +80,16 @@ void BioGenCompState::
     InputReceived(scBioGenComp_PU* PU)
 {
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
-        PU->ReceiveInput();
-    // Otherwise neglect it
-}
+    {   // Inputs are received only in 'processing' mode, otherwise we neglect it
+        if(gcsm_Ready == PU->StateFlag_Get())
+        {   // A new spike in 'Ready' state received; we start processing
+            PU->StateFlag_Set(gcsm_Processing);
+            PU->EVENT_GenComp.Begin_Computing.notify(SC_ZERO_TIME); // Issue 'Begin Computing'
+            PU->EVENT_GenComp.HeartBeat.notify(BIO_HEARTBEAT_TIME); // Issue first heartbeat
+        }
+        PU->ReceiveInput(); // Make the administration of the received input
+    }
+ }
 
 
 void BioGenCompState::
@@ -103,105 +111,4 @@ Fail(scBioGenComp_PU* PU)
 State_Set(scBioGenComp_PU* PU, GenCompStateMachineType_t& State)
 {
     PU-> StateFlag_Set( State);
- }
-/*
-    ReadyBioGenCompState::
-     ReadyBioGenCompState:
-    BioGenCompState()
-{  }
-
-    ReadyBioGenCompState::
-~ReadyBioGenCompState(){}
-
-    SleepingBioGenCompState::
-        SleepingBioGenCompState:
-        BioGenCompState()
-{
-    }
-*/
-    SleepingBioGenCompState::
-~SleepingBioGenCompState(){}
-
-    void SleepingBioGenCompState::
-Process(scBioGenComp_PU* PU)
-{
-    assert(0);     // Process signal while sleeping
-    // wake it up first
-}
-
-
-    void ReadyBioGenCompState::
-Process(scBioGenComp_PU* PU)
- {
- }
-
-    void ReadyBioGenCompState::
-Deliver(scBioGenComp_PU* PU)
- {
- }
-
-    void ReadyBioGenCompState::
- Relax(scBioGenComp_PU* PU)
- {
- }
-
-
-    void ReadyBioGenCompState::
-Reinitialize(scBioGenComp_PU* PU)
-{
-}
-
-
-void ReadyBioGenCompState::
-    Synchronize(scBioGenComp_PU* PU)
-{
-}
-
-
-DeliveringBioGenCompState::
-    DeliveringBioGenCompState(void):
-    BioGenCompState()
-{
- }
-
-
-DeliveringBioGenCompState::
-    ~DeliveringBioGenCompState(){}
-
-ProcessingBioGenCompState::
-    ProcessingBioGenCompState(void):
-    BioGenCompState()
-{ }
-
-void ProcessingBioGenCompState::
-    Process(scBioGenComp_PU* PU)
-{
-     assert(0);     // Process signal during processing
-}
-
-ProcessingBioGenCompState::
-    ~ProcessingBioGenCompState(){}
-
-RelaxingBioGenCompState::
-    RelaxingBioGenCompState(void):
-    BioGenCompState()
-{   }
-
-RelaxingBioGenCompState::
-    ~RelaxingBioGenCompState(){}
-
-FailedBioGenCompState::
-    FailedBioGenCompState(void):
-    BioGenCompState()
-{
-    //flag = gcsm_Ready;
-}
-
-FailedBioGenCompState::
-    ~FailedBioGenCompState(){}
-
-void FailedBioGenCompState::
-    Process(scBioGenComp_PU* PU)
-{
-     assert(0);     // Process signal during processing
 }
