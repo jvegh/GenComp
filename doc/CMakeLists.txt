@@ -12,7 +12,7 @@ option(TAC_INTERNAL_DOCUMENTATION "Build internal documentation" OFF)
 option(TAC_DOC_USE_MATHJAX "Use MathJax for rendering math in HTML docs" ON)
 
 # Set some Doxygen flags
-set(TAC_DOXY_PROJECT_NAME             "TAC")
+set(TAC_DOXY_PROJECT_NAME             "Time-Aware Computing")
 set(TAC_DOXY_OUTPUT_DIRECTORY_SUFFIX  "/html")
 set(TAC_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TAC_DOXY_INPUT                     "${TAC_SOURCE_DIR} ${TAC_SOURCE_DIR}/../modules/ ${TAC_SOURCE_DIR}/../modules/include/") #\"${TAC_SOURCE_DIR}/modules/NEURER/include\" \"${TAC_SOURCE_DIR}/modules/MEMBRANE/include\"                                    # \"${TAC_SOURCE_DIR}/modules/NEURER/include\" \"${TAC_SOURCE_DIR}/modules/MEMBRANE/include\"
