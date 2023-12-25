@@ -82,21 +82,25 @@ typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_
 
 /*!
  * \brief
- * This class implements an abstract computing unit; base for technical and biological computing
+ * This class implements a state machine for abstract computing unit scAbstractGenComp_PU
  *
- * The general computing is event-driven, i.e. events are received by the abstract state machine
- * and are processed by a technical or biological abstract processing unit.
- * The PU is generated in Ready (ready to process) state.
+ * The general computing is event-driven, i.e. events are received by the abstract general processing unit
+ * and are processed by a scTechGenComp_PU or scBioGenComp_PU general processing unit.
+ * This state machine controls transitions between states. When a processing unit receives a state-related
+ * event, it calls the corresponding method of this class.
+ * The PU is generated in Ready (ready to process, gcsm_Ready) state.
  *
- * @see AbstractGenCompState#EVENT_GenComp
+ * @see scAbstractGenComp_PU
+ * @see scAbstractGenComp_PU#EVENT_GenComp
  * @see GenCompStateMachineType_t
+ * @see scAbstractGenComp_PU#mStateFlag
  */
 
 class AbstractGenCompState
 {
     public:
         /**
-         * @brief Puts the PU state to 'Ready' (called by the AbstractGenComp_PU's constructor)
+         * @brief Puts the PU state to 'Ready' (called by the scAbstractGenComp_PU's constructor)
          * and sets up its event handling
          */
         AbstractGenCompState(void);
@@ -104,18 +108,25 @@ class AbstractGenCompState
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
          *
-         * Called twice: 1st time, the system must be in state 'Processing',
-         * 2nd time in state 'Delivering'
+         * @param PU The HW to set
+         *
+         * Called twice:
+         * - 1st time, the system must be in state gcsm_Processing, passes to gcsm_Delivering
+         * - 2nd time in state gcsm_Delivering; passes to gcsm_Relaxing
          */
         virtual void Deliver(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
+         *
+         * @param PU The HW to set
          */
         virtual void Process(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
+         *
+         * @param PU The HW to set
          */
         virtual void Relax(scAbstractGenComp_PU* PU);
 
@@ -123,7 +134,7 @@ class AbstractGenCompState
          * @brief Initialize: Sets the state machineto its well-defined initial state
          *
          * @param PU The HW to set
-         * A simple subroutine, sets state to 'ready', trigger to
+         * A simple subroutine, sets state to gcsm_Ready, trigger to
          */
         virtual void Initialize(scAbstractGenComp_PU* PU);
 
@@ -137,152 +148,44 @@ class AbstractGenCompState
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
+         *
+         * @param PU The HW to set
          */
         virtual void Synchronize(scAbstractGenComp_PU* PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
+         *
          * @param PU The HW that failed
          */
         virtual void Fail(scAbstractGenComp_PU* PU);
+
+        /**
+         * @brief State_Set
+         *
+         * @param PU The HW to set
+         * @param State The selected state type flag
+         */
         void State_Set(scAbstractGenComp_PU* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
+         *
          * @param PU The HW to set
          */
         virtual void Sleep(scAbstractGenComp_PU *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
-         */
-        virtual void Wakeup(scAbstractGenComp_PU *PU);
-        /**
-         * @brief State_Set Set the state of PU to st
+         *
          * @param PU The HW to set
          */
-#endif // USE_PU_HWSLEEPING
+        virtual void Wakeup(scAbstractGenComp_PU *PU);
+ #endif // USE_PU_HWSLEEPING
     protected:
         void UpdatePU(scAbstractGenComp_PU& PU);
-    private:
  };
 ;
 
-#if 0
-/*
- * The subclasses define the behavior *in the actual state*
- *
- */
-
- /**
- * @brief The ReadyGenCompState class
- *
- * The PU is ready to operate, is waiting for a 'Begin computing' signal
- */
-class ReadyGenCompState : public AbstractGenCompState {
-    public:
-        ReadyGenCompState(void);
-        virtual ~ReadyGenCompState();
-        void Deliver();
-        void Process();
-        void Relax();
-        void Reinitialize();
-        void Synchronize();
-};
-
-/**
- * @brief The SleepingGenCompState class
- *
- * The PU is going to economize power
- *
- */
-
-class SleepingGenCompState : public AbstractGenCompState {
-    public:
-        SleepingGenCompState(void);
-        virtual ~SleepingGenCompState();
-        void Process();
-};
-
-/**
- * @brief The ProcessingGenCompState class
- *
- * The PU starts to process the data
- */
-
-class ProcessingGenCompState : public AbstractGenCompState
-{
-    public:
-        ProcessingGenCompState(void);
-        virtual ~ProcessingGenCompState();
-        void Process();
-};
-
-/**
- * @brief The DeliveringGenCompState class
- *
- * The PU deliver its result to the 'output section'
- */
-class DeliveringGenCompState : public AbstractGenCompState
-{
-    public:
-        DeliveringGenCompState(void);
-        virtual ~DeliveringGenCompState();
-};
-
-/**
- * @brief The RelaxingGenCompState class
- *
- * The PU recovers its operating state
- */
-class RelaxingGenCompState : public AbstractGenCompState
-{
-    public:
-        RelaxingGenCompState(void);
-        virtual ~RelaxingGenCompState();
-};
-
-/**
- * @brief The AwakingGenCompState class
- *
- * The sleeping (for economizing power) unit is activated
- */
-class AwakingGenCompState : public AbstractGenCompState
-{
-    public:
-        AwakingGenCompState(void);
-        virtual ~AwakingGenCompState();
-};
-
-/**
- * @brief The ResettingGenCompState class
- *
- * The PU is set to its default state
- */
-class ResettingGenCompState : public AbstractGenCompState
-{
-    public:
-        ResettingGenCompState(void);
-        virtual ~ResettingGenCompState();
-};
-
-/**
- * @brief The FailedGenCompState class
- *
- * Some error happened or synchronization received
- */
-
-class FailedGenCompState : public AbstractGenCompState
-{
-    public:
-        FailedGenCompState(void);
-        virtual ~FailedGenCompState();
-        void Process();
-};
-
-
-
-
-#endif //0
 #endif //GenCompStates_h
