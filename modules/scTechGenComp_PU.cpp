@@ -42,12 +42,11 @@ scTechGenComp_PU::
 void scTechGenComp_PU::
     Initialize_method(void)
 {
-        DEBUG_SC_EVENT("Intializing");
-        DEBUG_SC_PRINT("Enter EVENT_GenComp.Initialize");
+        DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"Intializing");
         scAbstractGenComp_PU::Initialize_method();
         MachineState->Initialize(this);   // Change status to 'Initial'
         Initialize(); // Initialize the unit, HW and temporary variables
         // Put PU in its default state
-        //DEBUG_PRINT_SC("Exit  EVENT_GenComp.Initialize");
+        DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"Intializing");
 }
 

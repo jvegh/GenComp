@@ -25,6 +25,7 @@ AbstractGenCompState* TheAbstractGenCompState;
     scAbstractGenComp_PU::
 scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
+    ,mLocalTimeBase(sc_core::SC_ZERO_TIME)
 {
         if(!TheAbstractGenCompState)
             TheAbstractGenCompState = new AbstractGenCompState();
@@ -68,72 +69,50 @@ scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     Initialize_method(void)
 {
-            DEBUG_SC_EVENT(">>>   ");
+            DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
     MachineState->Initialize(this);   // Change status to 'Ready'
     Initialize(); // Initialize the unit, HW and temporary variables
     // Put PU in its default state
-            DEBUG_SC_EVENT("<<<   ");
+            DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
 }
 
 
 void scAbstractGenComp_PU::
     InputReceived_method(void)
 {
-            DEBUG_SC_EVENT(">>>   ");
+    DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
     MachineState->InputReceived(this);
     // The input is legal, continue receiving it
     ReceiveInput();
-            DEBUG_SC_EVENT("<<<   ");
+    DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
 void scAbstractGenComp_PU::
     ReceiveInput(void)
 {
-            DEBUG_SC_EVENT("   ---");
+            DEBUG_SC_LOCAL_EVENT("   >>>", mLocalTimeBase, "");
     mNoOfInputsReceived++;
 }
 
-/**
- */
-/*void scAbstractGenComp_PU::
-    Deliver_method(void)
-{
-    MachineState->Deliver(this);   // Check if receiving EVENT_GenComp#Deliver is legal
-    DEBUG_SC_EVENT("Delivering");
-    if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the end of Processing phase, the phase 'Delivering' follows
-            DEBUG_SC_PRINT("Entering delivering");
-            StateFlag_Set(gcsm_Delivering);    // Now delivering
-            next_trigger(20, SC_US);
-            DEBUG_SC_PRINT("Inside delivering");
-    }
-    else
-    {   // We are at the end of phase 'Delivering'
-            next_trigger(EVENT_GenComp.Relax);
-            DEBUG_SC_PRINT("Exiting delivering");
-            EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
-    }
- }
-*/
+
 void scAbstractGenComp_PU::
     Deliver()
 {
-    DEBUG_SC_EVENT("Delivering");
+    DEBUG_SC_LOCAL_EVENT("   >>>",mLocalTimeBase,"");
     if(gcsm_Processing == StateFlag_Get())
     {   // We are at the end of Processing phase, the phase 'Delivering' follows
-            DEBUG_SC_PRINT("Entering delivering");
+            DEBUG_SC_LOCAL_EVENT("   >>>", mLocalTimeBase, "");
             StateFlag_Set(gcsm_Delivering);    // Now delivering
-//            next_trigger(20, SC_US);
-            DEBUG_SC_PRINT("Inside delivering");
     }
     else
     {   // We are at the end of phase 'Delivering'
 //            next_trigger(EVENT_GenComp.Relax);
-            DEBUG_SC_PRINT("Exiting delivering");
+            DEBUG_SC_LOCAL_EVENT("   >>>", mLocalTimeBase, "");
+            DEBUG_SC_LOCAL_EVENT("", mLocalTimeBase, "SENT EVENT_GenComp.Relax");
             EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
     }
-
+    DEBUG_SC_LOCAL_EVENT("   <<<",mLocalTimeBase,"");
 }
 
 void scAbstractGenComp_PU::
@@ -175,14 +154,14 @@ void scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     Fail_method(void)
 {
-    DEBUG_SC_EVENT(">>>   ");
+    DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
     MachineState->Fail(this);   // Change status to 'Initial'
-    DEBUG_SC_EVENT("<<<   ");
+    DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
 }
 void scAbstractGenComp_PU::
     Fail(void)
 {
-    DEBUG_SC_EVENT("   ---");
+    DEBUG_SC_LOCAL_EVENT("   ---",mLocalTimeBase,"");
 }
 
 /*

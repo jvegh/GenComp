@@ -83,17 +83,17 @@ void scBioGenComp_PU::
 void scBioGenComp_PU::
     ReceiveInput(void)
 {
-            DEBUG_SC_LOCAL_EVENT(">>>   ", mLocalTimeBase, Inputs.size());
+           // DEBUG_SC_LOCAL_EVENT(">>>   ", mLocalTimeBase, Inputs.size());
     Inputs.push_back(Inputs.size()); // TEMPORARY, Just store the index
     if(1 == Inputs.size())
     {   // Start the HeartBeat processing instantly
         StateFlag_Set(gcsm_Processing);
         EVENT_GenComp.HeartBeat.notify(SC_ZERO_TIME);
-            DEBUG_SC_PRINT("SENT    EVENT_GenComp.HeartBeat with zero");
+            DEBUG_SC_LOCAL_EVENT("",mLocalTimeBase,"SENT    EVENT_GenComp.HeartBeat with zero");
         EVENT_GenComp.Begin_Computing.notify(SC_ZERO_TIME);
             scLocalTime_Set();      // The clock is synchronized to the beginning of processing
     }
-            DEBUG_SC_PRINT("<<<   ");
+    // DEBUG_SC_LOCAL_EVENT("<<<   ", mLocalTimeBase, Inputs.size());
 }
 
 void scBioGenComp_PU::
@@ -103,7 +103,7 @@ void scBioGenComp_PU::
     if (scLocalTime_Get() < sc_time(50,SC_US))
     {   // We are still processing
         EVENT_GenComp.HeartBeat.notify(BIO_HEARTBEAT_TIME);
-            DEBUG_SC_PRINT("SENT    EVENT_GenComp.HeartBeat with 10 us");
+            DEBUG_SC_LOCAL_EVENT("",mLocalTimeBase,"SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else
     {   // We are finishing processing
@@ -128,6 +128,8 @@ void scBioGenComp_PU::
     Deliver()
 {   // The state machine ensures that we are in phases either 'Processing' or 'Delivering'
             DEBUG_SC_LOCAL_EVENT("   ---",mLocalTimeBase,"");
+            DEBUG_SC_EVENT("...   ");
+            DEBUG_SC_PRINT("Test again");
     if(gcsm_Processing == StateFlag_Get())
     {   // We are at the beginning of the 'Delivering' phase
             StateFlag_Set(gcsm_Delivering);

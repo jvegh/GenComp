@@ -93,11 +93,10 @@ Initialize(scAbstractGenComp_PU* PU)
 void AbstractGenCompState::
     InputReceived(scAbstractGenComp_PU* PU)
 {
-    DEBUG_SC_EVENT("   >>>");
+    DEBUG_SC_EVENT("   >>>",sc_time_stamp(),"");
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
         PU->ReceiveInput();
     // Otherwise neglect it
-    DEBUG_SC_EVENT("   >>>");
 }
 
 

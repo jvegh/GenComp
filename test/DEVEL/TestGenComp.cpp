@@ -72,9 +72,7 @@ TEST_F(GenCompTest, BioPU)
     wait(BPU.EVENT_GenComp.Begin_Computing);
     EXPECT_EQ( gcsm_Processing, MyBPU->StateFlag_Get());  // The unit goes to 'Processing' state
     wait(BPU.EVENT_GenComp.HeartBeat);
-    wait(BPU.EVENT_GenComp.HeartBeat);
     BPU.EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);     // The BPU starts to receive spikes
-    wait(BPU.EVENT_GenComp.HeartBeat);
     wait(BPU.EVENT_GenComp.HeartBeat);
     wait(BPU.EVENT_GenComp.End_Computing);
     EXPECT_EQ( gcsm_Delivering, MyBPU->StateFlag_Get());  // The unit goes to 'Delivering' state

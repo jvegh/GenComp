@@ -98,20 +98,28 @@ using namespace std;
 */
 
 extern    string SC_TIME_UNIT[];
-
-#define DEBUG_SC_TIME sc_time_to_msec_Get() << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
-#define DEBUG_SC_RELATIVE_TIME(x) sc_time_String_Get(SC_TIME_UNIT_DEFAULT,sc_time_stamp()-x) << ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+#define DEBUG_SC_EVENT_STRING "EVT->"
+#define DEBUG_SC_PRINT_STRING "DBG->"
+#define DEBUG_SC_TIME_ABS sc_time_String_Get(SC_TIME_UNIT_DEFAULT)
+//<< SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+#define DEBUG_SC_TIME_LOCAL(x) sc_time_String_Get(SC_TIME_UNIT_DEFAULT,sc_time_stamp()-x)
+//<< ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+//#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << << dec << ", line " << __LINE__
 #define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
-#define DEBUG_SC_RELATIVE_PROLOG(P,T) P << name() << "@" << DEBUG_SC_RELATIVE_TIME(T) << " : \""
+#define DEBUG_LOCATION_SHORT string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1)  << dec << ", line " << __LINE__
+//#define DEBUG_SC_RELATIVE_PROLOG(P,T) P << name() << "@" << DEBUG_SC_TIME_LOCAL(T) << " : \""
+#define DEBUG_SC_PROLOG_LOCAL(Prompt,Time) "@" << DEBUG_SC_TIME_LOCAL(Time) << "," << name() << "::" << __func__ << ": \"" << Prompt
+//#define DEBUG_SC_PROLOG(Prompt,Time) "@" << DEBUG_SC_TIME_LOCAL(Time) << "," << name() << "::" << __func__ << ": \"" << Prompt
+#define DEBUG_SC_PROLOG_ABS "." << DEBUG_SC_TIME_ABS << "," << name() << "::" << __func__ << ": \""
 #ifdef DEBUG_EVENTS
-    #define DEBUG_SC_EVENT(x)  std::cerr << "!-EVT>" << name() << "@" << DEBUG_SC_TIME << " : \"" << x << "\" //" << DEBUG_LOCATION  << std::endl
-    #define DEBUG_SC_LOCAL_EVENT(P, T, X)  std::cerr << DEBUG_SC_RELATIVE_PROLOG(P,T) << X << "\" //" << DEBUG_LOCATION  << std::endl
+    #define DEBUG_SC_EVENT(X)        std::cerr << DEBUG_SC_EVENT_STRING << DEBUG_SC_PROLOG_ABS << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_LOCAL_EVENT(P, T, X)  std::cerr << DEBUG_SC_EVENT_STRING << DEBUG_SC_PROLOG_LOCAL(P,T) << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #else
-    #define DEBUG_SC_EVENT(x)
+    #define DEBUG_SC_EVENT(P, T, X)
     #define DEBUG_SC_LOCAL_EVENT(p,t,x)
 #endif
 #ifdef DEBUG_PRINTS
-    #define DEBUG_SC_PRINT(x)  std::cerr << "> DBG>"<< DEBUG_SC_TIME << ": \" " << x << " \" //" << DEBUG_LOCATION  << std::endl
+    #define DEBUG_SC_PRINT(X)  std::cerr << DEBUG_SC_PRINT_STRING << DEBUG_SC_PROLOG_ABS << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #else
     #define DEBUG_SC_PRINT(x)
 #endif
