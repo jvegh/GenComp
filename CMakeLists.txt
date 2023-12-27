@@ -29,7 +29,7 @@ cmake_policy(SET CMP0007 NEW)
 include(Colorize)   # Just to make some beauty
     set(CPACK_PACKAGE_NAME "GenComp")
     set(MyVersion "0.0.1")
-    set(MyDate "2023.12.17")
+    set(MyDate "2023.12.25")
     project(GenComp VERSION ${MyVersion} LANGUAGES C CXX)
 
 include(BuildType)
@@ -144,7 +144,8 @@ else()
 endif()
 
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_PREFIX_PATH "~/Qt/6.4.2/gcc_64")
+#set(CMAKE_PREFIX_PATH "~/Qt/6.4.2/gcc_64")
+set(CMAKE_PREFIX_PATH "~/Qt6/6.6.1/gcc_64")
 set(CMAKE_MODULE_PATH "${CMAKE_PREFIX_PATH}/lib/cmake/")
 #find_package should find everything fine so long as the ENV Variable is set or, for linux systems,
 #it is in the default install path.
@@ -181,6 +182,7 @@ endif(BUILD_TESTS)
 if(BUILD_DOCS)
   find_package(Doxygen)
   add_subdirectory(doc) # The doxygen documentation
+  set(doxyfile_in "${GENCOMP_SOURCE_DIR}/doc/Doxifile.in")
 endif(BUILD_DOCS)
 
 ##############################################################
