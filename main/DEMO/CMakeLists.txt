@@ -13,6 +13,11 @@ set(MY_SRCS
 #    ${PROJECT_NAME}_CLI.cpp
 )
 
+file(GLOB_RECURSE MY_HEADERS
+    include/*.h
+    ${CMAKE_SOURCE_DIR}/modules/include/*.h
+)
+
 # Maybe you need something similar
 #file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/data/obj")
 
@@ -26,21 +31,20 @@ set(CMAKE_AUTOMOC ON)
 include_directories(
         include
         forms
-        ../../modules/include
-        ../../QtGUI/BASIC/include
-        ../../3rdParty/QCustomPlot/include
+        ${CMAKE_SOURCE_DIR}/modules/include
+        ../../..//modules/include
+        ${CMAKE_SOURCE_DIR}/3rdParty/QCustomPlot/include
         ${Qt6Core_INCLUDE_DIRS}
         ${Qt6Gui_INCLUDE_DIRS}
         ${Qt6Widgets_INCLUDE_DIRS}
         ${Qt6PrintSupport_INCLUDE_DIRS}
         ${SystemC_INCLUDE_DIRS}
 #        ${SCV_INCLUDE_DIRS}
-        ${CMAKE_SOURCE_DIR}/modules/include
 )
     link_directories(
-                     ${SystemC_LIBRARY_DIRS}
-                     ${SCV_LIBRARY_DIRS}
-                     )
+        ${SystemC_LIBRARY_DIRS}
+        ${SCV_LIBRARY_DIRS}
+)
 
 
 message(HIGHLIGHTED "                    DEMO CLI exutable")
