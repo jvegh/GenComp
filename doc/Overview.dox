@@ -1,13 +1,183 @@
 /** \mainpage notitle
 
-<div class="statcounter">You are visitor#<a title="Visitor counter"
-href="https://www.statcounter.hu/" target="_blank"><img class="statcounter"
-src="https://c.statcounter.com/12506963/0/4d279618/0/" alt="Visitor counter"></a> of site 'Time-aware computing' (TAC).
-For a first contact with TAC, the best place is to have a look at the \link GettingStarted getting started \endlink page
-that show you how use the simulators (and, maybe, to write and compile your first time-aware simulator program) with TAC.
-You're already an TAC user? Here is a \link ReleaseNotes Release notes and porting guide \endlink to help porting your application.
+Presently, computing is in a crisis: technical and biological computing are not understood.
+Technical computing consumes enormous amount of energy and shows up desperately low computing efficiency.
+Payload performance of supercomputers
+and \gls{ANN}s is strongly limited; computing (in general, but especially \gls{AI} and 'deep learning')
+is energy-wasting and unsustainable. Biological computing is able to produce only
+toy-level models, brain simulation attempts failed. Neuromophic computing cannot demonstrate
+usefulnes of biological principles, interfacing biological and technical systems face severe difficulties.
+The lack of understanding of computing principles result also in ideas such as attempting
+building zetta-scale supercomputers, using supercomputers for heavy workload (such as \gls{AI}) applications,
+and 'growing supercomputers in a dish'.
+
+Von Neumann's theory of computing@cite EDVACreport1945 and
+Shannon's theory of communication@cite ShannonOriginal:1948
+must be unified and generalized.
+Their common point is that they are based on the idea of instant interaction (inherited from the classic phycsics).
+Both biological and technical computing (based on today's modern technology) must consider the
+limited  interaction speed (conduction velocity in biology and speed of \gls{EM} waves in technology).
+This change needs a different theoretical background, implementation principles and implementations.
+Von Neumann' elaborated only the classic (simplified, omitting the data transmission time aside its processing time)
+paradigm. It was intended to describe the '<i>vacuum tube implementation</i>' and it was perfect
+for that goal. It became the starting point of the mathematical field 'computing science'.
+However, it was told 'unsound' to apply the classic theory to biology, so the 'biologic computing'
+has no theory at all. The technological development quickly vitiated the classic paradigm for
+describing technical computing; so actually ad-hoc solutions are used instead of a perfect theory.
+
+
+
+Here you find the scientific background of '<b>General Computing</b>' (GenComp),
+also called '<b>Time-aware computing</b>' (TAC), which is essentially von Neumann's
+general computing paradigm (without omitting data transfer time).
+In addition, the site provides the way of its technical utilization (programming \gls{API},
+Technical Guide about how and why in that way the ideas are implemented,
+User's Guide with examples how to use the system, etc.).
+Figure @ref Fig_GraphicAbstract provides
+a picturesque overview on the effects of time-aware computing; from left to right:
+the theory of \gls{TAC}; its effect on large-scale technological computing;
+explaining the information storage method and learning ability in biological computing systems.
+You can <a href="TAC-doc.tgz"><b>download</b></a> this documentation as a tgz archive for offline reading.
+<br>
+
+
+<div class="fallacy">
+\anchor Fig_GraphicAbstract
+@image html GraphicAbstract.png "Graphic abstract on time-aware computing and its implementation-dependent effects " width=620px
+\latexonly @image latex GraphicAbstract.pdf "Graphic abstract on time-aware computing and its implementation-dependent effects " width=.8\textwidth  \endlatexonly
 </div>
 
+
+
+This is the documentation for both the notion @link GENCOMP_GEN_THEORY_PARADIGM_PAGE time-aware computing @endlink and the simulators using \gls{GenComp}.
+Here <i>computing</i> is handled in a broader sense: information processing <i>in any implementation</i>.
+It covers conventional computing, biomorphic computing,  biological (neural) computing, and computing relating, among others, (the technology of) artificial intelligence.
+The computing objects use both their inputs and their internal state to calculate
+their output. The time-aware computing means to consider that <i>computing means both processing the available data
+and delivering data to and from the computing object</i>.
+Furthermore, that those operations must be synchronized
+(and in this way they block each other); and that not only that those processes need time,
+but <i>the inputs, the output and the internal states all have their temporal behavior</i>.
+We show that taking into account that temporal dependence explicitly,
+leads to considerable differences in their behavior as opposed with the behavior
+expected based on the time-unaware description. Please take care when reading.
+The text is, of course, computing-oriented, so it uses words processor, core, thread,
+hardware thread, memory, etc. However, it uses them in a slightly different way,
+in a different meaning. So, please read the corresponding manual, or skim it at least,
+before going into details. The approach we take seems to be overly complicated,
+but it is needed to build a more effective and capable computing. It majorly simplifies
+modern many-thread computing, but its real advantage manifest in large-scale computing.
+
+
+The \b main \b documentation is organized into \em chapters covering different domains of features.
+They are themselves composed of \em user \em manual pages describing the different features
+in a comprehensive way, and \em reference pages that gives you access
+to the API documentation through the related \em modules and \em classes.
+Sometimes you may need our \link GLOSSARY glossary \endlink or the search engine
+(see the right side of the title line).
+
+For a first contact with \gls{GenComp}, the best place is to have a look at the \link GettingStarted getting started \endlink page
+that show you how use the simulators (and, maybe, to write and compile your first time-aware simulator program) with \gls{GenComp}.
+You're already an \gls{GenComp} user? Here is a \link ReleaseNotes Release notes and porting guide \endlink to help porting your application.
+
+
+
+
+<div class="statcounter">
+<b>Warning:</b>Please consider that this development is a one-man undertaking,
+and it shall develop together with its documentation. There exist pre-developed code fragments
+and docs, but it needs time to put them in a consistent state, especially that also
+development and testing is needed. Please come back later and see if there is something new.
+You are visitor#<a title="Visitor counter"
+href="https://www.statcounter.hu/" target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/12506963/0/4d279618/0/" alt="Visitor counter"></a>
+</div>
+
+*/
+
+/*
+The major chapters are:
+ - @link GENCOMP_BASIC BASIC: Basic-level components, such as elementary modules and communication @endlink
+ - @link TAC_GENERAL_MAIN_PAGE GENERAL: non-software-related docs @endlink
+ - @link GENCOMP_MODULE_SOURCES SOURCES: The simulation source files @endlink
+ - @link GENCOMP_OTHER_SOURCES OTHER: The other source files (GUI, main, test) @endlink
+
+@defgroup GENCOMP_BASIC BASIC The electronic modules
+        The the bottom layer (autonomous communication) for handling a large number of electronic modules
+    @defgroup GENCOMP_BASIC_USER BASIC: User's guide
+        Details of how to use the communication layer
+              @ingroup GENCOMP_BASIC
+    @defgroup GENCOMP_BASIC_TECHNICAL  BASIC: Technical guide & programming.
+              Summary of the technical operation of the BASIC system
+            How the things (mainly communication) work and the \gls{API} to use them
+            @ingroup GENCOMP_BASIC
+              @link GENCOMP_BASIC_TECHNICAL_Breakdown_PAGE Technical breakdown of the components @endlink
+
+              @link GENCOMP_BASIC_TECHNICAL_Communication_PAGE Communication of components @endlink
+
+              @link GENCOMP_BASIC_TECHNICAL_Operation_PAGE Operation details @endlink
+
+              @link GENCOMP_BASIC_TECHNICAL_MEMORY_PAGE  Memory handling @endlink
+
+              @link GENCOMP_BASIC_TECHNICAL_Cooperation_Page Why and how modules can cooperate @endlink
+
+    @defgroup GENCOMP_BASIC_THEORY BASIC: Theory guide & background
+        The theoretical basics for the communication in the bottom layer
+              @ingroup GENCOMP_BASIC
+
+@defgroup GENCOMP_GENERAL GENERAL: The non-packet specific docs
+Tell common handling for the TAC simulator family. The subclassed modules extend and specialize
+    these features
+     @defgroup GENCOMP_GENERAL_USER GENERAL: User's guide
+     General aspects of using TAC simulators
+         @ingroup GENCOMP_GENERAL
+        @link GENCOMP_GEN_WORKING_PAGE Working with TAC simulators @endlink
+
+        @link GENCOMP_GEN_USER_SETTINGS_PAGE How to use 'Settings' @endlink
+
+    @defgroup GENCOMP_GENERAL_TECHNICAL GENERAL: Technical guide & programming
+    The generally valid implementation details
+              @ingroup GENCOMP_GENERAL
+
+              @link GENCOMP_GEN_TECHNICAL_INTRODUCTION_PAGE New concepts of the technical computing  @endlink
+
+              Introducing new concepts such us a different layering and Explicitly Many-Processor Approach
+
+              @link GENCOMP_GEN_TECHNICAL_OPERATION_PAGE Simulating time-aware computing @endlink
+
+**              How (technically) time-aware computing works
+**    @defgroup GENCOMP_GENERAL_THEORY GENERAL: Theory guide & background
+**              The theoretical basics (principles and concepts) used in time-aware computation are sketched,
+**              at signaling and communication level
+
+** @ingroup GENCOMP_GENERAL
+**             @link GENCOMP_GEN_THEORY_INTRODUCTION_PAGE Introduction to computing @endlink
+
+**              @link GENCOMP_GEN_THEORY_ABSTRACT_PAGE The abstract computing model @endlink
+
+  **            @link GENCOMP_GEN_THEORY_LEARNING_PAGE  Information storage and learning @endlink
+
+**              @link GENCOMP_GEN_THEORY_PARADIGM_PAGE The idea of time-aware computing @endlink
+
+
+@defgroup GENCOMP_MODULE_SOURCES SOURCES: The simulation source files
+The source files are built on top of each other.
+Many of the are used in unchanged form, many have overloaded member functions
+    @defgroup GENCOMP_MODULE_BASIC SOURCES: package BASIC
+    Implementation details of the bottom (mainly communication) layer
+        @ingroup GENCOMP_MODULE_SOURCES
+    @defgroup GENCOMP_MODULE_PROC SOURCES: package PROC
+    Implementation details of the processor-related functionality
+        @ingroup GENCOMP_MODULE_SOURCES
+    @defgroup GENCOMP_MODULE_NEURER SOURCES: package NEURER
+    Implementation details of the time-aware neuron modeling facilities
+        @ingroup GENCOMP_MODULE_SOURCES
+    @defgroup GENCOMP_MODULE_MEMBRANE SOURCES: package MEMBRANE
+    Implementation details of the neuron membrane (a finite element patchwork model)
+        @ingroup GENCOMP_MODULE_SOURCES
+
+** @defgroup GENCOMP_OTHER_SOURCES The other source files (GUI, main, test)
+** Rarely needed source files; except if you want to branch a new development tree.
 
 \htmlonly
 <!-- Default Statcounter code for TimeAwareComputing
@@ -25,7 +195,12 @@ document.write("<sc"+"ript type='text/javascript' src='" + scJsHost+
 */
 
 /*
-This is the documentation for both the term @link TAC_GEN_THEORY_PARADIGM_PAGE time-aware computing @endlink and the simulators using \gls{TAC}.
+
+This is spare code for TAC documentation; will be reimplemented into the documentation of GenComp.
+The already reimplemented lines of some paragraphs are marked by
+
+
+This is the documentation for both the term @link TAC_GEN_THEORY_PARADIGM_PAGE time-aware computing @endlink and the simulators using \gls{GenComp}.
 Here <i>computing</i> is handled in a broader sense: information processing <i>in any implementation</i>.
 It covers conventional computing, biomorphic computing,  biological (neural) computing, and computing relating, among others, (the technology of) artificial intelligence.
 The computing objects use both their inputs and their internal state to calculate
@@ -70,7 +245,7 @@ Sometimes you may need our \link GLOSSARY glossary \endlink or the search engine
 
 The major chapters are:
  - @link TAC_BASIC BASIC: Basic-level components, such as elementary modules and communication @endlink
- - @link TAC_GENERAL_MAIN_PAGE GENERAL: The non-packet specific docs @endlink
+** - @link TAC_GENERAL_MAIN_PAGE GENERAL: The non-packet specific docs @endlink
  - @link TAC_MODULE_SOURCES SOURCES: The simulation source files @endlink
  - @link TAC_OTHER_SOURCES OTHER: The other source files (GUI, main, test) @endlink
 
@@ -118,19 +293,19 @@ Tell common handling for the TAC simulator family. The subclassed modules extend
 
               @link TAC_GEN_TECHNICAL_OPERATION_PAGE Simulating time-aware computing @endlink
 
-              How (technically) time-aware computing works
-    @defgroup TAC_GENERAL_THEORY GENERAL: Theory guide & background
-              The theoretical basics (principles and concepts) used in time-aware computation are sketched,
-              at signaling and communication level
+**              How (technically) time-aware computing works
+**    @defgroup TAC_GENERAL_THEORY GENERAL: Theory guide & background
+**              The theoretical basics (principles and concepts) used in time-aware computation are sketched,
+**              at signaling and communication level
 
-@ingroup TAC_GENERAL
-              @link TAC_GEN_THEORY_INTRODUCTION_PAGE Introduction to computing @endlink
+** @ingroup TAC_GENERAL
+   **           @link TAC_GEN_THEORY_INTRODUCTION_PAGE Introduction to computing @endlink
 
-              @link TAC_GEN_THEORY_ABSTRACT_PAGE The abstract computing model @endlink
+**              @link TAC_GEN_THEORY_ABSTRACT_PAGE The abstract computing model @endlink
 
-              @link TAC_GEN_THEORY_LEARNING_PAGE  Information storage and learning @endlink
+  **            @link TAC_GEN_THEORY_LEARNING_PAGE  Information storage and learning @endlink
 
-              @link TAC_GEN_THEORY_PARADIGM_PAGE The idea of time-aware computing @endlink
+**              @link TAC_GEN_THEORY_PARADIGM_PAGE The idea of time-aware computing @endlink
 
 
 @defgroup TAC_MODULE_SOURCES SOURCES: The simulation source files
@@ -149,8 +324,8 @@ Many of the are used in unchanged form, many have overloaded member functions
     Implementation details of the neuron membrane (a finite element patchwork model)
         @ingroup TAC_MODULE_SOURCES
 
-@defgroup TAC_OTHER_SOURCES The other source files (GUI, main, test)
-Rarely needed source files; except if you want to branch a new development tree.
+** @defgroup TAC_OTHER_SOURCES The other source files (GUI, main, test)
+** Rarely needed source files; except if you want to branch a new development tree.
 
 
 <b>Warning:</b>Please consider that this development is a one-man undertaking,

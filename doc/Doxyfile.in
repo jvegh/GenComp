@@ -618,6 +618,7 @@ LAYOUT_FILE            = "${CMAKE_CURRENT_BINARY_DIR}/${TAC_DOXY_OUTPUT_DIRECTOR
 # feature you need bibtex and perl available in the search path.
 
 CITE_BIB_FILES         = @CMAKE_SOURCE_DIR@/doc/CommonBibliography.bib \
+                         @CMAKE_SOURCE_DIR@/doc/CommonAIBibliography.bib \
                          @CMAKE_SOURCE_DIR@/doc/CommonNeuronalBibliography.bib \
                          @CMAKE_SOURCE_DIR@/doc/CommonPrivateBibliography.bib
 

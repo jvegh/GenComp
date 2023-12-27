@@ -1,0 +1,110 @@
+/**
+\page GENCOMP_GEN_THEORY_INTRODUCTION_PAGE Introduction to implementing computing
+
+This chapter discusses general notions and ideas of computing
+in a general sense, basically
+somewhat specialized toward electronic implementation
+using current technology with some terms, ideas of and hints to biological technology.
+This part uses many references to the
+real theoretical works and sometimes borrows text and figures from them.
+We discuss the basic terms only to the absolutely necessary depth.
+*/
+/*
+Von Neumann in his "First Draft" @cite EDVACreport1945
+discussed computing in general, and
+provided an <i>approximation</i> (called today as "classic paradigm")
+for (the timing relations of) <i>vacuum tubes only</i>, in which he  neglected
+the transfer time aside from the processing time.
+Although he discussed biological and technical computing in parallel, he explicitly warned
+(in his section 6.3) that it would be <i><b>unsound</b></i> (sic) to use his classic paradigm
+to describe neuronal operation, given that the conduction (transfer) time is longer
+than the synaptic (processing) time.
+He also added that using much faster vacuum tubes (meaning processing elements)
+also vitiates his simplified paradigm.
+However, he did not provide another procedure that could consider
+the case corresponding to today's technology and the case of neural computing.
+The needed "procedure" was only published recently @cite VeghMissingSecondDraft:2020
+@cite VeghTemporal:2020 @cite VeghBiologySpatioTemporal:2020 @cite VeghIntroducingTemporalBehaviorScience:2020
+@cite VeghRevisingClassicComputing:2021.
+The question opens, how then <i>networks of computing objects</i>
+such as simple technical computing objects
+(from logical gates to nodes of large computing networks);
+biology-mimicking, biology-inspired, biomorphic ones
+(including those for purposes of \gls{AI}) as well as natural biological objects
+can be modelled and scaled @cite VeghScalingANN:2021.
+
+As in general, "more is different" @cite MoreIsDifferent1972.
+Without considering that rule, it is hard to conclude
+the behavior of a system of computing elements knowing the computing elements' rules only.
+In connection with building larger computing systems,
+it was early predicted @cite ScalingParallel:1993,
+<i>"scaling thus put larger machines at an inherent disadvantage"</i>.
+Attempting to build new architectures without working out
+the detailed theory fails: the Gordon Bell Prize jury noticed @cite GordonBellPrize:2017
+that <i>"Surprisingly, there have been no brain
+        inspired massively parallel specialized computers
+        [among the winners of supercomputer TOP500 lists]"</i>, despite
+the concentrated efforts and support.
+Despite the enormous expectations,
+<i>"Core progress in AI has stalled in some fields"</i> @cite AIcoreProgressStalled:2020.
+The reason is that the model of computing is purely understood.
+
+
+The computing process is handled here essentially as proposed by von Neumann:
+it is a set of well-defined and well aligned
+(i.e., appropriately synchronized by events) processes,
+rather than stationary states with jumps between them.
+The principles of correct operations remain the same.
+Still,  different options in different implementations work slightly differently
+and result in other behavior, showing more or less resemblance with each other.
+Given the virtually infinite variety of computing systems,
+we confine ourselves to the 'classic' processor and (the signaling relations of) biological neurons, providing hints
+to some other kinds of computing systems.
+
+In section  @ref TAC_GEN_THEORY_ABSTRACT_PAGE we introduce an abstract
+model which serves as a basis for our discussion.
+This section also introduces different ideas for aligning the processes:
+to implement synchronization.
+Here we also explain why biology selected the asynchronous method with auto-synchronization.
+
+Given that synchronizing with a central clock is a common practice
+in electronic technology, section @ref TAC_GEN_THEORY_CENTRAL_PAGE is devoted to its aspects and consequences.
+The effect of the central synchronization accompanies one more important term,
+the dispersion of clock signals.
+The latter is crucial for computing systems' performance.
+The different implementation technologies explain the drastic
+differences in the behavior of the resulting computing systems.
+
+Section  @ref TAC_GEN_THEORY_LEARNING_PAGE explains why biological systems
+natively have the ability of life-long learning while technological computing systems
+must use "Learning On/Off" switches.
+Because of that difference, we can state that
+the learning methods studies on technological systems
+are not relevant for biological systems;
+primarily if they are used to complement our knowledge of their biological behavior.
+
+Section @ref TAC_GEN_THEORY_ARTIFICAL_PAGE discusses that this fundamental difference
+between the two implementations
+draws a clearly-cut line also between methods and behavior
+of artificial and natural intelligence.
+*/
+
+
+
+/*
+
+
+<div class="fallacy">
+<b>Fallacy:</b><br>
+In neurobiology, <b><i>the shorthand notation</i></b>  such as that action potential is generated,
+travels, arrives, or action potentials travel down the axon by jumping from
+one node to the next,
+etc.<b><i> always means that the potential is accompanied with transmitting charge</i></b>,
+although in many different envelopes, see also section @ref  TAC_NEURER_THEORY_POTENTIAL_SIGNAL.
+</div>
+
+
+<a href="http://hyperphysics.phy-astr.gsu.edu/hbase/Biology/allosteric.html"> for physical explanation
+of less understood biological statements.</a>
+
+*/

@@ -1,0 +1,26 @@
+/**
+\page  GENCOMP_GENERAL_MAIN_PAGE Software-independent, general information
+
+
+
+
+In this section non-package specific knowledge to simulation-related operations are described.
+
+ Still to be added
+*/
+ /*
+
+Given that TAC is a family of simulators, in many cases
+@link TAC_GENERAL_USER the non-package specific User's guide @endlink
+is referred to, and only some package-specific details are given here.
+
+@link TAC_GENERAL_USER General User's Guide @endlink
+
+@link TAC_GEN_USER_DIR_PAGE Application subdirectories @endlink
+
+@link TAC_GEN_USER_INTERFACE_PAGE User interfaces @endlink
+
+@link TAC_GEN_USER_SETTINGS_PAGE How to configure TAC simulators through its settings @endlink
+
+
+*/
