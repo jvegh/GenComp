@@ -66,17 +66,19 @@ class scAbstractGenComp_PU;
  *   - in biological mode: received its first argument
  *   Passes to Delivering (after issuing 'End Computing') if successful;
  *   Passes to Relaxing if Failed
- * - Delivering : The unit is delivering its result to its output section
+ * - Relaxing: Resets state and passes to 'Computing'
+ * --These states below are momantary states: need action and passes to one of the above states
+ * - Delivering: The unit is delivering its result to its output section
  *   - After some time, it Sends 'Begin Transmitting' @see AbstractGenComp_TU
  *     (Activates transmission unit to send computed result to its chained unit(s),
  *      then goes to Relaxing
- * - Relaxing: Resets state and passes to 'Computing'
+ * - Failing :
  * - Synchronizing: deliver result, anyhow ;  (a momentary state)
  *   - in biologycal mode, deliver immediate spike
  *   - in technical mode, deliver immediate result
  *   Passes to Relaxing (after issuing 'End Computing)
  */
-typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing, gcsm_Syncronizing, gcsm_Failed}
+typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing}
               GenCompStateMachineType_t;
 
 

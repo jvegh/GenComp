@@ -8,6 +8,7 @@
 
 #ifndef BioGenCompStates_h
 #define BioGenCompStates_h
+#include "GenCompStates.h"
 
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
 // must not be taken as in SystemC no new electronic module can be created.

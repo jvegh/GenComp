@@ -17,6 +17,8 @@
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
+string GenCompStates[]{"Sleeping", "Ready", "Processing", "Delivering", "Relaxing"};
+
 // The units of general computing work in the same way, using general events
 // The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK
 
