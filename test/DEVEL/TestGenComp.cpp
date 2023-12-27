@@ -19,7 +19,7 @@ extern bool UNIT_TESTING;		// Switched off by default
 #include "scBioGenComp_PU.h"
 #include "scTechGenComp_PU.h"
 
-//scAbstractGenComp_PU PU("myAbstrct");
+//scAbstractGenComp_PU PU("myAbs");
 //scTechGenComp_PU TPU("myTech",2);
 scBioGenComp_PU BPU("myBio");
 
