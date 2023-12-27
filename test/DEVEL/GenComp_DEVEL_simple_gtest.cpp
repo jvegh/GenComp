@@ -15,7 +15,6 @@
 //#define SUPPRESS_LOGGING    // In unit testing mode
 //#define DEBUGGING       // In debug mode
 //#include "Config.h"
-//#include "Macros.h"
 //#undef SUPPRESS_LOGGING
 
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
@@ -39,13 +38,12 @@ string simulation_name = "Test GenComp units without using a bus";
 
 int sc_main(int argc, char* argv[]) {
     // We rely on the default clearing of the values of time benchmarking
-    chrono::steady_clock::time_point t =chrono::steady_clock::now(),
-            absolutestart, start;
-    std::chrono::duration< int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
+    chrono::steady_clock::time_point t, absolutestart;
+    std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
     sc_core::sc_time SC_t, SC_x, SC_s;
     BENCHMARK_TIME_RESET(&t,&x,&s);
-    absolutestart = t; start = absolutestart;
-    sc_core::sc_report_handler::set_actions( "/IEEE_Std_1666/deprecated",
+    SC_BENCHMARK_TIME_RESET(&SC_t,&SC_x,&SC_s);
+     sc_core::sc_report_handler::set_actions( "/IEEE_Std_1666/deprecated",
                                                sc_core::SC_DO_NOTHING );
 
     BENCHMARK_TIME_BEGIN(&t,&x);
