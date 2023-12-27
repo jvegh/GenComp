@@ -15,8 +15,9 @@
 /** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
-#include "scAbstractGenComp_PU.h"
+
 #include "BioGenCompStates.h"
+#include "scAbstractGenComp_PU.h"
 
 #define BIO_HEARTBEAT_TIME sc_core::sc_time(10,SC_US)
 
@@ -124,8 +125,6 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
      * Generate
      */
     virtual void Heartbeat();
-private:
-    vector<int32_t> Inputs; // Stores reference to input source
   };// of class scBioGenComp_PU
 /** @}*/
 

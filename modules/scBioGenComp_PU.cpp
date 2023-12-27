@@ -46,11 +46,11 @@ scBioGenComp_PU(sc_core::sc_module_name nm):
 void scBioGenComp_PU::
     Initialize_method(void)
 {
-            DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
+            DEBUG_SC_EVENT_LOCAL(">>>   ");
     MachineState->Initialize(this);   // Change status to 'Initial'
     Initialize(); // Initialize the unit, HW and temporary variables
     // Put PU in its default state
-            DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
+            DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 
 /* The local neurons keep their local time
@@ -70,9 +70,9 @@ void scBioGenComp_PU::
 void scBioGenComp_PU::
     InputReceived_method()
 {
-            DEBUG_SC_LOCAL_EVENT(">>>   ", mLocalTimeBase, "Input");
+            DEBUG_SC_EVENT_LOCAL(">>>  Input");
     MachineState->InputReceived(this);
-            DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase, "Input");
+            DEBUG_SC_EVENT_LOCAL("<<<   Input");
 }
 
 
@@ -83,27 +83,32 @@ void scBioGenComp_PU::
 void scBioGenComp_PU::
     ReceiveInput(void)
 {
-           // DEBUG_SC_LOCAL_EVENT(">>>   ", mLocalTimeBase, Inputs.size());
+           // DEBUG_SC_EVENT_LOCAL(">>>   ", mLocalTimeBase, Inputs.size());
     Inputs.push_back(Inputs.size()); // TEMPORARY, Just store the index
-    if(1 == Inputs.size())
+    if(1 == NoOfInputsReceived_Get())
     {   // Start the HeartBeat processing instantly
         StateFlag_Set(gcsm_Processing);
         EVENT_GenComp.HeartBeat.notify(SC_ZERO_TIME);
-            DEBUG_SC_LOCAL_EVENT("",mLocalTimeBase,"SENT    EVENT_GenComp.HeartBeat with zero");
+            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with zero");
         EVENT_GenComp.Begin_Computing.notify(SC_ZERO_TIME);
             scLocalTime_Set();      // The clock is synchronized to the beginning of processing
     }
-    // DEBUG_SC_LOCAL_EVENT("<<<   ", mLocalTimeBase, Inputs.size());
+    // DEBUG_SC_EVENT_LOCAL("<<<   ", mLocalTimeBase, Inputs.size());
 }
 
 void scBioGenComp_PU::
     Heartbeat_method()
 {
+    sc_process_handle h2 = sc_get_current_process_handle(); // Returns a handle to process Run
+    if (h2.proc_kind() == SC_METHOD_PROC_)
+    {
+
+    }
     Heartbeat();    // Calculate the state at the new time
     if (scLocalTime_Get() < sc_time(50,SC_US))
     {   // We are still processing
         EVENT_GenComp.HeartBeat.notify(BIO_HEARTBEAT_TIME);
-            DEBUG_SC_LOCAL_EVENT("",mLocalTimeBase,"SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
+            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else
     {   // We are finishing processing
@@ -111,7 +116,7 @@ void scBioGenComp_PU::
             MachineState->Deliver(this);
 
     }
-             DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
+             DEBUG_SC_EVENT_LOCAL("<<<   ");
 
 }
 // The state of the biological computing is re-calculated (as the simulation time passes)
@@ -120,14 +125,14 @@ void scBioGenComp_PU::
 void scBioGenComp_PU::
     Heartbeat()
 {
-            DEBUG_SC_LOCAL_EVENT("   ---",mLocalTimeBase,"");
+            DEBUG_SC_EVENT_LOCAL("   ---");
 }
 
 
 void scBioGenComp_PU::
     Deliver()
 {   // The state machine ensures that we are in phases either 'Processing' or 'Delivering'
-            DEBUG_SC_LOCAL_EVENT("   ---",mLocalTimeBase,"");
+            DEBUG_SC_EVENT_LOCAL("   ---");
             DEBUG_SC_EVENT("...   ");
             DEBUG_SC_PRINT("Test again");
     if(gcsm_Processing == StateFlag_Get())

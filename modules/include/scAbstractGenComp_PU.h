@@ -19,7 +19,7 @@
 
 #include <systemc>
 using namespace sc_core; using namespace sc_dt;
- using namespace std;
+using namespace std;
 static vector<AbstractGenCompState*> AbsPU_StateVector;
 
 
@@ -162,6 +162,8 @@ class scAbstractGenComp_PU: public sc_core::sc_module
      * @param T The beginning of the simulated time of the recent operation
      */
     void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
+    sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
+     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
   protected:
     AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
     /**
@@ -169,9 +171,9 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     */
     virtual void Initialize();
     GenCompStateMachineType_t mStateFlag;    ///< preserves last state
-    int32_t mNoOfInputsReceived;
-    int32_t mNoOfInputsNeeded;
+     int32_t mNoOfInputsNeeded;
     sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
+    vector<int32_t> Inputs; // Stores reference to input source
  };// of class scAbstractGenComp_PU
 
 /** @}*/

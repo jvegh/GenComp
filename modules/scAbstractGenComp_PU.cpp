@@ -69,50 +69,50 @@ scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     Initialize_method(void)
 {
-            DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
+            DEBUG_SC_EVENT_LOCAL(">>>   ");
     MachineState->Initialize(this);   // Change status to 'Ready'
     Initialize(); // Initialize the unit, HW and temporary variables
     // Put PU in its default state
-            DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
+            DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 
 
 void scAbstractGenComp_PU::
     InputReceived_method(void)
 {
-    DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL(">>>   ");
     MachineState->InputReceived(this);
     // The input is legal, continue receiving it
     ReceiveInput();
-    DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
 void scAbstractGenComp_PU::
     ReceiveInput(void)
 {
-            DEBUG_SC_LOCAL_EVENT("   >>>", mLocalTimeBase, "");
-    mNoOfInputsReceived++;
+            DEBUG_SC_EVENT_LOCAL("   >>>");
+    Inputs.push_back(NoOfInputsReceived_Get());
 }
 
 
 void scAbstractGenComp_PU::
     Deliver()
 {
-    DEBUG_SC_LOCAL_EVENT("   >>>",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL("   >>>");
     if(gcsm_Processing == StateFlag_Get())
     {   // We are at the end of Processing phase, the phase 'Delivering' follows
-            DEBUG_SC_LOCAL_EVENT("   >>>", mLocalTimeBase, "");
+            DEBUG_SC_EVENT_LOCAL("   >>>");
             StateFlag_Set(gcsm_Delivering);    // Now delivering
     }
     else
     {   // We are at the end of phase 'Delivering'
 //            next_trigger(EVENT_GenComp.Relax);
-            DEBUG_SC_LOCAL_EVENT("   >>>", mLocalTimeBase, "");
-            DEBUG_SC_LOCAL_EVENT("", mLocalTimeBase, "SENT EVENT_GenComp.Relax");
+            DEBUG_SC_EVENT_LOCAL("   >>>");
+            DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.Relax");
             EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
     }
-    DEBUG_SC_LOCAL_EVENT("   <<<",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL("   <<<");
 }
 
 void scAbstractGenComp_PU::
@@ -154,14 +154,14 @@ void scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     Fail_method(void)
 {
-    DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL(">>>   ");
     MachineState->Fail(this);   // Change status to 'Initial'
-    DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 void scAbstractGenComp_PU::
     Fail(void)
 {
-    DEBUG_SC_LOCAL_EVENT("   ---",mLocalTimeBase,"");
+    DEBUG_SC_EVENT_LOCAL("   ---");
 }
 
 /*
@@ -170,6 +170,6 @@ void scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     Initialize(void)
 {
-    mNoOfInputsReceived = 0;
-}
+    Inputs.clear();
+ }
 

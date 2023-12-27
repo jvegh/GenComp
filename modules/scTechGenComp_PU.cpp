@@ -42,11 +42,11 @@ scTechGenComp_PU::
 void scTechGenComp_PU::
     Initialize_method(void)
 {
-        DEBUG_SC_LOCAL_EVENT(">>>   ",mLocalTimeBase,"Intializing");
+        DEBUG_SC_EVENT_LOCAL(">>>   Intializing");
         scAbstractGenComp_PU::Initialize_method();
         MachineState->Initialize(this);   // Change status to 'Initial'
         Initialize(); // Initialize the unit, HW and temporary variables
         // Put PU in its default state
-        DEBUG_SC_LOCAL_EVENT("<<<   ",mLocalTimeBase,"Intializing");
+        DEBUG_SC_EVENT_LOCAL("<<<   Intializing");
 }
 
