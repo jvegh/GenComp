@@ -26,6 +26,7 @@ AbstractGenCompState* TheAbstractGenCompState;
 scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
     ,mLocalTimeBase(sc_core::SC_ZERO_TIME)
+    ,mGenCompPUOperatingBits(gcob_ObserveModule)
 {
         if(!TheAbstractGenCompState)
             TheAbstractGenCompState = new AbstractGenCompState();
@@ -80,6 +81,8 @@ void scAbstractGenComp_PU::
 void scAbstractGenComp_PU::
     InputReceived_method(void)
 {
+    if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
+        DEBUG_SC_PRINT_LOCAL ("Input observed");
     DEBUG_SC_EVENT_LOCAL(">>>   ");
     MachineState->InputReceived(this);
     // The input is legal, continue receiving it

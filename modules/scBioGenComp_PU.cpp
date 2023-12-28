@@ -99,11 +99,13 @@ void scBioGenComp_PU::
 void scBioGenComp_PU::
     Heartbeat_method()
 {
-    sc_process_handle h2 = sc_get_current_process_handle(); // Returns a handle to process Run
-    if (h2.proc_kind() == SC_METHOD_PROC_)
-    {
+    if(OperatingBit_Get(gcob_ObserveModule) & OperatingBit_Get(gcob_ObserveInput))
+        DEBUG_SC_PRINT_LOCAL ("Input observed");
 
-    }
+    DEBUG_SC_EVENT_LOCAL("RCVD   EVENT_GenComp.HeartBeat");
+    sc_process_handle h2 = sc_get_current_process_handle(); // Returns a handle to process Run
+    sc_object* parent = dynamic_cast<scBioGenComp_PU*>(h2.get_parent_object());
+            DEBUG_SC_PRINT_LOCAL(parent->name());
     Heartbeat();    // Calculate the state at the new time
     if (scLocalTime_Get() < sc_time(50,SC_US))
     {   // We are still processing
@@ -116,8 +118,7 @@ void scBioGenComp_PU::
             MachineState->Deliver(this);
 
     }
-             DEBUG_SC_EVENT_LOCAL("<<<   ");
-
+ //            DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 // The state of the biological computing is re-calculated (as the simulation time passes)
 //
@@ -126,6 +127,9 @@ void scBioGenComp_PU::
     Heartbeat()
 {
             DEBUG_SC_EVENT_LOCAL("   ---");
+    sc_process_handle h2 = sc_get_current_process_handle(); // Returns a handle to process Run
+    sc_object* parent = dynamic_cast<scBioGenComp_PU*>(h2.get_parent_object());
+    DEBUG_SC_PRINT_LOCAL(parent->name());
 }
 
 

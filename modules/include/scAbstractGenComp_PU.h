@@ -18,6 +18,7 @@
 #include "GenCompStates.h"
 
 #include <systemc>
+#include <bitset>
 using namespace sc_core; using namespace sc_dt;
 using namespace std;
 static vector<AbstractGenCompState*> AbsPU_StateVector;
@@ -55,6 +56,21 @@ static vector<AbstractGenCompState*> AbsPU_StateVector;
  */
 #endif //SCTECHGENCOMP_H
 #endif //SCBIOGENCOMP_H
+
+/*! \var typedef GenCompPUOperatingBits_t
+ * \brief the names of the bits in the bitset describing scAbstractGenComp_PU
+ */
+typedef enum
+{
+    gcob_ObserveModule,   ///< The scAbstractGenComp_PU is observed (by the simulator)
+    gcob_ObserveBeginComputing,  ///< Watch 'Begin Computing'
+    gcob_ObserveEndComputing,
+    gcob_ObserveHeartbeat,      ///< Observe 'Heartbeat's of the PU
+    gcob_ObserveInput,      ///< Observe 'Heartbeat's of the PU
+    gcob_Max        // just maintains the number of bits used
+} GenCompPUOperatingBits_t;
+
+
 class scAbstractGenComp_PU: public sc_core::sc_module
 {
     friend class AbstractGenCompState;
@@ -163,8 +179,30 @@ class scAbstractGenComp_PU: public sc_core::sc_module
      */
     void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
     sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
-     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
-  protected:
+    size_t NoOfInputsReceived_Get(){ return Inputs.size();}
+     /*!
+     * \brief Set an operating bit for this scAbstractGenComp_PU
+     * \param B is the bit to set
+     * \param V is the requested value of the bit
+     */
+    void OperatingBit_Set(GenCompPUOperatingBits_t B, bool V)
+     {
+        assert(B < gcob_Max);
+        mGenCompPUOperatingBits[B] = V;
+    }
+
+     /*!
+     * \brief Set an operating bit for this scAbstractGenComp_PU
+     * \param B is the bit to set
+     * \return is the requested value of the bit
+     */
+     bool OperatingBit_Get(GenCompPUOperatingBits_t B)
+     {
+         assert(B < gcob_Max);
+         return mGenCompPUOperatingBits[B];
+     }
+     void GetData(int32_t &A){ A = 1234;}
+   protected:
     AbstractGenCompState* MachineState;     ///< Points to the service object of the state machine
     /**
      * @brief Puts the PU to its default state (just the HW).
@@ -174,6 +212,9 @@ class scAbstractGenComp_PU: public sc_core::sc_module
      int32_t mNoOfInputsNeeded;
     sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
     vector<int32_t> Inputs; // Stores reference to input source
+private:
+    bitset<gcob_Max>
+        mGenCompPUOperatingBits;   ///< The bits of the GenComp_PU state
  };// of class scAbstractGenComp_PU
 
 /** @}*/
