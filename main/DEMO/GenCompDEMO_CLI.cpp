@@ -37,83 +37,18 @@
 //??string ListOfIniFiles;
 
 #include "scBioGenComp_PU.h"
-
-class scSimulator : public sc_core::sc_module
-{
- public:
-    SC_HAS_PROCESS(scSimulator);
-     scSimulator(sc_core::sc_module_name nm);
-    /**
-     * @brief Run until the next simulated event
-     * @return
-     */
-    bool Run();
-     /**
-      * @brief Register
-      * @param Module the activity of which must be watched
-      */
-    void Register(scBioGenComp_PU* Module);
-    /**
-     * @brief scLocalTime_Set
-     * @param T The beginning of the simulated time of the recent operation
-     */
-    void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
-    sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
-    bool HasMoreToDo(void){ return mMoreEvents;}
-    void Update();
-protected:
-    sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
-    bool mMoreEvents; ///< If we have more events to simulate
-    vector<scAbstractGenComp_PU*> mWatchedModules;   /// Store the registered objects here
-    };
-
-
-scSimulator::scSimulator(sc_core::sc_module_name nm)
-    : sc_core::sc_module( nm)
-    ,mLocalTimeBase(sc_core::SC_ZERO_TIME)
-    ,mMoreEvents(false)
-{
-}
-
-bool scSimulator::Run()
-{
-    // We are in the process of simulating
-    // Run up to the next activity}
-    sc_start( sc_time_to_pending_activity() );
-    // Be sure there is no processing
-    sc_pause();
-    int32_t AA = -12;
-    mWatchedModules[0]->GetData(AA);
-    mMoreEvents = sc_pending_activity();
-    DEBUG_SC_PRINT(" Running continues= " << mMoreEvents);
-    return mMoreEvents;
-}
-
-// Register only already created modules !!!
-void scSimulator::Register(scBioGenComp_PU* Module)
-{
-    scAbstractGenComp_PU* Valid = dynamic_cast<scAbstractGenComp_PU*>(Module);
-    if(!Valid) return;    // Attempting to regisster something wrong
-    mWatchedModules.push_back(Module);
-    DEBUG_SC_PRINT("Module " << Module->name() << " registered");
-}
-
-void  scSimulator::Update(void)
-{
-    int32_t AA = 0;
-    mWatchedModules[0]->GetData(AA);
-}
+#include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStates[];   // Just for debugging
 
-class scDemoBioGenComp_PU : public scBioGenComp_PU
+class scGenComp_PUBioDemo : public scBioGenComp_PU
 {
 public:
-    scDemoBioGenComp_PU(sc_core::sc_module_name nm):
+    scGenComp_PUBioDemo(sc_core::sc_module_name nm):
         scBioGenComp_PU(nm)
     {
-        typedef scDemoBioGenComp_PU SC_CURRENT_USER_MODULE;
+        typedef scGenComp_PUBioDemo SC_CURRENT_USER_MODULE;
         SC_THREAD(PrintState);
 //        sensitive << scPrintEvent;
         // dont_initialize(); // Allow calling it at start
@@ -145,29 +80,31 @@ public:
     }
 };
 
+scGenComp_PUBioDemo* MyBio;
+scGenComp_Simulator* MySimulator;
+
 // Prepare sxXXX modules and instantiate them
-scDemoBioGenComp_PU* MyBio;
-scSimulator* MySimulator;
 int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
 {
     switch(ObjectSelector)
     {
-        case 0: MyBio = new scDemoBioGenComp_PU("MyBio"); break;
+        case 0: MyBio = new scGenComp_PUBioDemo("MyBio"); break;
         default:
         {
-            MyBio = new scDemoBioGenComp_PU("MyBio");
+            MyBio = new scGenComp_PUBioDemo("MyBio");
         }; break;
     }
     return 0;
 }
-
 
 bool UNIT_TESTING = false; // Used internally for debugging
 //QTextEdit *Simulator_LogWindow = 0; // By default and for CLI, we have no QTextEdit
 
 // Using sc_main() is mandatory for using SystemC; equivalent with main()
 int sc_main(int argc, char* argv[])
-{ 
+{
+    bool UseSimulator = false;   // Can use either scGenComp_Simulator or stand-alone unit operating modes
+    int returnValue=0;
     // We rely on the default clearing of the values of time benchmarking
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
@@ -181,9 +118,6 @@ int sc_main(int argc, char* argv[])
 
     // Do whatever setup you will need for your program here
     //
-
-    bool UseSimulator = true;
-    int returnValue=0;
     // You may use your object without a frame (without using a simulator)
     // Just prepare your sc_modules in a wrapper; the functionality is defined in its Initialize method
      // ------Make anything before starting
@@ -197,10 +131,10 @@ int sc_main(int argc, char* argv[])
     }
     else
     {// Create a simulator
+        MySimulator = new scGenComp_Simulator("MySim");
         // Must be created before registering
-        MyBio = new scDemoBioGenComp_PU("MyBio");
-        MySimulator = new scSimulator("MySim");
-        MySimulator->Register(MyBio);
+        MyBio = new scGenComp_PUBioDemo("MyBio");
+        MySimulator->RegisterPU(MyBio);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
@@ -234,7 +168,12 @@ int sc_main(int argc, char* argv[])
         std::cerr << ", error code " << returnValue << endl;
     else
         std::cerr << " with no error"  << endl;
-    std::cerr  << "GenComp/DEMO simulation " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+    if(UseSimulator)
+        std::cerr  << "GenComp/DEMO by scGenComp_Simulator " << MySimulator->Time_Get().count()/1000/1000. << " msec CLOCK time" << "//"
+                   <<  sc_time_String_Get(SC_TIME_UNIT_DEFAULT,MySimulator->scTime_Get()) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+    else
+        std::cerr  << "GenComp/DEMO simulation " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s)
+                   << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     return(returnValue);
 }
 
