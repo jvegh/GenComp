@@ -13,7 +13,6 @@
 //#include <QTextEdit>
 //extern QTextEdit *Simulator_LogWindow; // By default and for CLI, we have no QTextEdit
 
-
 #include <systemc>
 #include <chrono>
 #include "Project.h"
@@ -41,7 +40,7 @@
 
 class scSimulator : public sc_core::sc_module
 {
-public:
+ public:
     SC_HAS_PROCESS(scSimulator);
      scSimulator(sc_core::sc_module_name nm);
     /**
@@ -53,7 +52,7 @@ public:
       * @brief Register
       * @param Module the activity of which must be watched
       */
-    void Register(sc_core::sc_module* Module);
+    void Register(scBioGenComp_PU* Module);
     /**
      * @brief scLocalTime_Set
      * @param T The beginning of the simulated time of the recent operation
@@ -61,11 +60,12 @@ public:
     void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
     sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
     bool HasMoreToDo(void){ return mMoreEvents;}
+    void Update();
 protected:
     sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
     bool mMoreEvents; ///< If we have more events to simulate
-    vector<sc_core::sc_module*> mWatchedModules;   /// Store the registered objects here
-};
+    vector<scAbstractGenComp_PU*> mWatchedModules;   /// Store the registered objects here
+    };
 
 
 scSimulator::scSimulator(sc_core::sc_module_name nm)
@@ -78,33 +78,31 @@ scSimulator::scSimulator(sc_core::sc_module_name nm)
 bool scSimulator::Run()
 {
     // We are in the process of simulating
-    sc_process_handle T1 =  sc_get_current_process_handle();
-    sc_object* P1 = T1.get_parent_object();
-    sc_core::sc_time MyT = sc_time_to_pending_activity() ;
-    DEBUG_SC_PRINT("Next time =" << MyT);
-    sc_start( sc_time_to_pending_activity() );     // Run up to the next activity}
-    sc_process_handle T =  sc_get_current_process_handle();
-    sc_object* P = T.get_parent_object();
-    if(P)
-    {
-    DEBUG_SC_PRINT(" handle of process '" << P->name() << "' received");
-    }
-    else
-    {
-        DEBUG_SC_PRINT(" Invalid process handle received");
-    }
+    // Run up to the next activity}
+    sc_start( sc_time_to_pending_activity() );
+    // Be sure there is no processing
+    sc_pause();
+    int32_t AA = -12;
+    mWatchedModules[0]->GetData(AA);
     mMoreEvents = sc_pending_activity();
     DEBUG_SC_PRINT(" Running continues= " << mMoreEvents);
     return mMoreEvents;
 }
 
 // Register only already created modules !!!
-void scSimulator::Register(sc_core::sc_module* Module)
+void scSimulator::Register(scBioGenComp_PU* Module)
 {
+    scAbstractGenComp_PU* Valid = dynamic_cast<scAbstractGenComp_PU*>(Module);
+    if(!Valid) return;    // Attempting to regisster something wrong
     mWatchedModules.push_back(Module);
     DEBUG_SC_PRINT("Module " << Module->name() << " registered");
 }
 
+void  scSimulator::Update(void)
+{
+    int32_t AA = 0;
+    mWatchedModules[0]->GetData(AA);
+}
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStates[];   // Just for debugging
@@ -157,7 +155,7 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
         case 0: MyBio = new scDemoBioGenComp_PU("MyBio"); break;
         default:
         {
-            MyBio = new scDemoBioGenComp_PU("MyBioAll");
+            MyBio = new scDemoBioGenComp_PU("MyBio");
         }; break;
     }
     return 0;
