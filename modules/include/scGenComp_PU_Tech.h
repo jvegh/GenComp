@@ -1,4 +1,4 @@
-/** @file scTechGenComp_PU.h
+/** @file scGenComp_PU_Tech.h
  *  @ingroup GENCOMP_MODULE_PROCESS
 
  *  @brief Function prototypes for the computing module
@@ -15,12 +15,12 @@
 /** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
-#include "scAbstractGenComp_PU.h"
+#include "scGenComp_PU_Abstract.h"
 #include "TechGenCompStates.h"
 static vector<AbstractGenCompState*> TechPU_StateVector;
 
 /* !
- * \class scTechGenComp_PU
+ * \class scGenComp_PU_Tech
  * \brief  A simple abstract class to deal with the operation using states of a general computing unit
  *
  * Operating principle of event processing:
@@ -49,12 +49,12 @@ static vector<AbstractGenCompState*> TechPU_StateVector;
 
 
 /*!
- * \class scTechGenComp_PU
+ * \class scGenComp_PU_Tech
  * \brief  Implements a general technical-type computing
  *
  * The technical PUs need all arguments at the beginning
  */
-class scTechGenComp_PU : public scAbstractGenComp_PU
+class scGenComp_PU_Tech : public scGenComp_PU_Abstract
 {
   public:
     /*!
@@ -64,8 +64,8 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
      *
      */
 
-    scTechGenComp_PU(sc_core::sc_module_name nm, int32_t No);
-    virtual ~scTechGenComp_PU(); // Must be overridden
+    scGenComp_PU_Tech(sc_core::sc_module_name nm, int32_t No);
+    virtual ~scGenComp_PU_Tech(); // Must be overridden
     virtual void Initialize_method();
     /**
       * @brief Check if we can begin processing
@@ -75,7 +75,7 @@ class scTechGenComp_PU : public scAbstractGenComp_PU
 
   protected:
     int32_t mNoOfArgs;    // The number of args before computation can start
- };// of class scTechGenComp_PU
+ };// of class scGenComp_PU_Tech
 
 /** @}*/
 

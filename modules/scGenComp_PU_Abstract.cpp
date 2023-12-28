@@ -1,4 +1,4 @@
-/** @file scAbstractGenComp_PU.cpp
+/** @file scGenComp_PU_Abstract.cpp
  *  @ingroup GENCOMP_MODULE_PROCESS
  *  @brief  The abstract processing unit for generalized computing
  */
@@ -16,14 +16,14 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in un
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 
 #include "DebugMacros.h"
-#include "scAbstractGenComp_PU.h"
+#include "scGenComp_PU_Abstract.h"
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 
 AbstractGenCompState* TheAbstractGenCompState;
-    scAbstractGenComp_PU::
-scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
+    scGenComp_PU_Abstract::
+scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
     ,mLocalTimeBase(sc_core::SC_ZERO_TIME)
     ,mGenCompPUOperatingBits(gcob_ObserveModule)
@@ -31,7 +31,7 @@ scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
         if(!TheAbstractGenCompState)
             TheAbstractGenCompState = new AbstractGenCompState();
         MachineState = TheAbstractGenCompState;
-    typedef scAbstractGenComp_PU SC_CURRENT_USER_MODULE;
+    typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
     // Intialize the module with generating an event
     SC_METHOD(Initialize_method);
     sensitive << EVENT_GenComp.Initialize;
@@ -61,13 +61,13 @@ scAbstractGenComp_PU(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     sensitive << EVENT_GenComp.Synchronize;
     dont_initialize();
  }
-scAbstractGenComp_PU::
-~scAbstractGenComp_PU(void)
+scGenComp_PU_Abstract::
+~scGenComp_PU_Abstract(void)
 {
 }
 
 // Puts the PU in its default state
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Initialize_method(void)
 {
             DEBUG_SC_EVENT_LOCAL(">>>   ");
@@ -78,7 +78,7 @@ void scAbstractGenComp_PU::
 }
 
 
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
@@ -91,7 +91,7 @@ void scAbstractGenComp_PU::
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     ReceiveInput(void)
 {
             DEBUG_SC_EVENT_LOCAL("   >>>");
@@ -99,7 +99,7 @@ void scAbstractGenComp_PU::
 }
 
 
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Deliver()
 {
     DEBUG_SC_EVENT_LOCAL("   >>>");
@@ -118,13 +118,13 @@ void scAbstractGenComp_PU::
     DEBUG_SC_EVENT_LOCAL("   <<<");
 }
 
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
    Relax_method(void)
 {
     //    MachineState->Sleep();   // Change status to 'Initial'
 }
 
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Synchronize_method(void)
 {
     //    MachineState->Sleep();   // Change status to 'Initial'
@@ -132,36 +132,36 @@ void scAbstractGenComp_PU::
 
 
 #ifdef USE_PU_HWSLEEPING
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Sleep_method(void)
 {
     MachineState->Sleep(this);   // Change status to 'Ready'
 }
 
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Wakeup_method(void)
 {
     MachineState->Wakeup(this);   // Change status to 'Ready'
 }
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Wakeup(void)
 {
 // Make actual waking-up
 // Ends with issuing event 'Awaken'
 }
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Clock_method(void)
 {
 }
 #endif // USE_PU_HWSLEEPING
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Fail_method(void)
 {
     DEBUG_SC_EVENT_LOCAL(">>>   ");
     MachineState->Fail(this);   // Change status to 'Initial'
     DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Fail(void)
 {
     DEBUG_SC_EVENT_LOCAL("   ---");
@@ -170,7 +170,7 @@ void scAbstractGenComp_PU::
 /*
  * Initialize the GenComp unit
  */
-void scAbstractGenComp_PU::
+void scGenComp_PU_Abstract::
     Initialize(void)
 {
     Inputs.clear();

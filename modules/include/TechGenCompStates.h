@@ -11,11 +11,11 @@
 
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
 // must not be taken as in SystemC no new electronic module can be created.
-// So, scTechGenComp_PU handles the events and calls the corresponding
+// So, scGenComp_PU_Tech handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
 #include "GenCompStates.h"
-class scTechGenComp_PU;
+class scGenComp_PU_Tech;
 
 // This define in only temporarily here,  should go to HWConfig.h
 #define USE_PU_HWSLEEPING
@@ -105,17 +105,17 @@ class TechGenCompState: public AbstractGenCompState
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
          */
-        virtual void Deliver(scTechGenComp_PU *PU);
+        virtual void Deliver(scGenComp_PU_Tech *PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
          */
-        virtual void Process(scTechGenComp_PU *PU);
+        virtual void Process(scGenComp_PU_Tech *PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          */
-        virtual void Relax(scTechGenComp_PU *PU);
+        virtual void Relax(scGenComp_PU_Tech *PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
@@ -123,7 +123,7 @@ class TechGenCompState: public AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void Initialize(scTechGenComp_PU* PU);
+        virtual void Initialize(scGenComp_PU_Tech* PU);
 
         /**
          * @brief InputReceived: The machine received new input, administer it
@@ -131,38 +131,38 @@ class TechGenCompState: public AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void InputReceived(scTechGenComp_PU* PU);
+        virtual void InputReceived(scGenComp_PU_Tech* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          */
-        virtual void Synchronize(scTechGenComp_PU *PU);
+        virtual void Synchronize(scGenComp_PU_Tech *PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
          * @param PU The HW that failed
          */
-        virtual void Fail(scTechGenComp_PU* PU);
-        void State_Set(scTechGenComp_PU* PU, GenCompStateMachineType_t& State);
+        virtual void Fail(scGenComp_PU_Tech* PU);
+        void State_Set(scGenComp_PU_Tech* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
          * @param PU The HW to set
          */
-        virtual void Sleep(scTechGenComp_PU *PU);
+        virtual void Sleep(scGenComp_PU_Tech *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          */
-        virtual void Wakeup(scTechGenComp_PU *PU);
+        virtual void Wakeup(scGenComp_PU_Tech *PU);
         /**
          * @brief State_Set Set the state of PU to st
          * @param PU The HW to set
          */
 #endif // USE_PU_HWSLEEPING
     protected:
-        void UpdatePU(scTechGenComp_PU& PU);
+        void UpdatePU(scGenComp_PU_Tech& PU);
     private:
  };
 

@@ -7,7 +7,7 @@
  *  @bug No known bugs.
 */
 
-#include "scBioGenComp_PU.h"
+#include "scGenComp_PU_Bio.h"
 #include "GenCompStates.h"
 
 // This section configures debug and log printing
@@ -34,40 +34,40 @@ BioGenCompState::
 
 // Overload if want to use "dormant" state
    void BioGenCompState::
-Wakeup(scBioGenComp_PU *PU)
+Wakeup(scGenComp_PU_Bio *PU)
 {
  //   State_Set(machine, new ReadyGenCompState(name()));
  //   machine.WakeUp();
 }
 
     void BioGenCompState::
-Deliver(scBioGenComp_PU *PU)
+Deliver(scGenComp_PU_Bio *PU)
 {
 }
 
 // Put the PU electronics to low-power mode
 // Must come from 'Ready' state; otherwise fail
     void BioGenCompState::
-Sleep(scBioGenComp_PU* PU)
+Sleep(scGenComp_PU_Bio* PU)
 {
     assert(gcsm_Sleeping != PU->StateFlag_Get());
     PU->StateFlag_Set(gcsm_Sleeping);
 }
 
     void BioGenCompState::
-Process(scBioGenComp_PU* PU)
+Process(scGenComp_PU_Bio* PU)
 {
 //    State_Set(machine, new ProcessingGenCompState(name()));
 }
 
     void BioGenCompState::
-Relax(scBioGenComp_PU* PU)
+Relax(scGenComp_PU_Bio* PU)
 {
 
 // Although a method thread, is invoked from the constructor
 }
     void BioGenCompState::
-Initialize(scBioGenComp_PU* PU)
+Initialize(scGenComp_PU_Bio* PU)
 {
     PU->StateFlag_Set(gcsm_Ready);
 }
@@ -77,7 +77,7 @@ Initialize(scBioGenComp_PU* PU)
  *  Input can be received only in 'Ready' and 'Processing' states
  */
 void BioGenCompState::
-    InputReceived(scBioGenComp_PU* PU)
+    InputReceived(scGenComp_PU_Bio* PU)
 {
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
     {   // Inputs are received only in 'processing' mode, otherwise we neglect it
@@ -93,13 +93,13 @@ void BioGenCompState::
 
 
 void BioGenCompState::
-    Synchronize(scBioGenComp_PU* PU)
+    Synchronize(scGenComp_PU_Bio* PU)
 {
 }
 
 //Can happen only in Processing state; passes to Relaxing state
     void BioGenCompState::
-Fail(scBioGenComp_PU* PU)
+Fail(scGenComp_PU_Bio* PU)
 {
     if(gcsm_Processing== PU->StateFlag_Get())
         PU->Fail();
@@ -108,7 +108,7 @@ Fail(scBioGenComp_PU* PU)
 }
 
     void BioGenCompState::
-State_Set(scBioGenComp_PU* PU, GenCompStateMachineType_t& State)
+State_Set(scGenComp_PU_Bio* PU, GenCompStateMachineType_t& State)
 {
     PU-> StateFlag_Set( State);
 }

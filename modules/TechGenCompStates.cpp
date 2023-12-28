@@ -7,7 +7,7 @@
  *  @bug No known bugs.
 */
 
-#include "scTechGenComp_PU.h"
+#include "scGenComp_PU_Tech.h"
 
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
@@ -32,39 +32,39 @@ TechGenCompState::
 
 // Overload if want to use "dormant" state
    void TechGenCompState::
-Wakeup(scTechGenComp_PU *PU)
+Wakeup(scGenComp_PU_Tech *PU)
 {
 }
 
     void TechGenCompState::
-Deliver(scTechGenComp_PU *PU)
+Deliver(scGenComp_PU_Tech *PU)
 {
 }
 
 // Put the PU electronics to low-power mode
 // Must come from 'Ready' state; otherwise fail
     void TechGenCompState::
-Sleep(scTechGenComp_PU* PU)
+Sleep(scGenComp_PU_Tech* PU)
 {
     assert(gcsm_Sleeping != PU->StateFlag_Get());
     PU->StateFlag_Set(gcsm_Sleeping);
 }
 
     void TechGenCompState::
-Process(scTechGenComp_PU* PU)
+Process(scGenComp_PU_Tech* PU)
 {
 //    State_Set(machine, new ProcessingGenCompState(name()));
 }
 
     void TechGenCompState::
-Relax(scTechGenComp_PU* PU)
+Relax(scGenComp_PU_Tech* PU)
 {
 
     }
 
 // Although a method thread, is invoked from the constructor
     void TechGenCompState::
-Initialize(scTechGenComp_PU* PU)
+Initialize(scGenComp_PU_Tech* PU)
 {
     PU-> StateFlag_Set(gcsm_Ready);
 }
@@ -74,7 +74,7 @@ Initialize(scTechGenComp_PU* PU)
  *  Input can be received only in 'Ready' and 'Processing' states
  */
 void TechGenCompState::
-    InputReceived(scTechGenComp_PU* PU)
+    InputReceived(scGenComp_PU_Tech* PU)
 {
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
         PU->ReceiveInput();
@@ -83,13 +83,13 @@ void TechGenCompState::
 
 
 void TechGenCompState::
-    Synchronize(scTechGenComp_PU* PU)
+    Synchronize(scGenComp_PU_Tech* PU)
 {
 }
 
 //Can happen only in Processing state; passes to Relaxing state
     void TechGenCompState::
-Fail(scTechGenComp_PU* PU)
+Fail(scGenComp_PU_Tech* PU)
 {
     if(gcsm_Processing== PU->StateFlag_Get())
         PU->Fail();
@@ -98,7 +98,7 @@ Fail(scTechGenComp_PU* PU)
 }
 
     void TechGenCompState::
-State_Set(scTechGenComp_PU* PU, GenCompStateMachineType_t& State)
+State_Set(scGenComp_PU_Tech* PU, GenCompStateMachineType_t& State)
 {
     PU-> StateFlag_Set( State );
 }

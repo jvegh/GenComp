@@ -1,4 +1,4 @@
-/** @file scBioGenComp_PU.cpp
+/** @file scGenComp_PU_Bio.cpp
  *  @ingroup GENCOMP_MODULE_PROCESS
  *  @brief  The abstract processing unit for generalized computing
  */
@@ -7,7 +7,7 @@
  *  @bug No known bugs.
 */
 
-#include "scBioGenComp_PU.h"
+#include "scGenComp_PU_Bio.h"
 // This section configures debug and log printing; must be located AFTER the other includes
 //#define SUPPRESS_LOGGING // Suppress all log messages
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
@@ -21,11 +21,11 @@ static BioGenCompState *TheBioGenCompState;
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
-    scBioGenComp_PU::
-scBioGenComp_PU(sc_core::sc_module_name nm):
-    scAbstractGenComp_PU(nm)
+    scGenComp_PU_Bio::
+scGenComp_PU_Bio(sc_core::sc_module_name nm):
+    scGenComp_PU_Abstract(nm)
 {
-    typedef scBioGenComp_PU SC_CURRENT_USER_MODULE;
+    typedef scGenComp_PU_Bio SC_CURRENT_USER_MODULE;
     if(!TheBioGenCompState)
         TheBioGenCompState = new BioGenCompState(); // We need one singleton copy of state machine
     MachineState =  TheBioGenCompState;     // However, the state flag is stored per PU object
@@ -37,13 +37,13 @@ scBioGenComp_PU(sc_core::sc_module_name nm):
     dont_initialize();
 }
 
-    scBioGenComp_PU::
-~scBioGenComp_PU(void)
+    scGenComp_PU_Bio::
+~scGenComp_PU_Bio(void)
 {
 }
 
 // Puts the PU in its default state
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     Initialize_method(void)
 {
             DEBUG_SC_EVENT_LOCAL(">>>   ");
@@ -57,7 +57,7 @@ void scBioGenComp_PU::
  * A time base is set by 'Begin Computing' or 'Begin Sleeping'
  *
  */
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     Initialize(void)
 {
     mLocalTimeBase = sc_time_stamp();
@@ -67,7 +67,7 @@ void scBioGenComp_PU::
  * A spike arrived, store spike parameters;
  * If it was the first spike, issue 'Begin_Computing'
  */
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     InputReceived_method()
 {
             DEBUG_SC_EVENT_LOCAL(">>>  Input");
@@ -80,7 +80,7 @@ void scBioGenComp_PU::
  * This routine makes actual input processing, although most of the job is done in Process and Heartbeat
  * It is surely called in state 'Processing'
  */
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     ReceiveInput(void)
 {
            // DEBUG_SC_EVENT_LOCAL(">>>   ", mLocalTimeBase, Inputs.size());
@@ -96,7 +96,7 @@ void scBioGenComp_PU::
     // DEBUG_SC_EVENT_LOCAL("<<<   ", mLocalTimeBase, Inputs.size());
 }
 
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     Heartbeat_method()
 {
     if(OperatingBit_Get(gcob_ObserveModule) & OperatingBit_Get(gcob_ObserveInput))
@@ -104,7 +104,7 @@ void scBioGenComp_PU::
 
     DEBUG_SC_EVENT_LOCAL("RCVD   EVENT_GenComp.HeartBeat");
     sc_process_handle h2 = sc_get_current_process_handle(); // Returns a handle to process Run
-    sc_object* parent = dynamic_cast<scBioGenComp_PU*>(h2.get_parent_object());
+    sc_object* parent = dynamic_cast<scGenComp_PU_Bio*>(h2.get_parent_object());
             DEBUG_SC_PRINT_LOCAL(parent->name());
     Heartbeat();    // Calculate the state at the new time
     if (scLocalTime_Get() < sc_time(50,SC_US))
@@ -123,22 +123,20 @@ void scBioGenComp_PU::
 // The state of the biological computing is re-calculated (as the simulation time passes)
 //
 //
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     Heartbeat()
 {
-            DEBUG_SC_EVENT_LOCAL("   ---");
+ /*           DEBUG_SC_EVENT_LOCAL("   ---");
     sc_process_handle h2 = sc_get_current_process_handle(); // Returns a handle to process Run
-    sc_object* parent = dynamic_cast<scBioGenComp_PU*>(h2.get_parent_object());
-    DEBUG_SC_PRINT_LOCAL(parent->name());
+    sc_object* parent = dynamic_cast<scGenComp_PU_Bio*>(h2.get_parent_object());
+    DEBUG_SC_PRINT_LOCAL(parent->name());*/
 }
 
 
-void scBioGenComp_PU::
+void scGenComp_PU_Bio::
     Deliver()
 {   // The state machine ensures that we are in phases either 'Processing' or 'Delivering'
             DEBUG_SC_EVENT_LOCAL("   ---");
-            DEBUG_SC_EVENT("...   ");
-            DEBUG_SC_PRINT("Test again");
     if(gcsm_Processing == StateFlag_Get())
     {   // We are at the beginning of the 'Delivering' phase
             StateFlag_Set(gcsm_Delivering);

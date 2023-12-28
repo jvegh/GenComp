@@ -17,16 +17,12 @@
  */
 
 #include "BioGenCompStates.h"
-#include "scAbstractGenComp_PU.h"
+#include "scGenComp_PU_Abstract.h"
 
 #define BIO_HEARTBEAT_TIME sc_core::sc_time(10,SC_US)
 
-
-
-//static vector<BioGenCompState*> BioPU_StateVector;
-
 /*
- * \class scBioGenComp_PU
+ * \class scGenComp_PU_Bio
  * \brief  A simple abstract class to implement the operation of a general bio computing unit
  *
  * Operating principle of event processing:
@@ -54,11 +50,11 @@
  */
 
 /*!
- * \class scBioGenComp_PU
+ * \class scGenComp_PU_Bio
  * \brief  Implements a general biological-type computing PU
  *
  */
-class scBioGenComp_PU : public scAbstractGenComp_PU
+class scGenComp_PU_Bio : public scGenComp_PU_Abstract
 {
   public:
     /*!
@@ -68,8 +64,8 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
      * Creates an abstract biological computing unit
      */
 
-    scBioGenComp_PU(sc_core::sc_module_name nm);
-    virtual ~scBioGenComp_PU(void); // Must be overridden
+    scGenComp_PU_Bio(sc_core::sc_module_name nm);
+    virtual ~scGenComp_PU_Bio(void); // Must be overridden
     virtual void Initialize_method();
     /**
      * @brief A new spike received
@@ -125,7 +121,7 @@ class scBioGenComp_PU : public scAbstractGenComp_PU
      * Generate
      */
     virtual void Heartbeat();
-  };// of class scBioGenComp_PU
+  };// of class scGenComp_PU_Bio
 /** @}*/
 
 #endif // SCBIOGENCOMP_H

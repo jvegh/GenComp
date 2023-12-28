@@ -1,4 +1,4 @@
-/** @file scAbstractGenComp_PU.h
+/** @file scGenComp_PU_Abstract.h
  *  @ingroup GENCOMP_MODULE_PROCESS
 
  *  @brief Function prototypes for the computing module
@@ -28,7 +28,7 @@ static vector<AbstractGenCompState*> AbsPU_StateVector;
 #ifndef SCTECHGENCOMP_H // Just to exclude for Doxygen
 
 /*!
- * \class scAbstractGenComp_PU
+ * \class scGenComp_PUAbstract
  * \brief  A simple abstract class to deal  with states of a general computing unit
  *
  * Operating principle of event processing:
@@ -58,11 +58,11 @@ static vector<AbstractGenCompState*> AbsPU_StateVector;
 #endif //SCBIOGENCOMP_H
 
 /*! \var typedef GenCompPUOperatingBits_t
- * \brief the names of the bits in the bitset describing scAbstractGenComp_PU
+ * \brief the names of the bits in the bitset describing scGenComp_PU_Abstract
  */
 typedef enum
 {
-    gcob_ObserveModule,   ///< The scAbstractGenComp_PU is observed (by the simulator)
+    gcob_ObserveModule,   ///< The scGenComp_PU_Abstract is observed (by the simulator)
     gcob_ObserveBeginComputing,  ///< Watch 'Begin Computing'
     gcob_ObserveEndComputing,
     gcob_ObserveHeartbeat,      ///< Observe 'Heartbeat's of the PU
@@ -71,7 +71,7 @@ typedef enum
 } GenCompPUOperatingBits_t;
 
 
-class scAbstractGenComp_PU: public sc_core::sc_module
+class scGenComp_PU_Abstract: public sc_core::sc_module
 {
     friend class AbstractGenCompState;
   public:
@@ -81,9 +81,9 @@ class scAbstractGenComp_PU: public sc_core::sc_module
      *
      */
 
-    scAbstractGenComp_PU(sc_core::sc_module_name nm);
+    scGenComp_PU_Abstract(sc_core::sc_module_name nm);
 
-    virtual ~scAbstractGenComp_PU(void); // Must be overridden
+    virtual ~scGenComp_PU_Abstract(void); // Must be overridden
 
      /**
       * @brief The physical delivery method
@@ -181,7 +181,7 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
      /*!
-     * \brief Set an operating bit for this scAbstractGenComp_PU
+     * \brief Set an operating bit for this scGenComp_PU_Abstract
      * \param B is the bit to set
      * \param V is the requested value of the bit
      */
@@ -192,7 +192,7 @@ class scAbstractGenComp_PU: public sc_core::sc_module
     }
 
      /*!
-     * \brief Set an operating bit for this scAbstractGenComp_PU
+     * \brief Set an operating bit for this scGenComp_PU_Abstract
      * \param B is the bit to set
      * \return is the requested value of the bit
      */
@@ -215,7 +215,7 @@ class scAbstractGenComp_PU: public sc_core::sc_module
 private:
     bitset<gcob_Max>
         mGenCompPUOperatingBits;   ///< The bits of the GenComp_PU state
- };// of class scAbstractGenComp_PU
+ };// of class scGenComp_PU_Abstract
 
 /** @}*/
 

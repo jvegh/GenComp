@@ -14,7 +14,7 @@
 // So, AbstractGenComp_PU handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
-class scAbstractGenComp_PU;
+class scGenComp_PU_Abstract;
 
 // This define in only temporarily here,  should go to HWConfig.h
 #define USE_PU_HWSLEEPING
@@ -23,7 +23,7 @@ class scAbstractGenComp_PU;
 /*! \var typedef  GenCompStateMachineType_t
  * The operation of an elementary computing unit of general computing is modelled as a multiple-state machine,
  * with internal state variables.
- * The states are used in AbstractGenComp_PU.
+ * The states are used in scGenComp_PU_Abstract.
  @verbatim
   Sleeping   - waiting for activation;
                Goes to Ready
@@ -69,7 +69,7 @@ class scAbstractGenComp_PU;
  * - Relaxing: Resets state and passes to 'Computing'
  * --These states below are momantary states: need action and passes to one of the above states
  * - Delivering: The unit is delivering its result to its output section
- *   - After some time, it Sends 'Begin Transmitting' @see AbstractGenComp_TU
+ *   - After some time, it Sends 'Begin Transmitting' @see scGenComp_PU_Abstract
  *     (Activates transmission unit to send computed result to its chained unit(s),
  *      then goes to Relaxing
  * - Failing :
@@ -84,7 +84,7 @@ typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_
 
 /*!
  * \brief
- * This class implements a state machine for abstract computing unit scAbstractGenComp_PU
+ * This class implements a state machine for abstract computing unit scGenComp_PU_Abstract
  *
  * The general computing is event-driven, i.e. events are received by the abstract general processing unit
  * and are processed by a scTechGenComp_PU or scBioGenComp_PU general processing unit.
@@ -92,17 +92,17 @@ typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_
  * event, it calls the corresponding method of this class.
  * The PU is generated in Ready (ready to process, gcsm_Ready) state.
  *
- * @see scAbstractGenComp_PU
- * @see scAbstractGenComp_PU#EVENT_GenComp
+ * @see scGenComp_PU_Abstract
+ * @see scGenComp_PU_Abstract#EVENT_GenComp
  * @see GenCompStateMachineType_t
- * @see scAbstractGenComp_PU#mStateFlag
+ * @see scGenComp_PU_Abstract#mStateFlag
  */
 
 class AbstractGenCompState
 {
     public:
         /**
-         * @brief Puts the PU state to 'Ready' (called by the scAbstractGenComp_PU's constructor)
+         * @brief Puts the PU state to 'Ready' (called by the scGenComp_PU_Abstract's constructor)
          * and sets up its event handling
          */
         AbstractGenCompState(void);
@@ -116,21 +116,21 @@ class AbstractGenCompState
          * - 1st time, the system must be in state gcsm_Processing, passes to gcsm_Delivering
          * - 2nd time in state gcsm_Delivering; passes to gcsm_Relaxing
          */
-        virtual void Deliver(scAbstractGenComp_PU* PU);
+        virtual void Deliver(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
          *
          * @param PU The HW to set
          */
-        virtual void Process(scAbstractGenComp_PU* PU);
+        virtual void Process(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          *
          * @param PU The HW to set
          */
-        virtual void Relax(scAbstractGenComp_PU* PU);
+        virtual void Relax(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
@@ -138,7 +138,7 @@ class AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to gcsm_Ready, trigger to
          */
-        virtual void Initialize(scAbstractGenComp_PU* PU);
+        virtual void Initialize(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief InputReceived: The machine received new input, administer it
@@ -146,21 +146,21 @@ class AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void InputReceived(scAbstractGenComp_PU* PU);
+        virtual void InputReceived(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          *
          * @param PU The HW to set
          */
-        virtual void Synchronize(scAbstractGenComp_PU* PU);
+        virtual void Synchronize(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
          *
          * @param PU The HW that failed
          */
-        virtual void Fail(scAbstractGenComp_PU* PU);
+        virtual void Fail(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief State_Set
@@ -168,7 +168,7 @@ class AbstractGenCompState
          * @param PU The HW to set
          * @param State The selected state type flag
          */
-        void State_Set(scAbstractGenComp_PU* PU, GenCompStateMachineType_t& State);
+        void State_Set(scGenComp_PU_Abstract* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
@@ -176,17 +176,17 @@ class AbstractGenCompState
          *
          * @param PU The HW to set
          */
-        virtual void Sleep(scAbstractGenComp_PU *PU);
+        virtual void Sleep(scGenComp_PU_Abstract *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          *
          * @param PU The HW to set
          */
-        virtual void Wakeup(scAbstractGenComp_PU *PU);
+        virtual void Wakeup(scGenComp_PU_Abstract *PU);
  #endif // USE_PU_HWSLEEPING
     protected:
-        void UpdatePU(scAbstractGenComp_PU& PU);
+        void UpdatePU(scGenComp_PU_Abstract& PU);
  };
 ;
 

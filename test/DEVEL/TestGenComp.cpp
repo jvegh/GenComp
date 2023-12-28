@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "scAbstractGenComp_PU.h"
+#include "scGenComp_PU_Abstract.h"
 
 #define SUPPRESS_LOGGING    // Suppress log messages
 //#define DEBUGGING       // Uncomment to debug this unit
@@ -15,13 +15,13 @@
  */
 extern bool UNIT_TESTING;		// Switched off by default
 
-#include "scAbstractGenComp_PU.h"
-#include "scBioGenComp_PU.h"
-#include "scTechGenComp_PU.h"
+#include "scGenComp_PU_Abstract.h"
+#include "scGenComp_PU_Bio.h"
+#include "scGenComp_PU_Tech.h"
 
 //scAbstractGenComp_PU PU("myAbs");
 //scTechGenComp_PU TPU("myTech",2);
-scBioGenComp_PU BPU("myBio");
+scGenComp_PU_Bio BPU("myBio");
 
 // A new test class  of these is created for each test
 class GenCompTest : public testing::Test
@@ -65,7 +65,7 @@ TEST_F(GenCompTest, AbstractPU)
  */
 TEST_F(GenCompTest, BioPU)
 {
-    scBioGenComp_PU* MyBPU = &BPU;
+    scGenComp_PU_Bio* MyBPU = &BPU;
     EXPECT_EQ( gcsm_Ready, MyBPU->StateFlag_Get());  // The unit is initialized to 'Ready' state
     // Now the 1st spike arrives
     BPU.EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);     // The BPU starts to receive spikes

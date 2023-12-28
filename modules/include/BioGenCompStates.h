@@ -12,10 +12,10 @@
 
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
 // must not be taken as in SystemC no new electronic module can be created.
-// So, scBioGenComp_PU handles the events and calls the corresponding
+// So, scGenComp_PU_Bio handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
-class scBioGenComp_PU;
+class scGenComp_PU_Bio;
 
 // This define in only temporarily here,  should go to HWConfig.h
 #define USE_PU_HWSLEEPING
@@ -24,7 +24,7 @@ class scBioGenComp_PU;
 /* ! \var typedef  GenCompStateMachineType_t
  * The operation of an elementary computing unit of general computing is modelled as a multiple-state machine,
  * with internal state variables.
- * The states are used in scBioGenComp_PU.
+ * The states are used in scGenComp_PU_Bio.
  @verbatim
   Sleeping   - waiting for activation;
                Goes to Ready
@@ -97,7 +97,7 @@ class BioGenCompState : public AbstractGenCompState
 {
     public:
         /**
-         * @brief Puts the PU state to 'Ready' (called by the BioGenComp_PU's constructor)
+         * @brief Puts the PU state to 'Ready' (called by the scGenComp_PU_Bio's constructor)
          * and sets up its event handling
          */
         BioGenCompState(void);
@@ -105,17 +105,17 @@ class BioGenCompState : public AbstractGenCompState
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
          */
-        virtual void Deliver(scBioGenComp_PU *PU);
+        virtual void Deliver(scGenComp_PU_Bio *PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
          */
-        virtual void Process(scBioGenComp_PU *PU);
+        virtual void Process(scGenComp_PU_Bio *PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          */
-        virtual void Relax(scBioGenComp_PU *PU);
+        virtual void Relax(scGenComp_PU_Bio *PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
@@ -123,7 +123,7 @@ class BioGenCompState : public AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void Initialize(scBioGenComp_PU* PU);
+        virtual void Initialize(scGenComp_PU_Bio* PU);
 
         /**
          * @brief InputReceived: The machine received new input, administer it
@@ -131,38 +131,38 @@ class BioGenCompState : public AbstractGenCompState
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void InputReceived(scBioGenComp_PU* PU);
+        virtual void InputReceived(scGenComp_PU_Bio* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          */
-        virtual void Synchronize(scBioGenComp_PU *PU);
+        virtual void Synchronize(scGenComp_PU_Bio *PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
          * @param PU The HW that failed
          */
-        virtual void Fail(scBioGenComp_PU* PU);
-        void State_Set(scBioGenComp_PU* PU, GenCompStateMachineType_t& State);
+        virtual void Fail(scGenComp_PU_Bio* PU);
+        void State_Set(scGenComp_PU_Bio* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
          * @param PU The HW to set
          */
-        virtual void Sleep(scBioGenComp_PU *PU);
+        virtual void Sleep(scGenComp_PU_Bio *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          */
-        virtual void Wakeup(scBioGenComp_PU *PU);
+        virtual void Wakeup(scGenComp_PU_Bio *PU);
         /**
          * @brief State_Set Set the state of PU to st
          * @param PU The HW to set
          */
 #endif // USE_PU_HWSLEEPING
     protected:
-        void UpdatePU(scBioGenComp_PU& PU);
+        void UpdatePU(scGenComp_PU_Bio& PU);
     private:
  };
 ;

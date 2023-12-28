@@ -15,7 +15,7 @@
  *  @{
  */
 
-#include "scAbstractGenComp_PU.h"
+#include "scGenComp_PU_Abstract.h"
 #include <chrono>
 
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
@@ -40,7 +40,7 @@
  * \brief  Implements a general biological-type computing PU
  *
  */
-#include "scBioGenComp_PU.h"
+#include "scGenComp_PU_Bio.h"
 
 
 extern string GenCompStates[];   // Just for debugging
@@ -60,7 +60,7 @@ public:
       * @brief Register
       * @param Module the activity of which must be watched
       */
-    void RegisterPU(scBioGenComp_PU* Module);
+    void RegisterPU(scGenComp_PU_Bio* Module);
     /**
      * @brief scLocalTime_Set
      * @param T The beginning of the simulated time of the recent operation
@@ -74,7 +74,7 @@ public:
 protected:
     sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
     bool mMoreEvents; ///< If we have more events to simulate
-    vector<scAbstractGenComp_PU*> mWatchedModules;   /// Store the registered objects here
+    vector<scGenComp_PU_Abstract*> mWatchedPUs;   /// Store the registered objects here
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
     sc_core::sc_time SC_t, SC_x, SC_s;

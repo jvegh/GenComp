@@ -38,7 +38,7 @@ bool scGenComp_Simulator::Run()
     sc_pause(); // Be sure there is no processing
     mMoreEvents = sc_pending_activity();    // Set flag if more to do
     int32_t AA = -12;
-    mWatchedModules[0]->GetData(AA);
+    mWatchedPUs[0]->GetData(AA);
     DEBUG_SC_PRINT(" Running continues= " << mMoreEvents);
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
@@ -46,16 +46,16 @@ bool scGenComp_Simulator::Run()
 }
 
 // Register only already created modules !!!
-void scGenComp_Simulator::RegisterPU(scBioGenComp_PU* Module)
+void scGenComp_Simulator::RegisterPU(scGenComp_PU_Bio* Module)
 {
-    scAbstractGenComp_PU* Valid = dynamic_cast<scAbstractGenComp_PU*>(Module);
+    scGenComp_PU_Abstract* Valid = dynamic_cast<scGenComp_PU_Abstract*>(Module);
     if(!Valid) return;    // Attempting to regisster something wrong
-    mWatchedModules.push_back(Module);
+    mWatchedPUs.push_back(Module);
     DEBUG_SC_PRINT("Module " << Module->name() << " registered");
 }
 
 void  scGenComp_Simulator::Update(void)
 {
     int32_t AA = 0;
-    mWatchedModules[0]->GetData(AA);
+    mWatchedPUs[0]->GetData(AA);
 }

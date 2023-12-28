@@ -36,19 +36,19 @@
 //??scClusterBusSimulator* TheSimulator;
 //??string ListOfIniFiles;
 
-#include "scBioGenComp_PU.h"
+#include "scGenComp_PU_Bio.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStates[];   // Just for debugging
 
-class scGenComp_PUBioDemo : public scBioGenComp_PU
+class scGenComp_PU_BioDemo : public scGenComp_PU_Bio
 {
 public:
-    scGenComp_PUBioDemo(sc_core::sc_module_name nm):
-        scBioGenComp_PU(nm)
+    scGenComp_PU_BioDemo(sc_core::sc_module_name nm):
+        scGenComp_PU_Bio(nm)
     {
-        typedef scGenComp_PUBioDemo SC_CURRENT_USER_MODULE;
+        typedef scGenComp_PU_BioDemo SC_CURRENT_USER_MODULE;
         SC_THREAD(PrintState);
 //        sensitive << scPrintEvent;
         // dont_initialize(); // Allow calling it at start
@@ -75,12 +75,12 @@ public:
         wait(15,SC_US);
         DEBUG_SC_PRINT(INPUTS_MESSAGE);
         wait(8,SC_US);
-        scBioGenComp_PU::Initialize();                             // Reset local time
+        scGenComp_PU_Bio::Initialize();                             // Reset local time
         DEBUG_SC_PRINT_LOCAL(INPUTS_MESSAGE);
     }
 };
 
-scGenComp_PUBioDemo* MyBio;
+scGenComp_PU_BioDemo* MyBio;
 scGenComp_Simulator* MySimulator;
 
 // Prepare sxXXX modules and instantiate them
@@ -88,10 +88,10 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
 {
     switch(ObjectSelector)
     {
-        case 0: MyBio = new scGenComp_PUBioDemo("MyBio"); break;
+        case 0: MyBio = new scGenComp_PU_BioDemo("MyBio"); break;
         default:
         {
-            MyBio = new scGenComp_PUBioDemo("MyBio");
+            MyBio = new scGenComp_PU_BioDemo("MyBio");
         }; break;
     }
     return 0;
@@ -126,14 +126,14 @@ int sc_main(int argc, char* argv[])
     if(!UseSimulator)
     {
         // !! all SC-related object and connections must be established before calling the simulator!!
-        int32_t ObjectSelector = -1;    // Select one of the test objects or all
+        int32_t ObjectSelector = -1;    // Select all test objects
         returnValue = scPrepareGenCompObjects(ObjectSelector);
     }
     else
     {// Create a simulator
         MySimulator = new scGenComp_Simulator("MySim");
         // Must be created before registering
-        MyBio = new scGenComp_PUBioDemo("MyBio");
+        MyBio = new scGenComp_PU_BioDemo("MyBio");
         MySimulator->RegisterPU(MyBio);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
