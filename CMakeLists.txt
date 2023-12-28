@@ -182,7 +182,7 @@ endif(BUILD_TESTS)
 if(BUILD_DOCS)
   find_package(Doxygen)
   add_subdirectory(doc) # The doxygen documentation
-  set(doxyfile_in "${GENCOMP_SOURCE_DIR}/doc/Doxifile.in")
+  set(doxyfile_in "${GENCOMP_SOURCE_DIR}/doc/Doxyfile.in")
 endif(BUILD_DOCS)
 
 ##############################################################
