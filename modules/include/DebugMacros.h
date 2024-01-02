@@ -99,10 +99,12 @@ using namespace std;
 
 extern    string SC_TIME_UNIT[];
 // define prompts for SC debugging
-#define DEBUG_SC_EVENT_STRING "EVT->"
-#define DEBUG_SC_PRINT_STRING "DBG->"
-#define DEBUG_SC_EVENT_STRING_LOCAL "EVT*>"
-#define DEBUG_SC_PRINT_STRING_LOCAL "DBG*>"
+#define DEBUG_EVENT_STRING "EVT->"
+#define DEBUG_PRINT_STRING "DBG->"
+#define DEBUG_WARNING_STRING "WNG->"
+#define DEBUG_EVENT_STRING_LOCAL "EVT*>"
+#define DEBUG_PRINT_STRING_LOCAL "DBG*>"
+#define DEBUG_WARNING_STRING_LOCAL "WNG*>"
 //
 #define DEBUG_SC_TIME sc_time_String_Get(SC_TIME_UNIT_DEFAULT)
 //<< SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
@@ -116,18 +118,21 @@ extern    string SC_TIME_UNIT[];
 //#define DEBUG_SC_PROLOG(Prompt) "@" << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \"" << Prompt
 #define DEBUG_SC_PROLOG "@" << DEBUG_SC_TIME << "," << name() << "::" << __func__ << ": \""
 #ifdef DEBUG_EVENTS
-    #define DEBUG_SC_EVENT(X)        std::cerr << DEBUG_SC_EVENT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_EVENT_LOCAL(X)  std::cerr << DEBUG_SC_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_EVENT(X)        std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_EVENT_LOCAL(X)  std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #else
-    #define DEBUG_SC_EVENT(P, T, X)
-    #define DEBUG_SC_EVENT_LOCAL(p,t,x)
+    #define DEBUG_SC_EVENT(X)
+    #define DEBUG_SC_EVENT_LOCAL(x)
 #endif
 #ifdef DEBUG_PRINTS
-    #define DEBUG_SC_PRINT(X)  std::cerr << DEBUG_SC_PRINT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_PRINT_LOCAL(X)  std::cerr << DEBUG_SC_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_PRINT(X)  std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_PRINT_LOCAL(X)  std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_WARNING(X)  std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_WARNING_LOCAL(X)  std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #else
     #define DEBUG_SC_PRINT(x)
     #define DEBUG_SC_PRINT_LOCAL(X)
+    #define DEBUG_SC_WARNING(x)
 #endif
 // During unit testing, all event tracing messages are suppressed
 #ifdef DEBUG_EVENTS
@@ -180,20 +185,20 @@ extern    string SC_TIME_UNIT[];
 
 
     #define DEBUG_PRINT_MESSAGE(x,M) \
-        {std::cerr << "DBG" << "PrologString_Get()" <<" " << x << Processor_Get()->StringOfMessage_Get(M) << DEBUG_LOCATION  << std::endl;}
+        {std::cerr << DEBUG_PRINT_STRING << "PrologString_Get()" <<" " << x << Processor_Get()->StringOfMessage_Get(M) << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_WITH_SOURCE(TX) \
-        std::cerr << "DBG" << PrologString_Get().c_str() << "\"" << std::string(TX).c_str() << "\" @line " << LOG_LINENO(PC_Get()) << DEBUG_LOCATION << "\n" \
+        std::cerr << DEBUG_PRINT_STRING << PrologString_Get().c_str() << "\"" << std::string(TX).c_str() << "\" @line " << LOG_LINENO(PC_Get()) << DEBUG_LOCATION << "\n" \
         << "     " << LOG_SOURCELINE(PC_Get()) << std::endl
     #define DEBUG_PRINT_OBJECT(x)  if(!UNIT_TESTING) \
-        {std::cerr  << "DBG" << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
+        {std::cerr  << DEBUG_PRINT_STRING << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_IGP_MESSAGE(x)  if(!UNIT_TESTING) \
-        {std::cerr  << "DBG" << " IGP MESSAGE " << " "  << x << DEBUG_LOCATION  << std::endl;}
+        {std::cerr  << DEBUG_PRINT_STRING << " IGP MESSAGE " << " "  << x << DEBUG_LOCATION  << std::endl;}
      #define DEBUG_PRINT(x)  if(!UNIT_TESTING) \
-        {std::cerr  << "DBG@" << sc_time_to_nsec_Get().c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
+{std::cerr  << DEBUG_PRINT_STRING <<"@" <<  DEBUG_SC_TIME << " \"" <<  x  << " \" " << DEBUG_LOCATION << " (::" << __func__ << ") " << std::endl;}
     #define DEBUG_PRINT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
-         {if(A!=B) std::cerr  << "DBG@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
+         {if(A!=B) std::cerr  << DEBUG_PRINT_STRING << "@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
     #define DEBUG_PRINT_OBJECT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
-        {if(A!=B) std::cerr  << "DBG" << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
+        {if(A!=B) std::cerr  << DEBUG_PRINT_STRING << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
 #else // DEBUG_PRINTS not printed
     #define DEBUG_ONLY(x)
     #define PRINT_MESSAGE(M)
@@ -241,20 +246,20 @@ extern    string SC_TIME_UNIT[];
     #define PLOT_QT_WAIT(LENGTH) \
         Plot->PlotQTwait(ID_Get(),atoi(sc_time_to_nsec_Get(sc_time_stamp()-LENGTH,0).c_str()),exec.PC, atoi(sc_time_to_nsec_Get(LENGTH,0).c_str()))
 #define DEBUG_PRINT(x)  if(!UNIT_TESTING) \
-    {std::cerr  << "DBG@" << sc_time_to_nsec_Get(2, 6, sc_core::sc_time_stamp()).c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
+    {std::cerr  << DEBUG_PRINT_STRING <<"@" << sc_time_to_nsec_Get(2, 6, sc_core::sc_time_stamp()).c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
 #define DEBUG_PRINT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
-     {if(A!=B) std::cerr  << "DBG@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
+     {if(A!=B) std::cerr  << DEBUG_PRINT_STRING << "@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
 #define DEBUG_PRINT_OBJECT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
-    {if(A!=B) std::cerr  << "DBG" << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
+    {if(A!=B) std::cerr  << DEBUG_PRINT_STRING << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
 */
 #else
 #define PLOT_ALLOCATON_BEGIN_SET(CORE)
 /*#define DEBUG_PRINT(x)  if(!UNIT_TESTING) \
-    {std::cerr  << "DBG@" << sc_time_to_nsec_Get(2, 6, sc_core::sc_time_stamp()).c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
+    {std::cerr  << DEBUG_PRINT_STRING << "@" << sc_time_to_nsec_Get(2, 6, sc_core::sc_time_stamp()).c_str() << " " <<  x  << DEBUG_LOCATION  << std::endl;}
 #define DEBUG_PRINT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
-     {if(A!=B) std::cerr  << "DBG@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
+     {if(A!=B) std::cerr  <<DEBUG_PRINT_STRING "@" << sc_time_to_nsec_Get(2, 6, sc_time_stamp()).c_str() << "ns|" << name() << ":>> " <<  x  << DEBUG_LOCATION  << std::endl;}
 #define DEBUG_PRINT_OBJECT_IF_DIFFERENT(x,A,B)  if(!UNIT_TESTING) \
-    {if(A!=B) std::cerr  << "DBG" << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
+    {if(A!=B) std::cerr  << DEBUG_PRINT_STRING << PrologString_Get() << " "  << x << DEBUG_LOCATION  << std::endl;}
 */
 #endif // MAKE_PERFORMANCE_DIAGRAM
 
