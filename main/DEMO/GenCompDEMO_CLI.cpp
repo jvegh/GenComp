@@ -40,7 +40,7 @@
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
-extern string GenCompStates[];   // Just for debugging
+extern string GenCompStatesString[];   // Just for debugging
 
 class scGenComp_PU_BioDemo : public scGenComp_PU_Bio
 {
@@ -49,34 +49,20 @@ public:
         scGenComp_PU_Bio(nm)
     {
         typedef scGenComp_PU_BioDemo SC_CURRENT_USER_MODULE;
-        SC_THREAD(PrintState);
-//        sensitive << scPrintEvent;
-        // dont_initialize(); // Allow calling it at start
-        //PrintState();   // Begins with printing, but waits sometimes
+        SC_THREAD(InputReceived_method); //Needed to allow 'wait()
+        sensitive << EVENT_GenComp.InputReceived;
+        dont_initialize();  // Run only when real input received
+         EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
+        DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
+        EVENT_GenComp.InputReceived.notify(12,SC_US);     // The BPU starts to receive spikes
+        DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
+        EVENT_GenComp.InputReceived.notify(23,SC_US);     // The BPU starts to receive spikes
     }
-    void Initialize()
-    {   // The PU starts immediatley and receives three spikes
-
-#define INPUTS_MESSAGE  "Unit is in state '" << GenCompStates[mStateFlag] << "' and received " << Inputs.size() << " inputs"
-                DEBUG_SC_PRINT(">>>");
-                // These DEBUG_XXX macros compile to nothing if
-        EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-                DEBUG_SC_EVENT_LOCAL(INPUTS_MESSAGE);
-        EVENT_GenComp.InputReceived.notify(13,SC_US);     // The BPU starts to receive spikes
-                DEBUG_SC_EVENT(INPUTS_MESSAGE);
-        EVENT_GenComp.InputReceived.notify(15,SC_MS);     // The BPU starts to receive spikes
-                 DEBUG_SC_EVENT(INPUTS_MESSAGE);
-                DEBUG_SC_PRINT("Initialize exited");
-                DEBUG_SC_PRINT_LOCAL("<<<");
-    }
-    void PrintState()
-    {   // Unit receives inputs at 0 and 28; resets at 23
+#define INPUTS_MESSAGE  "Unit is in state '" << GenCompStatesString[mStateFlag] << "' and received " << Inputs.size() << " inputs"
+    void InputReceived_method()
+    {   // Unit receives inputs at 13 and 14; resets at 17; // Makes only printing
+        scGenComp_PU_Bio::InputReceived_method();   // The rest is made by the superclass
         DEBUG_SC_PRINT(INPUTS_MESSAGE);
-        wait(15,SC_US);
-        DEBUG_SC_PRINT(INPUTS_MESSAGE);
-        wait(8,SC_US);
-        scGenComp_PU_Bio::Initialize();                             // Reset local time
-        DEBUG_SC_PRINT_LOCAL(INPUTS_MESSAGE);
     }
 };
 
@@ -103,7 +89,7 @@ bool UNIT_TESTING = false; // Used internally for debugging
 // Using sc_main() is mandatory for using SystemC; equivalent with main()
 int sc_main(int argc, char* argv[])
 {
-    bool UseSimulator = false;   // Can use either scGenComp_Simulator or stand-alone unit operating modes
+    bool UseSimulator = true;   // Can use either scGenComp_Simulator or stand-alone unit operating modes
     int returnValue=0;
     // We rely on the default clearing of the values of time benchmarking
     chrono::steady_clock::time_point t;
@@ -114,7 +100,11 @@ int sc_main(int argc, char* argv[])
     sc_core::sc_report_handler::set_actions( "/IEEE_Std_1666/deprecated",
                                             sc_core::SC_DO_NOTHING );
     // About to start
-    std::cerr  << "\n Demonstrates using GenComp with SystemC" << "\n>>> Entering " << PROJECT_NAME << "_DEMO/CLI V" << PROJECT_VERSION << endl;
+    std::cerr  << "\n Demonstrates using GenComp with SystemC" << "\n>>> Entering " << PROJECT_NAME << "_DEMO/CLI V"
+              << PROJECT_VERSION;
+    if(UseSimulator)
+        std::cout << " with simulator";
+    std::cout << endl;
 
     // Do whatever setup you will need for your program here
     //
@@ -152,8 +142,8 @@ int sc_main(int argc, char* argv[])
         {    // We are at the beginning, just make a call to set up the SystemC engine
             sc_start(SC_ZERO_TIME);
             while(MySimulator->Run())
-            {
-                DEBUG_PRINT("Again");
+            {   // This portion is run repeatedly by the simulator
+//                DEBUG_PRINT("Again ");
             }
         };
         BENCHMARK_TIME_END(&t,&x,&s);

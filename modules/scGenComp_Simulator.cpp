@@ -39,7 +39,7 @@ bool scGenComp_Simulator::Run()
     mMoreEvents = sc_pending_activity();    // Set flag if more to do
     int32_t AA = -12;
     mWatchedPUs[0]->GetData(AA);
-    DEBUG_SC_PRINT(" Running continues= " << mMoreEvents);
+    //DEBUG_SC_PRINT(" Running continues= " << mMoreEvents);
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
     return mMoreEvents;
@@ -49,7 +49,7 @@ bool scGenComp_Simulator::Run()
 void scGenComp_Simulator::RegisterPU(scGenComp_PU_Bio* Module)
 {
     scGenComp_PU_Abstract* Valid = dynamic_cast<scGenComp_PU_Abstract*>(Module);
-    if(!Valid) return;    // Attempting to regisster something wrong
+    if(!Valid) return;    // Attempting to register something wrong
     mWatchedPUs.push_back(Module);
     DEBUG_SC_PRINT("Module " << Module->name() << " registered");
 }
