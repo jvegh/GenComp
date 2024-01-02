@@ -38,7 +38,7 @@ include(BuildType)
 # Choose if clocked physical bus is to be used; slows down simulation
   option (USE_CLOCKED_BUS "Simulate clocked physical bus" OFF)
 # Choose whether you need debugging support for development or making a release
-  option (DEBUG_MODE "Include debug support for the package"  ON)
+  option (DEBUG_MODE "Include debug support for the package"  OFF)
 # Choose whether the stand-alone unit testing is to be built
   option (BUILD_TESTS "Include unit tests for the package"  ON)
 # Choose whether to make documention as well
