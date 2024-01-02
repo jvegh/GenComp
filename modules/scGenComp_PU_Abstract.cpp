@@ -21,28 +21,44 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in un
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 
-AbstractGenCompState* TheAbstractGenCompState;
+GenCompStates_Abstract* TheGenCompStates_Abstract;
     scGenComp_PU_Abstract::
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
-    ,mLocalTimeBase(sc_core::SC_ZERO_TIME)
     ,mGenCompPUOperatingBits(gcob_ObserveModule)
-{
-        if(!TheAbstractGenCompState)
-            TheAbstractGenCompState = new AbstractGenCompState();
-        MachineState = TheAbstractGenCompState;
+ {
+        if(!TheGenCompStates_Abstract)
+            TheGenCompStates_Abstract = new GenCompStates_Abstract();
+        MachineState = TheGenCompStates_Abstract;
     typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
     // Intialize the module with generating an event
     SC_METHOD(Initialize_method);
     sensitive << EVENT_GenComp.Initialize;
-    dont_initialize(); //Simply execute initialization, without an event
-    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+//    dont_initialize();
+        // Operating
     SC_METHOD(InputReceived_method);
     sensitive << EVENT_GenComp.InputReceived;
     dont_initialize();
-    // Operating
-    SC_METHOD(Relax_method);
-    sensitive << EVENT_GenComp.Relax;
+    SC_METHOD(ProcessingBegin_method);
+    sensitive << EVENT_GenComp.ProcessingBegin;
+    dont_initialize();
+    SC_METHOD(ProcessingEnd_method);
+    sensitive << EVENT_GenComp.ProcessingEnd;
+    dont_initialize();
+    SC_METHOD(DeliveringBegin_method);
+    sensitive << EVENT_GenComp.DeliveringBegin;
+    dont_initialize();
+    SC_METHOD(DeliveringEnd_method);
+    sensitive << EVENT_GenComp.DeliveringEnd;
+    dont_initialize();
+    SC_METHOD(RelaxingBegin_method);
+    sensitive << EVENT_GenComp.RelaxingBegin;
+    dont_initialize();
+    SC_METHOD(RelaxingEnd_method);
+    sensitive << EVENT_GenComp.RelaxingEnd;
+    dont_initialize();
+    SC_METHOD(Heartbeat_method);
+    sensitive << EVENT_GenComp.Heartbeat;
     dont_initialize();
 #ifdef USE_PU_HWSLEEPING
     // Power handling
@@ -66,16 +82,82 @@ scGenComp_PU_Abstract::
 {
 }
 
+
 // Puts the PU in its default state
 void scGenComp_PU_Abstract::
     Initialize_method(void)
 {
-            DEBUG_SC_EVENT_LOCAL(">>>   ");
-    MachineState->Initialize(this);   // Change status to 'Ready'
-    Initialize(); // Initialize the unit, HW and temporary variables
-    // Put PU in its default state
-            DEBUG_SC_EVENT_LOCAL("<<<   ");
+    DEBUG_SC_EVENT_LOCAL(">>>   ");
+    MachineState->Initialize(this);   // Change status to 'Ready' and call DoInitialize()
+    DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
+
+/*
+ * Initialize the GenComp unit. Usually called by the state machine
+ */
+void scGenComp_PU_Abstract::
+    DoInitialize(void)
+{
+    DEBUG_SC_EVENT_LOCAL(">>>   ");
+    mLocalTimeBase = sc_time_stamp();
+    Inputs.clear();
+    DEBUG_SC_EVENT_LOCAL("<<<   ");
+}
+
+
+
+// The physical delivery
+void scGenComp_PU_Abstract::
+    Deliver()
+{
+    DEBUG_SC_EVENT_LOCAL("   >>>");
+    if(gcsm_Processing == StateFlag_Get())
+    {   // We are at the end of Processing phase, the phase 'Delivering' follows
+        StateFlag_Set(gcsm_Delivering);    // Now delivering
+    }
+    else
+    {   // We are at the end of phase 'Delivering'
+        DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.Relax");
+        //??           EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
+    }
+    DEBUG_SC_EVENT_LOCAL("   <<<");
+}
+
+// Called when the state 'processing' begins
+void scGenComp_PU_Abstract::
+    DeliveringBegin_method()
+{
+    DEBUG_SC_EVENT_LOCAL("Delivering started");
+}
+
+
+// Called when the state 'processing' ends
+void scGenComp_PU_Abstract::
+    DeliveringEnd_method()
+{
+    DEBUG_SC_EVENT_LOCAL("Delivering finished");
+    MachineState->Relax(this);    // Pass to "Relaxing"
+}
+
+
+// Called when the state 'processing' ends
+void scGenComp_PU_Abstract::
+    Heartbeat_method()
+{
+    if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveHeartbeat))
+        DEBUG_SC_PRINT_LOCAL ("Heartbeat observed");
+    DEBUG_SC_EVENT_LOCAL("In state '" << GenCompStatesString[mStateFlag]);
+
+    switch(StateFlag_Get())
+    {
+    case gcsm_Ready: Heartbeat_Ready(); break;
+    case gcsm_Processing: Heartbeat_Processing(); break;
+    case gcsm_Delivering: Heartbeat_Delivering(); break;
+    case gcsm_Relaxing: Heartbeat_Relaxing(); break;
+    default: ; assert(0); break; // do nothing
+    }
+}
+
 
 
 void scGenComp_PU_Abstract::
@@ -83,45 +165,87 @@ void scGenComp_PU_Abstract::
 {
     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
         DEBUG_SC_PRINT_LOCAL ("Input observed");
-    DEBUG_SC_EVENT_LOCAL(">>>   ");
-    MachineState->InputReceived(this);
+            DEBUG_SC_EVENT_LOCAL(">>>   ");
     // The input is legal, continue receiving it
-    ReceiveInput();
-    DEBUG_SC_EVENT_LOCAL("<<<   ");
+    DoInputReceive();
+            DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
 void scGenComp_PU_Abstract::
-    ReceiveInput(void)
+    DoInputReceive(void)
 {
             DEBUG_SC_EVENT_LOCAL("   >>>");
+    if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
+            DEBUG_SC_PRINT_LOCAL ("Input observed");
+
     Inputs.push_back(NoOfInputsReceived_Get());
+            DEBUG_SC_EVENT_LOCAL("   <<<");
 }
 
 
+// Called when the state 'processing' begins
 void scGenComp_PU_Abstract::
-    Deliver()
+    ProcessingBegin_method()
+{
+    ProcessingBegin();
+}
+
+void scGenComp_PU_Abstract::
+    ProcessingBegin()
+{
+            DEBUG_SC_EVENT_LOCAL("Processing started");
+    MachineState->Process(this);    // Go to "Processing"
+    scLocalTime_Set();      // The clock is synchronized to the beginning of processing
+            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with zero");
+}
+// Called when the state 'processing' ends
+void scGenComp_PU_Abstract::
+    ProcessingEnd_method()
+{
+    ProcessingEnd();
+}
+
+void scGenComp_PU_Abstract::
+    ProcessingEnd()
+{
+    DEBUG_SC_EVENT_LOCAL("Processing finished");
+    MachineState->Deliver(this);    // Pass to "Delivering
+}
+
+
+// Called when the state 'processing' begins
+void scGenComp_PU_Abstract::
+    RelaxingBegin_method()
+{
+    MachineState->Relax(this);    // Go to "Relaxsing"
+    DEBUG_SC_EVENT_LOCAL("Relaxing started");
+}
+
+// Called when the state 'processing' ends
+void scGenComp_PU_Abstract::
+    RelaxingEnd_method()
+{
+    DEBUG_SC_EVENT_LOCAL("Relaxing finished");
+    MachineState->Initialize(this);    // Pass to "Ready"
+}
+
+
+// After the result delivered internally, reset the processing unit
+void scGenComp_PU_Abstract::
+   Relax(void)
 {
     DEBUG_SC_EVENT_LOCAL("   >>>");
-    if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the end of Processing phase, the phase 'Delivering' follows
-            DEBUG_SC_EVENT_LOCAL("   >>>");
-            StateFlag_Set(gcsm_Delivering);    // Now delivering
+    if(gcsm_Delivering == StateFlag_Get())
+    {   // We are at the end of Delivering phase, the phase 'Relaxing' follows
+        StateFlag_Set(gcsm_Relaxing);    // Now Relaxing
     }
     else
-    {   // We are at the end of phase 'Delivering'
-//            next_trigger(EVENT_GenComp.Relax);
-            DEBUG_SC_EVENT_LOCAL("   >>>");
-            DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.Relax");
-            EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
+    {   // We are at the end of phase 'Relaxing'
+        DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.Ready");
+        EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     }
     DEBUG_SC_EVENT_LOCAL("   <<<");
-}
-
-void scGenComp_PU_Abstract::
-   Relax_method(void)
-{
-    //    MachineState->Sleep();   // Change status to 'Initial'
 }
 
 void scGenComp_PU_Abstract::
@@ -135,30 +259,30 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     Sleep_method(void)
 {
-    MachineState->Sleep(this);   // Change status to 'Ready'
+    assert(gcsm_Ready != StateFlag_Get());
+    // Be sure we were in 'Ready'
+    StateFlag_Set(gcsm_Sleeping);
 }
 
 void scGenComp_PU_Abstract::
     Wakeup_method(void)
 {
-    MachineState->Wakeup(this);   // Change status to 'Ready'
-}
+    assert(gcsm_Sleeping != StateFlag_Get());
+    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+ }
 void scGenComp_PU_Abstract::
     Wakeup(void)
 {
 // Make actual waking-up
 // Ends with issuing event 'Awaken'
 }
-void scGenComp_PU_Abstract::
-    Clock_method(void)
-{
-}
+
 #endif // USE_PU_HWSLEEPING
 void scGenComp_PU_Abstract::
     Fail_method(void)
 {
     DEBUG_SC_EVENT_LOCAL(">>>   ");
-    MachineState->Fail(this);   // Change status to 'Initial'
+    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 void scGenComp_PU_Abstract::
@@ -167,12 +291,4 @@ void scGenComp_PU_Abstract::
     DEBUG_SC_EVENT_LOCAL("   ---");
 }
 
-/*
- * Initialize the GenComp unit
- */
-void scGenComp_PU_Abstract::
-    Initialize(void)
-{
-    Inputs.clear();
- }
 

@@ -16,8 +16,8 @@
  *  @{
  */
 #include "scGenComp_PU_Abstract.h"
-#include "TechGenCompStates.h"
-static vector<AbstractGenCompState*> TechPU_StateVector;
+#include "GenCompStates_Tech.h"
+static vector<GenCompStates_Abstract*> TechPU_StateVector;
 
 /* !
  * \class scGenComp_PU_Tech
@@ -67,11 +67,6 @@ class scGenComp_PU_Tech : public scGenComp_PU_Abstract
     scGenComp_PU_Tech(sc_core::sc_module_name nm, int32_t No);
     virtual ~scGenComp_PU_Tech(); // Must be overridden
     virtual void Initialize_method();
-    /**
-      * @brief Check if we can begin processing
-      * @return true if we can begin processing
-      */
-    virtual bool CanBeginProcessing(void);
 
   protected:
     int32_t mNoOfArgs;    // The number of args before computation can start

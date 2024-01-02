@@ -21,16 +21,16 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 
-TechGenCompState* TheTechGenCompState;
+GenCompStates_Tech* TheGenCompStates_Tech;
     scGenComp_PU_Tech::
 scGenComp_PU_Tech(sc_core::sc_module_name nm, int32_t No):
     scGenComp_PU_Abstract(nm)
      ,mNoOfArgs(No)
 {
     typedef scGenComp_PU_Tech SC_CURRENT_USER_MODULE;
-    if(!TheTechGenCompState)
-        TheTechGenCompState = new TechGenCompState();
-    MachineState = TheTechGenCompState;
+    if(!TheGenCompStates_Tech)
+        TheGenCompStates_Tech = new GenCompStates_Tech();
+    MachineState = TheGenCompStates_Tech;
 }
 
 scGenComp_PU_Tech::
@@ -44,8 +44,8 @@ void scGenComp_PU_Tech::
 {
         DEBUG_SC_EVENT_LOCAL(">>>   Intializing");
         scGenComp_PU_Abstract::Initialize_method();
-        MachineState->Initialize(this);   // Change status to 'Initial'
-        Initialize(); // Initialize the unit, HW and temporary variables
+        MachineState->Initialize(this);   // Change status to 'Ready'
+        DoInitialize(); // Initialize the unit, HW and temporary variables
         // Put PU in its default state
         DEBUG_SC_EVENT_LOCAL("<<<   Intializing");
 }

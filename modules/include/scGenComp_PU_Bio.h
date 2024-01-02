@@ -1,4 +1,4 @@
-/** @file scBioGenComp_PU.h
+/** @file scGenComp_PU_Bio.h
  *  @ingroup GENCOMP_MODULE_PROCESS
 
  *  @brief Function prototypes for the computing module
@@ -16,7 +16,7 @@
  *  @{
  */
 
-#include "BioGenCompStates.h"
+#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
 #define BIO_HEARTBEAT_TIME sc_core::sc_time(10,SC_US)
@@ -66,7 +66,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
 
     scGenComp_PU_Bio(sc_core::sc_module_name nm);
     virtual ~scGenComp_PU_Bio(void); // Must be overridden
-    virtual void Initialize_method();
+//    virtual void Initialize_method();
     /**
      * @brief A new spike received
      *
@@ -78,26 +78,48 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * @brief Receving an input a momentary action, just administer its processing.
      * It is possible only in 'Ready' and 'Processing' states
      */
-    virtual void ReceiveInput();
+    virtual void DoInputReceive();
+     /**
+     * @brief Called when the state 'processing' begins
+     *
+     * The unit passes to phase 'Processing'
+     */
+//    void ProcessingBegin_method();
+    void ProcessingBegin();
+    /**
+     * @brief Called when the state 'processing' ends
+     *
+     * The unit passes to phase 'Delivering'
+     */
+    void ProcessingEnd_method();
     /**
      * @brief Deliver
+     *
+     * Called when the state
      */
     virtual void Deliver();
+
+    /**
+     * @brief Relax
+     *
+     *
+     */
+    virtual void Relax();
+
 
     /**
      * @brief Heartbeat_method
      *
      * A periodic  signal as a timebase for solving differential equations.
      *
-     * - To economize resources, a central signal is used, but it is NOT a central clock signal
-     * - The unit receives a signal EVENT_GenComp.HeartBeat
-     * - If in 'Processing' mode
-     *   - The sensitivity is ON from EVENT_GenComp.Begin_Computing in 'Processing' mode
-     *   - The sensitivity if OFF from EVENT_GenComp.Relaxed in "Ready" mode
-     */
-    virtual void Heartbeat_method();
-/*    virtual void Relax(){assert(0);}
-    virtual void Reinitialize(){assert(0);}
+     * - The unit receives a signal EVENT_GenComp.HeartBeat and handles it
+     *   differently in different modes
+     * - In 'Processing' mode, re-calculates membrane's charge-up potential
+     * - In 'Ready' mode, re-calculates membrane's decay potential
+     * - In 'Delivering' mode, re-calculates membrane's decay potential
+      */
+//    virtual void Heartbeat_method();
+/*    virtual void Reinitialize(){assert(0);}
     virtual void Synchronize(){assert(0);}
     virtual void Fail(){assert(0);}
 */
@@ -105,22 +127,55 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
     /**
      * @brief Puts the PU to its default state (just the HW).
     */
-    virtual void Initialize();
+//    virtual void Initialize();
+
 //    virtual bool CanBeginProcessing(void);
     /**
      * @brief Heartbeat
      *
-     * The state of the biological computing is re-calculated (as the simulation time passes)
-     * - If called in 'Processing' mode
-     *   Re-issues EVENT_GenComp.Heartbeat until membrane potential reaches its threshold value
-     *   Issues EVENT_GenComp.Begin_Computing upon the arrival of the first spike
-     *   Issues EVENT_GenComp.End_Computing upon arriving the threshold potential (and passes to 'Delivering')
-     *   Issues EVENT_GenComp.Fail upon decreasing the membrane potential
-     * - if called in 'Ready' mode
-     *   Re-issues EVENT_GenComp.Hearbeat until membrane potential decreased to its resting value
-     * Generate
+      * Generate
      */
-    virtual void Heartbeat();
+    void Heartbeat();
+    /**
+     *
+     * Handle heartbeats in 'Ready' mode
+     */
+    void Heartbeat_Ready();
+    /**
+     * @brief Handle heartbeats in 'Processing' mode
+     *
+     * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential reaches its threshold value
+     * -  Starts to receive heartbeats after EVENT_GenComp.ProcessingBegin arrives
+     * -  Stops generating heartbeats after EVENT_GenComp.ProcessingEnd  arrivies (when reaching the threshold potential
+     *    then issues EVENT_GenComp.DeliveringBegin
+     * -  Issues EVENT_GenComp.Fail whey the membrane potential decaya near to its threshold
+     */
+    void Heartbeat_Processing();
+    /**
+     * @brief Handle heartbeats in 'Delivering' mode
+     *
+     * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential at hillock reaches its threshold value
+     * -  Starts to receive heartbeats after EVENT_GenComp.DeliveringBegin arrives
+     * -  Stops generating heartbeats after EVENT_GenComp.DeliveringEnd arrives
+     *     then issues EVENT_GenComp.RelaxingBegin
+     */
+    void Heartbeat_Delivering();
+    /**
+     * @brief Handle heartbeats in 'Relaxing' mode
+     *
+     * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential starts to increase
+     * -  Starts to receive heartbeats after EVENT_GenComp.RelaxingBegin arrives
+     * -  Stops generating heartbeats after EVENT_GenComp.DeliveringEnd  arrives
+     *     then issues EVENT_GenComp.Initializing
+     */
+     void Heartbeat_Relaxing();
+    /**
+     * @brief Heartbeat_Recalculate_Membrane_Potential
+     *
+     *  The state of the biological computing is re-calculated (as the simulation time passes)
+     *  (solve the differential equation at this time)
+     */
+    void Recalculate_Membrane_Potential();
   };// of class scGenComp_PU_Bio
 /** @}*/
 
