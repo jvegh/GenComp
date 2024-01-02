@@ -1,4 +1,4 @@
-/** @file TechGenCompStates.h
+/** @file GenCompStates_Tech.h
  *  @ingroup GENCOMP_MODULE_PROCESS
  *  @brief Working states of the archetypes of technical processing units
  */
@@ -6,15 +6,15 @@
  *  @bug No known bugs.
  */
 
-#ifndef TechGenCompStates_h
-#define TechGenCompStates_h
+#ifndef GenCompStates_Tech
+#define GenCompStates_Tech_h
 
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
 // must not be taken as in SystemC no new electronic module can be created.
 // So, scGenComp_PU_Tech handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
-#include "GenCompStates.h"
+#include "GenCompStates_Abstract.h"
 class scGenComp_PU_Tech;
 
 // This define in only temporarily here,  should go to HWConfig.h
@@ -89,19 +89,19 @@ class scGenComp_PU_Tech;
  * and are processed by a technical or biological biological processing unit.
  * The PU is generated in Ready (ready to process) state.
  *
- * @see TechGenCompState#EVENT_GenComp
- * @see TechGenCompStateMachineType_t
+ * @see GenCompStates_Tech#EVENT_GenComp
+ * @see GenCompStateMachineType_Tech_t
  */
 
-class TechGenCompState: public AbstractGenCompState
+class GenCompStates_Tech: public GenCompStates_Abstract
 {
     public:
         /**
          * @brief Puts the PU state to 'Ready' (called by the BioGenComp_PU's constructor)
          * and sets up its event handling
          */
-        TechGenCompState(void);
-        virtual ~TechGenCompState(void);
+        GenCompStates_Tech(void);
+        virtual ~GenCompStates_Tech(void);
         /**
          * @brief Deliver: Signal 'End computing'; result to the 'output section'
          */
@@ -166,4 +166,4 @@ class TechGenCompState: public AbstractGenCompState
     private:
  };
 
-#endif //TechGenCompStates_h
+#endif //GenCompStates_Tech_h

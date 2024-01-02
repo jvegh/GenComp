@@ -1,30 +1,29 @@
-/** @file BioGenCompStates.h
+/** @file GenCompStates_Abstract.h
  *  @ingroup GENCOMP_MODULE_PROCESS
- *  @brief Working states of the archetypes of biological processing units
+ *  @brief Working states of the archetypes of processing units
  */
  /*  @author János Végh (jvegh)
  *  @bug No known bugs.
  */
 
-#ifndef BioGenCompStates_h
-#define BioGenCompStates_h
-#include "GenCompStates.h"
+#ifndef GenCompStates_Abstract_h
+#define GenCompStates_Abstract_h
 
 // Idea from https://stackoverflow.com/questions/14676709/c-code-for-state-machine/19896947
 // must not be taken as in SystemC no new electronic module can be created.
-// So, scGenComp_PU_Bio handles the events and calls the corresponding
+// So, AbstractGenComp_PU handles the events and calls the corresponding
 //using namespace sc_core; using namespace std;
 
-class scGenComp_PU_Bio;
+class scGenComp_PU_Abstract;
 
 // This define in only temporarily here,  should go to HWConfig.h
 #define USE_PU_HWSLEEPING
 
 
-/* ! \var typedef  GenCompStateMachineType_t
+/*! \var typedef  GenCompStateMachineType_t
  * The operation of an elementary computing unit of general computing is modelled as a multiple-state machine,
  * with internal state variables.
- * The states are used in scGenComp_PU_Bio.
+ * The states are used in scGenComp_PU_Abstract.
  @verbatim
   Sleeping   - waiting for activation;
                Goes to Ready
@@ -67,104 +66,131 @@ class scGenComp_PU_Bio;
  *   - in biological mode: received its first argument
  *   Passes to Delivering (after issuing 'End Computing') if successful;
  *   Passes to Relaxing if Failed
- * - Delivering : The unit is delivering its result to its output section
- *   - After some time, it Sends 'Begin Transmitting' @see AbstractGenComp_TU
+ * - Relaxing: Resets state and passes to 'Computing'
+ * --These states below are momantary states: need action and passes to one of the above states
+ * - Delivering: The unit is delivering its result to its output section
+ *   - After some time, it Sends 'Begin Transmitting' @see scGenComp_PU_Abstract
  *     (Activates transmission unit to send computed result to its chained unit(s),
  *      then goes to Relaxing
- * - Relaxing: Resets state and passes to 'Computing'
+ * - Failing :
  * - Synchronizing: deliver result, anyhow ;  (a momentary state)
- *   - in biological mode, deliver immediate spike
+ *   - in biologycal mode, deliver immediate spike
  *   - in technical mode, deliver immediate result
  *   Passes to Relaxing (after issuing 'End Computing)
  */
-//typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing, gcsm_Syncronizing, gcsm_Failed}
-  //            GenCompStateMachineType_t;
+typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing}
+              GenCompStateMachineType_t;
 
 
 /*!
  * \brief
- * This class implements states for an biological computing unit; base for biological computing
+ * This class implements a state machine for abstract computing unit scGenComp_PU_Abstract
  *
- * The general computing is event-driven, i.e. events are received by the biological state machine
- * and are processed by a technical or biological biological processing unit.
- * The PU is generated in Ready (ready to process) state.
+ * The general computing is event-driven, i.e. events are received by the abstract general processing unit
+ * and are processed by a scTechGenComp_PU or scBioGenComp_PU general processing unit.
+ * This state machine controls transitions between states. When a processing unit receives a state-related
+ * event, it calls the corresponding method of this class.
+ * The PU is generated in Ready (ready to process, gcsm_Ready) state.
  *
- * @see BioGenCompState#EVENT_GenComp
- * @see BioGenCompStateMachineType_t
+ * @see scGenComp_PU_Abstract
+ * @see scGenComp_PU_Abstract#EVENT_GenComp
+ * @see GenCompStateMachineType_t
+ * @see scGenComp_PU_Abstract#mStateFlag
  */
 
-class BioGenCompState : public AbstractGenCompState
+class GenCompStates_Abstract
 {
     public:
         /**
-         * @brief Puts the PU state to 'Ready' (called by the scGenComp_PU_Bio's constructor)
+         * @brief Puts the PU state to 'Ready' (called by the scGenComp_PU_Abstract's constructor)
          * and sets up its event handling
          */
-        BioGenCompState(void);
-        virtual ~BioGenCompState(void);
-        /**
-         * @brief Deliver: Signal 'End computing'; result to the 'output section'
-         */
-        virtual void Deliver(scGenComp_PU_Bio *PU);
+        GenCompStates_Abstract(void);
+        virtual ~GenCompStates_Abstract(void);
 
         /**
-         * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
-         */
-        virtual void Process(scGenComp_PU_Bio *PU);
+         * @brief Deliver: Received signal 'End computing'; issues signal 'Beging delivering';
+         * - delivers result to the 'output section'; calls PU's DoDelivering
+         * - the system must be in state gcsm_Processing, passes to gcsm_Delivering
+         *
+         * @param PU The HW to set
+         *
+         * the system must be in state gcsm_Processing, passes to gcsm_Delivering
+          */
+        virtual void Deliver(scGenComp_PU_Abstract* PU);
+
 
         /**
-         * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
+         * @brief Fail: Can happen only in Processing state; passes to Relaxing state
+         *
+         * @param PU The HW that failed
          */
-        virtual void Relax(scGenComp_PU_Bio *PU);
+        virtual void Fail(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
          *
          * @param PU The HW to set
-         * A simple subroutine, sets state to 'ready', trigger to
+         * A simple subroutine, sets state to gcsm_Ready, trigger to
          */
-        virtual void Initialize(scGenComp_PU_Bio* PU);
+        virtual void Initialize(scGenComp_PU_Abstract* PU);
 
         /**
-         * @brief InputReceived: The machine received new input, administer it
+         * @brief The machine received new input, administer it
          *
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void InputReceived(scGenComp_PU_Bio* PU);
+        virtual void InputReceive(scGenComp_PU_Abstract* PU);
 
+        /**
+         * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
+         *
+         * @param PU The HW to set
+         */
+        virtual void Process(scGenComp_PU_Abstract* PU);
+
+        /**
+         * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
+         *
+         * @param PU The HW to set
+         */
+
+        virtual void Relax(scGenComp_PU_Abstract* PU);
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
+         *
+         * @param PU The HW to set
          */
-        virtual void Synchronize(scGenComp_PU_Bio *PU);
+        virtual void Synchronize(scGenComp_PU_Abstract* PU);
+
 
         /**
-         * @brief Fail: Can happen only in Processing state; passes to Relaxing state
-         * @param PU The HW that failed
+         * @brief State_Set
+         *
+         * @param PU The HW to set
+         * @param State The selected state type flag
          */
-        virtual void Fail(scGenComp_PU_Bio* PU);
-        void State_Set(scGenComp_PU_Bio* PU, GenCompStateMachineType_t& State);
+        void State_Set(scGenComp_PU_Abstract* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
+         *
          * @param PU The HW to set
          */
-        virtual void Sleep(scGenComp_PU_Bio *PU);
+        virtual void Sleep(scGenComp_PU_Abstract *PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
-         */
-        virtual void Wakeup(scGenComp_PU_Bio *PU);
-        /**
-         * @brief State_Set Set the state of PU to st
+         *
          * @param PU The HW to set
          */
-#endif // USE_PU_HWSLEEPING
-    protected:
-        void UpdatePU(scGenComp_PU_Bio& PU);
-    private:
+        virtual void Wakeup(scGenComp_PU_Abstract *PU);
+ #endif // USE_PU_HWSLEEPING
+ /*   protected:
+        void UpdatePU(scGenComp_PU_Abstract& PU);*/
  };
 ;
 
-#endif //BioGenCompStates_h
+#endif //GenCompStates_Abstract_h

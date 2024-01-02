@@ -1,4 +1,4 @@
-/** @file BioGenCompStates.cpp
+/** @file GenCompStates_Bio.cpp
  *  @ingroup GENCOMP_MODULE_PROCESS
  *  @brief  The abstract processing unit for biological generalized computing
  */
@@ -8,7 +8,7 @@
 */
 
 #include "scGenComp_PU_Bio.h"
-#include "GenCompStates.h"
+#include "GenCompStates_Abstract.h"
 
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
@@ -19,54 +19,66 @@
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
-
 // The units of biological general computing work in the same way, using general events
-// The XXX_method() is activated by the event; XXX makes the activity, if the stae is OK
+// The XXX_method() is activated by the event; DoXXX makes the activity, if the state is OK
 
-BioGenCompState::
-    BioGenCompState(void): AbstractGenCompState()
+GenCompStates_Bio::
+    GenCompStates_Bio(void): GenCompStates_Abstract()
 {}
 
-BioGenCompState::
-    ~BioGenCompState(void)
+GenCompStates_Bio::
+    ~GenCompStates_Bio(void)
 {
 }
 
+
+
 // Overload if want to use "dormant" state
-   void BioGenCompState::
+   void GenCompStates_Bio::
 Wakeup(scGenComp_PU_Bio *PU)
 {
- //   State_Set(machine, new ReadyGenCompState(name()));
  //   machine.WakeUp();
 }
 
-    void BioGenCompState::
+    void GenCompStates_Bio::
 Deliver(scGenComp_PU_Bio *PU)
 {
 }
 
 // Put the PU electronics to low-power mode
 // Must come from 'Ready' state; otherwise fail
-    void BioGenCompState::
+    void GenCompStates_Bio::
 Sleep(scGenComp_PU_Bio* PU)
 {
     assert(gcsm_Sleeping != PU->StateFlag_Get());
     PU->StateFlag_Set(gcsm_Sleeping);
 }
 
-    void BioGenCompState::
+    void GenCompStates_Bio::
 Process(scGenComp_PU_Bio* PU)
 {
-//    State_Set(machine, new ProcessingGenCompState(name()));
+    assert((gcsm_Processing == PU->StateFlag_Get()) || (gcsm_Ready == PU->StateFlag_Get())); // No other case allowed
+        // Legally received a 'Begin processing' signal
+    if(gcsm_Ready == PU->StateFlag_Get())
+    {   // We are still in 'Ready' state, set the mode and
+        PU->StateFlag_Set(gcsm_Processing);
+        PU->EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
+        PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME);
+    }
+    else
+    {
+
+    }
+    //    PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME);
+
 }
 
-    void BioGenCompState::
+    void GenCompStates_Bio::
 Relax(scGenComp_PU_Bio* PU)
 {
 
-// Although a method thread, is invoked from the constructor
 }
-    void BioGenCompState::
+    void GenCompStates_Bio::
 Initialize(scGenComp_PU_Bio* PU)
 {
     PU->StateFlag_Set(gcsm_Ready);
@@ -76,29 +88,36 @@ Initialize(scGenComp_PU_Bio* PU)
  *  The machine PU received new input, administer it
  *  Input can be received only in 'Ready' and 'Processing' states
  */
-void BioGenCompState::
-    InputReceived(scGenComp_PU_Bio* PU)
+void GenCompStates_Bio::
+    DoInputReceive(scGenComp_PU_Bio* PU)
 {
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
     {   // Inputs are received only in 'processing' mode, otherwise we neglect it
         if(gcsm_Ready == PU->StateFlag_Get())
         {   // A new spike in 'Ready' state received; we start processing
             PU->StateFlag_Set(gcsm_Processing);
-            PU->EVENT_GenComp.Begin_Computing.notify(SC_ZERO_TIME); // Issue 'Begin Computing'
-            PU->EVENT_GenComp.HeartBeat.notify(BIO_HEARTBEAT_TIME); // Issue first heartbeat
+            PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Issue 'Begin Processing'
+                    DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
+            PU->EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME); // Issue first heartbeat
+                    DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
         }
-        PU->ReceiveInput(); // Make the administration of the received input
+        // Now the unit is surely in state 'Processing'
+        PU->DoInputReceive(); // Make the administration of the received input
+    }
+    else
+    {
+        DEBUG_SC_WARNING("Bio event neglected");
     }
  }
 
 
-void BioGenCompState::
+void GenCompStates_Bio::
     Synchronize(scGenComp_PU_Bio* PU)
 {
 }
 
 //Can happen only in Processing state; passes to Relaxing state
-    void BioGenCompState::
+    void GenCompStates_Bio::
 Fail(scGenComp_PU_Bio* PU)
 {
     if(gcsm_Processing== PU->StateFlag_Get())
@@ -107,7 +126,7 @@ Fail(scGenComp_PU_Bio* PU)
 
 }
 
-    void BioGenCompState::
+    void GenCompStates_Bio::
 State_Set(scGenComp_PU_Bio* PU, GenCompStateMachineType_t& State)
 {
     PU-> StateFlag_Set( State);
