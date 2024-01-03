@@ -12,6 +12,9 @@
 #define EMPA_UTILS_H
 #include "HWConfig.h"
 using namespace std;
+/** @addtogroup GENCOMP_MODULE_STUFF
+ *  @{
+ */
 
     int
 MaskToID(SC_GRIDPOINT_MASK_TYPE Mask); ///< Converts core mask to its sequence number
@@ -75,5 +78,6 @@ sc_time_to_msec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int d =
 StringOfTime_Get(void);
 
 int sb_fprintf(FILE *fp, const char *fmt, ...) ;
+     /** @}*/
 
 #endif // EMPA_UTILS_H

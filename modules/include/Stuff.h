@@ -13,6 +13,9 @@
 #include <string>
 extern bool GUI_MODE;	// This tells whether routine run in GUI mode
 using namespace std;
+/** @addtogroup GENCOMP_MODULE_STUFF
+ *  @{
+ */
 
 
 /*!
@@ -54,5 +57,9 @@ GetAppVersion(void);
 */
 
 bool FinishProgram(void);
+
+  /** @}*/
+
+
 
 #endif //  GENCOMP_STUFF_H

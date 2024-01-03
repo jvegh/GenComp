@@ -39,7 +39,22 @@ static vector<GenCompStates_Abstract*> AbsPU_StateVector;
  *  Begin restoring the 'Ready' state
  *  @var EVENT_GenComp_type::RelaxingEnd
  *  End restoring the 'Ready' state
+ *  @var EVENT_GenComp_type::TransmittingBegin
+ *  Begin transmitting the result (externally); unattended
+ *  @var EVENT_GenComp_type::TransmittingEnd
+ *  Feedback from transmission unit; unattended
  *
+ *  @var EVENT_GenComp_type::SleepingBegin
+ *  Begin of HW sleepig
+ *  Only in 'Ready' state, the PU can spare power by going to 'Sleeping' state
+ *  @var EVENT_GenComp_type::SleepingEnd,
+ *  End of HW spleeping
+ *  @var EVENT_GenComp_type::Synchronize
+ *  External event forces PU to synchronize
+ *  @var EVENT_GenComp_type::Fail
+ *  Computing failed, start over
+ *  @var EVENT_GenComp_type::Initialize,             // Put the unit to its ground state
+ *  @var EVENT_GenComp_type::InputReceived,          // New input received
  */
 
 struct EVENT_GenComp_type {
@@ -60,6 +75,7 @@ struct EVENT_GenComp_type {
         SleepingEnd,
         Sleep,
         Synchronize,             // External synhronize signal
+
         TransmittingBegin,      // Begin transmitting the result (externally); unattended
         TransmittingEnd,        // Feedback from transmission unit; unattended
         PotentialRestored,      //
@@ -69,30 +85,7 @@ struct EVENT_GenComp_type {
 };
 
 /*
- *             DeliveringBegin,        // Begin delivering the result (internally)
-            DeliveringEnd,          // End delivering
-            Fail,                   // Computing failed, start over
-            Heartbeat,              // Refresh PU's state
-            Initialize,             // Put the unit to its ground state
-            InputReceived,          // New input received
-            ProcessingBegin,        // Begin data processing
-            ProcessingEnd,          // End data processing
-            ReadyBegin,             // Begin being in ready state
-            ReadyEnd,               // End being in ready state
-            RelaxingBegin,          // Begin restoring the 'Ready' state
-            RelaxingEnd,            // End restoring the 'Ready' state
-            SleepingBegin,
-            SleepingEnd,
-            Sleep,
-            Synchronize,             // External synhronize signal
-            TransmittingBegin,      // Begin transmitting the result (externally); unattended
-            TransmittingEnd,        // Feedback from transmission unit; unattended
-            Potential_Restored,      //
-                // HW-related
-            Awaken,                  // Signals that is ready to use
-            Wakeup;                  // The HW is needed again, awake it
 
- * Only in 'Ready' state, the PU can spare power by going to 'Sleeping' state
  *
  * Operating principle of event processing:
  *
@@ -106,6 +99,7 @@ struct EVENT_GenComp_type {
  * - Deliver
  * - Process
  * - Relax
+ * - Transmit
  * - Synchronize
  *
 
@@ -177,7 +171,12 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
 
     virtual ~scGenComp_PU_Abstract(void); // Must be overridden
 
-    /**
+    /**    If this macro is not defined, no code is generated;
+  the variables, however, must be defined (although they will be
+  optimized out as unused ones).
+  Alternatively, the macros may be protected with "\#ifdef MAKE_TIME_BENCHMARKING".
+  The macros have source-module scope. All variables must be passed by reference.
+
      * @brief The HW initialization
     */
     virtual void DoInitialize();
