@@ -53,14 +53,12 @@ Sleep(scGenComp_PU_Abstract* PU)
     PU->EVENT_GenComp.SleepingBegin.notify(SC_ZERO_TIME);
 }
 
-// Must be in "Processing" state to pass to
+// Must be in "Ready" state to pass to
     void GenCompStates_Abstract::
 Process(scGenComp_PU_Abstract* PU)
 {
-        assert(gcsm_Processing == PU->StateFlag_Get()); // No other case allowed
+    assert(gcsm_Ready == PU->StateFlag_Get()); // No other case allowed
     // Legally received a 'Begin processing' signal
-//    PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME);
-    PU->EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
 }
 
 // For relaxing, it must be in statio "Delivering"
