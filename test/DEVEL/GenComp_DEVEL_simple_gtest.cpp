@@ -79,7 +79,7 @@ int sc_main(int argc, char* argv[]) {
         std::cerr << " error code " << returnValue << endl;
     else
         std::cerr << "no error"  << endl;
-    std::cerr  << "SystemC unit testing took " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+    std::cerr  << "SystemC unit testing took " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     return(returnValue);
 }
 

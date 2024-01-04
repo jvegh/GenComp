@@ -50,10 +50,10 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
 {
     switch(ObjectSelector)
     {
-        case 0: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio"); break;
+        case 0: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
         default:
         {
-            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
         }; break;
     }
     return 0;
@@ -98,14 +98,14 @@ int sc_main(int argc, char* argv[])
     else
     {// Create a simulator
         MySimulator = new scGenComp_Simulator("MySim");
-        // Must be created before registering
+        // All units must be created before registering
         MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
         MySimulator->RegisterPU(MyBioDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
     // ------!!No instantiation of objects from classes scXXX is allowed outside this section!!
-    std::cerr  << "  -Elapsed for preparing simulation: " << x.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+    std::cerr  << "  -Elapsed for preparing simulation: " << x.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s,SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
 
     if(!returnValue)
     {   // It was all right with the preparation, prepare simulation
@@ -113,18 +113,20 @@ int sc_main(int argc, char* argv[])
         BENCHMARK_TIME_BEGIN(&t,&x);
         SC_BENCHMARK_TIME_BEGIN(&SC_t,&SC_x);
         if(!UseSimulator)
-            sc_start();
+            sc_start(); // Will run until dies
         else
-        {    // We are at the beginning, just make a call to set up the SystemC engine
-            sc_start(SC_ZERO_TIME);
+        {   // This is the real simulation cycle: runs until end
+            // but allows updateing any state of the simulated object
+            sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
             while(MySimulator->Run())
             {   // This portion is run repeatedly by the simulator
+                // Update display here
 //                DEBUG_PRINT("Again ");
             }
         };
         BENCHMARK_TIME_END(&t,&x,&s);
         SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
-        std::cerr  << "  -Elapsed for running the simulation: " << x.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+        std::cerr  << "  -Elapsed for running the simulation: " << x.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     }
     else
         std::cerr  << "  -Error " << returnValue << " during preparing objects" << endl;
@@ -136,9 +138,9 @@ int sc_main(int argc, char* argv[])
         std::cerr << " with no error"  << endl;
     if(UseSimulator)
         std::cerr  << "GenComp/DEMO by scGenComp_Simulator " << MySimulator->Time_Get().count()/1000/1000. << " msec CLOCK time" << "//"
-                   <<  sc_time_String_Get(SC_TIME_UNIT_DEFAULT,MySimulator->scTime_Get()) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+                   <<  sc_time_String_Get(MySimulator->scTime_Get(), SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     else
-        std::cerr  << "GenComp/DEMO simulation " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_s)
+        std::cerr  << "GenComp/DEMO simulation " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT)
                    << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     return(returnValue);
 }

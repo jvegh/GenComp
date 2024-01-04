@@ -20,9 +20,9 @@ extern    string SC_TIME_UNIT[];
 //
 // Utility functions for degugging
 //
-#define DEBUG_SC_TIME sc_time_String_Get(SC_TIME_UNIT_DEFAULT)
+#define DEBUG_SC_TIME sc_time_String_Get(sc_time_stamp(),SC_TIME_UNIT_DEFAULT)
 //<< SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
-#define DEBUG_SC_TIME_LOCAL sc_time_String_Get(SC_TIME_UNIT_DEFAULT,sc_time_stamp()-scTimeBase_Get())
+#define DEBUG_SC_TIME_LOCAL sc_time_String_Get(sc_time_stamp()-scTimeBase_Get(),SC_TIME_UNIT_DEFAULT)
 //<< ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
 //#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << << dec << ", line " << __LINE__
 #define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
