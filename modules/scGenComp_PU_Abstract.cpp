@@ -34,7 +34,7 @@ scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     // Intialize the module with generating an event
     SC_METHOD(Initialize_method);
     sensitive << EVENT_GenComp.Initialize;
-//    dont_initialize();
+    dont_initialize();
         // Operating
     SC_METHOD(InputReceived_method);
     sensitive << EVENT_GenComp.InputReceived;
@@ -163,24 +163,24 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
+                DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
+                DEBUG_SC_EVENT("Received input #" << NoOfInputsReceived_Get());
     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
         DEBUG_SC_PRINT_LOCAL ("Input observed");
-            DEBUG_SC_EVENT_LOCAL(">>>   ");
     // The input is legal, continue receiving it
     DoInputReceive();
-            DEBUG_SC_EVENT_LOCAL("<<<   ");
+
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
 void scGenComp_PU_Abstract::
     DoInputReceive(void)
 {
-            DEBUG_SC_EVENT_LOCAL("   >>>");
+            DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
             DEBUG_SC_PRINT_LOCAL ("Input observed");
 
     Inputs.push_back(NoOfInputsReceived_Get());
-            DEBUG_SC_EVENT_LOCAL("   <<<");
 }
 
 
