@@ -57,7 +57,7 @@
     or, if confortable
     can be accessed as
     @code{.cpp}
-    sc_time_String_Get(SC_TIME_UNIT_DEFAULT,SC_x)
+    sc_time_String_Get(SC_x, SC_TIME_UNIT_DEFAULT)
     @endcode
  */
 /*  @author János Végh (jvegh)
