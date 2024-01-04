@@ -22,10 +22,12 @@ extern GenCompStates_Bio *TheGenCompStates_Bio;
 scGenComp_PU_BioDEMO::
     scGenComp_PU_BioDEMO(sc_core::sc_module_name nm):
     scGenComp_PU_Bio(nm)
-{   // Needed to avoid using SystemC specific aíntax
+{   // Needed to avoid using SystemC specific syntax
     typedef scGenComp_PU_BioDEMO SC_CURRENT_USER_MODULE;
     // This routine is called after initalizations but before starting simulation
     SC_THREAD(InitializeForDemo_method);
+    // ** Do not reimplement any of the xxx_method functions
+    // until you know what you are doing
 };
 
 // Prepare events for the demo unit; runs before the other 'method's

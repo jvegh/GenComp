@@ -29,9 +29,8 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm):
     if(!TheGenCompStates_Bio)
         TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
     MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
-    SC_METHOD(InputReceived_method);
-    sensitive << EVENT_GenComp.InputReceived;
-    dont_initialize();
+    // ** Do not reimplement any of the xxx_method functions
+    // until you know what you are doing
 }
 
     scGenComp_PU_Bio::
@@ -84,7 +83,7 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     Heartbeat_Processing()
 {
-    HeartbeatRecalculateMembranePotential();
+    CalculateMembranePotential();
     if (scLocalTime_Get() < sc_time(5*BIO_HEARTBEAT_TIME))
         {   // We are still processing; re-issue the heartbeat
             // if the limit is not yet reached
@@ -157,13 +156,13 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     InputReceived_method()
 {
+    DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived");
     // In bio mode, any input causes passing to 'Processing' statio
-    DEBUG_SC_EVENT_LOCAL("<<<Received input #" << NoOfInputsReceived_Get());
     if(!NoOfInputsReceived_Get())
         {   // This is the first input we received, change the state first
             MachineState->Process(this);
-                DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingBegin");
-                DEBUG_SC_EVENT("SENT    EVENT_GenComp.HeartBeat");
+            ProcessingBegin();
+            DEBUG_SC_EVENT("SENT implicite 'EVENT_GenComp.ProcessingBegin'");
         }
     // The input is legal, statio is OK, continue receiving it
     MachineState->InputReceive(this);
@@ -178,17 +177,15 @@ void scGenComp_PU_Bio::
     DoInputReceive(void)
 {
     scGenComp_PU_Abstract::DoInputReceive();
-                DEBUG_SC_EVENT_LOCAL("<<<Received input #" << NoOfInputsReceived_Get());
 }
 
 
 void scGenComp_PU_Bio::
     ProcessingBegin()
 {
-    DEBUG_SC_EVENT_LOCAL("Processing started");
     scGenComp_PU_Abstract::ProcessingBegin();  // Make default processing
     EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
-    DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with zero");
+                DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with zero");
 }
 
 // Called when the state 'processing' ends
@@ -202,7 +199,7 @@ void scGenComp_PU_Bio::
 }
 
 void scGenComp_PU_Bio::
-    HeartbeatRecalculateMembranePotential()
+    CalculateMembranePotential()
 {
     int i=1;
 }
