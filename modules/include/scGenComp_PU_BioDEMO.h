@@ -59,9 +59,11 @@ class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
 
     /**
       *  Prepare events for the demo unit; run before the other 'method's
-      * The unit is 'Ready', expected to 'live' at 12 us
-      // from 12 to 17 receives heartbeats
-      // at 20 finishes 'Processing'
+      * The unit is 'Ready', expected to 'live' at 120 us
+      * Until 125 us receives heartbeats, in 'Processing' mode
+      * Until 130 us receives heartbeats, in 'Delivering' mode
+      * Until 135 us receives heartbeats, in 'Relaxing' mode
+      * Until 140 us receives heartbeats, in 'Ready' mode
     */
     void InitializeForDemo_method();
 
