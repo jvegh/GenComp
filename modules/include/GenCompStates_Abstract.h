@@ -144,7 +144,7 @@ class GenCompStates_Abstract
         virtual void InputReceive(scGenComp_PU_Abstract* PU);
 
         /**
-         * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
+         * @brief Process: Signal 'begin computing' received; arguments are in the 'input section'; start computing
          *
          * @param PU The HW to set
          */

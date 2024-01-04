@@ -38,7 +38,7 @@ GenCompStates_Abstract::
     void GenCompStates_Abstract::
 Deliver(scGenComp_PU_Abstract* PU)
 {
-    assert(gcsm_Processing == PU->StateFlag_Get()); // Make sure it is was in state 'Processing'
+    assert(gcsm_Processing == PU->StateFlag_Get()); // Make sure if it was in state 'Processing'
     PU->StateFlag_Set(gcsm_Delivering);
     PU->EVENT_GenComp.DeliveringBegin.notify(SC_ZERO_TIME);
   }
