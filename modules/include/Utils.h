@@ -73,6 +73,8 @@ YFromPosition_Get(int x, int y);
     string
 sc_time_String_Get( sc_core::sc_time T, int32_t U=SC_TIME_UNIT_DEFAULT, const int32_t d = 2, const int32_t w=7);
 
+    /**
+*/
     string
 sc_time_to_nsec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 2, const int32_t w=6);
 

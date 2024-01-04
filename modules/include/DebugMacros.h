@@ -53,9 +53,8 @@ extern    string SC_TIME_UNIT[];
 #define DEBUG_SC_EVENT_LOCAL(X)  std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #else
 #define DEBUG_SC_EVENT(X)
-#define DEBUG_SC_EVENT_LOCAL(x)
+#define DEBUG_SC_EVENT_LOCAL(X)
 #endif
-//
 //
 //
 /*!
@@ -74,14 +73,12 @@ extern    string SC_TIME_UNIT[];
 /*!
   \def DEBUG_SC_WARNING(X)
   Prints a  warning message type and time, message \a X, and the location
-  @param X the message from the event
 */
 
 /*!
   \def DEBUG_SC_PRINT_LOCAL(X)
   Prints a  message type and time, message \a X, and the location
   The same as DEBUG_SC_WARNING, but uses local time
-  @param X the message from the event
 */
 
 #ifdef DEBUG_PRINTS
@@ -90,10 +87,10 @@ extern    string SC_TIME_UNIT[];
 #define DEBUG_SC_WARNING(X)  std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #define DEBUG_SC_WARNING_LOCAL(X)  std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
 #else
-#define DEBUG_SC_PRINT(x)
+#define DEBUG_SC_PRINT(X)
 #define DEBUG_SC_PRINT_LOCAL(X)
-#define DEBUG_SC_WARNING(x)
-#define DEBUG_SC_WARNING_LOCAL(x)
+#define DEBUG_SC_WARNING(X)
+#define DEBUG_SC_WARNING_LOCAL(X)
 #endif
 //
 // The macros blow are not yet revived
