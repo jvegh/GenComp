@@ -264,27 +264,13 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     void ProcessingBegin();
     void ProcessingEnd();
 
-    /** @brief The PU is ready to operate
-     *
-     *  Is sensitive to events Initialize
-     */
-    void Ready_method(void);
-
     /**
-     * @brief Relax_method
-     *
-     * - Sensitive to
+     * @brief Resetting the unix to its operating state
      *
      * No input received; basically just spends time
-     * (plus resets unit to "Ready" state
+     * (plus resets unit to "Ready" state)
      *
-     */
-    /**
-      * @brief Resetting the unix to its operating state
-      *
-      * The resetting method is called twice; at the beginning and at the end of the 'Relaxing' phase
-      * The first phase is executed in state 'Delivering', the 2nd one in state 'Relaxing'
-      * The routine is actived by EVENT_GenComp.End_Delivering
+     * The routine is actived by EVENT_GenComp.End_Delivering
      */
 
     virtual void Relax_method(){ assert(0);};
@@ -340,7 +326,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * @brief scLocalTime_Set
      * @param T The beginning of the simulated time of the recent operation
      */
-    void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
+    void scLocalTime_Set(sc_core::sc_time T){    mLocalTimeBase = T;}
     sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
      /*!

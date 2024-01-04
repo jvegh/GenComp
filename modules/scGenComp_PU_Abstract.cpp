@@ -163,8 +163,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
-                DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
-                DEBUG_SC_EVENT("Received input #" << NoOfInputsReceived_Get());
+    DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
         DEBUG_SC_PRINT_LOCAL ("Input observed");
     // The input is legal, continue receiving it
@@ -176,10 +175,11 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     DoInputReceive(void)
 {
-            DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
-    if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
+     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
             DEBUG_SC_PRINT_LOCAL ("Input observed");
 
+     DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
+     DEBUG_SC_EVENT("Received input #" << NoOfInputsReceived_Get());
     Inputs.push_back(NoOfInputsReceived_Get());
 }
 
@@ -194,11 +194,16 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     ProcessingBegin()
 {
-            DEBUG_SC_EVENT_LOCAL("Processing started");
-    MachineState->Process(this);    // Go to "Processing"
-    scLocalTime_Set();      // The clock is synchronized to the beginning of processing
-            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with zero");
+    scLocalTime_Set(sc_time_stamp());      // The clock is synchronized to the beginning of processing
+    Inputs.clear();
+    DEBUG_SC_EVENT_LOCAL("Processing started");
 }
+/*
+PU->EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
+DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
+PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME);
+DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
+*/
 // Called when the state 'processing' ends
 void scGenComp_PU_Abstract::
     ProcessingEnd_method()
