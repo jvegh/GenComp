@@ -36,37 +36,13 @@
 //??scClusterBusSimulator* TheSimulator;
 //??string ListOfIniFiles;
 
-#include "scGenComp_PU_Bio.h"
+#include "scGenComp_PU_BioDEMO.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStatesString[];   // Just for debugging
 
-class scGenComp_PU_BioDemo : public scGenComp_PU_Bio
-{
-public:
-    scGenComp_PU_BioDemo(sc_core::sc_module_name nm):
-        scGenComp_PU_Bio(nm)
-    {
-        typedef scGenComp_PU_BioDemo SC_CURRENT_USER_MODULE;
-        SC_THREAD(InputReceived_method); //Needed to allow 'wait()
-        sensitive << EVENT_GenComp.InputReceived;
-        dont_initialize();  // Run only when real input received
-         EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
-        EVENT_GenComp.InputReceived.notify(12,SC_US);     // The BPU starts to receive spikes
-        DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
-        EVENT_GenComp.InputReceived.notify(23,SC_US);     // The BPU starts to receive spikes
-    }
-#define INPUTS_MESSAGE  "Unit is in state '" << GenCompStatesString[mStateFlag] << "' and received " << Inputs.size() << " inputs"
-    void InputReceived_method()
-    {   // Unit receives inputs at 13 and 14; resets at 17; // Makes only printing
-        scGenComp_PU_Bio::InputReceived_method();   // The rest is made by the superclass
-        DEBUG_SC_PRINT(INPUTS_MESSAGE);
-    }
-};
-
-scGenComp_PU_BioDemo* MyBio;
+scGenComp_PU_BioDEMO* MyBioDEMO;
 scGenComp_Simulator* MySimulator;
 
 // Prepare sxXXX modules and instantiate them
@@ -74,10 +50,10 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
 {
     switch(ObjectSelector)
     {
-        case 0: MyBio = new scGenComp_PU_BioDemo("MyBio"); break;
+        case 0: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio"); break;
         default:
         {
-            MyBio = new scGenComp_PU_BioDemo("MyBio");
+            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
         }; break;
     }
     return 0;
@@ -123,8 +99,8 @@ int sc_main(int argc, char* argv[])
     {// Create a simulator
         MySimulator = new scGenComp_Simulator("MySim");
         // Must be created before registering
-        MyBio = new scGenComp_PU_BioDemo("MyBio");
-        MySimulator->RegisterPU(MyBio);
+        MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+        MySimulator->RegisterPU(MyBioDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
