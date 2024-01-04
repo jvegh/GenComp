@@ -66,6 +66,11 @@ class scGenComp_PU_Tech : public scGenComp_PU_Abstract
 
     scGenComp_PU_Tech(sc_core::sc_module_name nm, int32_t No);
     virtual ~scGenComp_PU_Tech(); // Must be overridden
+    /**
+     * @brief Initialize the technical PU
+     *
+     *
+     */
     virtual void Initialize_method();
 
   protected:

@@ -31,6 +31,8 @@ scGenComp_PU_Tech(sc_core::sc_module_name nm, int32_t No):
     if(!TheGenCompStates_Tech)
         TheGenCompStates_Tech = new GenCompStates_Tech();
     MachineState = TheGenCompStates_Tech;
+    // ** Do not reimplement any of the xxx_method functions
+    // until you know what you are doing
 }
 
 scGenComp_PU_Tech::
