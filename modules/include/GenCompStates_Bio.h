@@ -107,17 +107,17 @@ class GenCompStates_Bio : public GenCompStates_Abstract
          * do delivering result to the 'output section';
          *
          */
-        virtual void Deliver(scGenComp_PU_Bio *PU);
+        virtual void Deliver(scGenComp_PU_Abstract *PU);
 
         /**
          * @brief Process: Signal 'begin computing" received; arguments in the 'input section'; start computing
          */
-        virtual void Process(scGenComp_PU_Bio *PU);
+        virtual void Process(scGenComp_PU_Abstract *PU);
 
         /**
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          */
-        virtual void Relax(scGenComp_PU_Bio *PU);
+        virtual void Relax(scGenComp_PU_Abstract *PU);
 
         /**
          * @brief Initialize: Sets the state machineto its well-defined initial state
@@ -125,7 +125,7 @@ class GenCompStates_Bio : public GenCompStates_Abstract
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void Initialize(scGenComp_PU_Bio* PU);
+        virtual void Initialize(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief The machine received new input, administer it
@@ -133,31 +133,31 @@ class GenCompStates_Bio : public GenCompStates_Abstract
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void DoInputReceive(scGenComp_PU_Bio* PU);
+        virtual void DoInputReceive(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          */
-        virtual void Synchronize(scGenComp_PU_Bio *PU);
+        virtual void Synchronize(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Fail: Can happen only in Processing state; passes to Relaxing state
          * @param PU The HW that failed
          */
-        virtual void Fail(scGenComp_PU_Bio* PU);
-        void State_Set(scGenComp_PU_Bio* PU, GenCompStateMachineType_t& State);
+        virtual void Fail(scGenComp_PU_Abstract* PU);
+        void State_Set(scGenComp_PU_Abstract* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
          * @brief Sleep: Send the HW to sleep if idle for a longer time;  economize power
          * @param PU The HW to set
          */
-        virtual void Sleep(scGenComp_PU_Bio *PU);
+        virtual void Sleep(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          */
-        virtual void Wakeup(scGenComp_PU_Bio *PU);
+        virtual void Wakeup(scGenComp_PU_Abstract* PU);
         /**
          * @brief State_Set Set the state of PU to st
          * @param PU The HW to set
