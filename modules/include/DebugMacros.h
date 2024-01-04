@@ -1,11 +1,103 @@
+/** @file DebugMacros.h
+ *  @brief Macros for debugging both normal and SystemC  (simulated) functionality
+ *  @ingroup GENCOMP_MODULE_STUFF
+ */
 // Basically, the debug and log messages have two operating modes
-///  @ingroup GENCOMP_MODULE_PROCESS
 #ifndef DEBUG_MACROS_H
 #define DEBUG_MACROS_H
 
 // During unit testing, all log messages are suppressed
 #include "Utils.h"
 
+extern    string SC_TIME_UNIT[];
+// define prompts for SC debugging
+#define DEBUG_EVENT_STRING "EVT->"
+#define DEBUG_PRINT_STRING "DBG->"
+#define DEBUG_WARNING_STRING "WNG->"
+#define DEBUG_EVENT_STRING_LOCAL "EVT*>"
+#define DEBUG_PRINT_STRING_LOCAL "DBG*>"
+#define DEBUG_WARNING_STRING_LOCAL "WNG*>"
+//
+// Utility functions for degugging
+//
+#define DEBUG_SC_TIME sc_time_String_Get(SC_TIME_UNIT_DEFAULT)
+//<< SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+#define DEBUG_SC_TIME_LOCAL sc_time_String_Get(SC_TIME_UNIT_DEFAULT,sc_time_stamp()-scTimeBase_Get())
+//<< ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+//#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << << dec << ", line " << __LINE__
+#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
+#define DEBUG_LOCATION_SHORT string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1)  << dec << ", line " << __LINE__
+//#define DEBUG_SC_RELATIVE_PROLOG(P) P << name() << "@" << DEBUG_SC_TIME_LOCAL << " : \""
+#define DEBUG_SC_PROLOG_LOCAL "." << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \""
+//#define DEBUG_SC_PROLOG(Prompt) "@" << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \"" << Prompt
+#define DEBUG_SC_PROLOG "@" << DEBUG_SC_TIME << "," << name() << "::" << __func__ << ": \""
+//
+// scGenComp_PU_Abstract-based debug routines
+//
+
+/*!
+  \def DEBUG_SC_EVENT(X)
+  Prints a  message type and time, message \a X, and the location of the event
+  @param X the message from the event
+*/
+
+/*!
+  \def DEBUG_SC_EVENT_LOCAL(X)
+  Prints a  message type and scGenComp_PU_Abstract's LOCAL time, message \a X, and the location of the event.
+  The same as DEBUG_SC_EVENT, but uses local time
+  @param X the message from the event
+*/
+
+#ifdef DEBUG_EVENTS
+#define DEBUG_SC_EVENT(X)        std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_EVENT_LOCAL(X)  std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#else
+#define DEBUG_SC_EVENT(X)
+#define DEBUG_SC_EVENT_LOCAL(x)
+#endif
+//
+//
+//
+/*!
+  \def DEBUG_SC_PRINT(X)
+  Prints a  message type and time, message \a X, and the location
+  @param X the message from the event
+*/
+
+/*!
+  \def DEBUG_SC_PRINT_LOCAL(X)
+  Prints a  message type and time, message \a X, and the location
+  The same as DEBUG_SC_PRINT, but uses local time
+  @param X the message from the event
+*/
+
+/*!
+  \def DEBUG_SC_WARNING(X)
+  Prints a  warning message type and time, message \a X, and the location
+  @param X the message from the event
+*/
+
+/*!
+  \def DEBUG_SC_PRINT_LOCAL(X)
+  Prints a  message type and time, message \a X, and the location
+  The same as DEBUG_SC_WARNING, but uses local time
+  @param X the message from the event
+*/
+
+#ifdef DEBUG_PRINTS
+#define DEBUG_SC_PRINT(X)  std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_PRINT_LOCAL(X)  std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_WARNING(X)  std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_WARNING_LOCAL(X)  std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#else
+#define DEBUG_SC_PRINT(x)
+#define DEBUG_SC_PRINT_LOCAL(X)
+#define DEBUG_SC_WARNING(x)
+#define DEBUG_SC_WARNING_LOCAL(x)
+#endif
+//
+// The macros blow are not yet revived
+//
 // Do not produce log messages during unit testing or if explicitly suppressed
 #ifdef SUPPRESS_LOGGING
 //  #define LOG_FATAL(x)
@@ -96,44 +188,6 @@ using namespace std;
   Prints non-object event \a x to the standard err output
 
 */
-
-extern    string SC_TIME_UNIT[];
-// define prompts for SC debugging
-#define DEBUG_EVENT_STRING "EVT->"
-#define DEBUG_PRINT_STRING "DBG->"
-#define DEBUG_WARNING_STRING "WNG->"
-#define DEBUG_EVENT_STRING_LOCAL "EVT*>"
-#define DEBUG_PRINT_STRING_LOCAL "DBG*>"
-#define DEBUG_WARNING_STRING_LOCAL "WNG*>"
-//
-#define DEBUG_SC_TIME sc_time_String_Get(SC_TIME_UNIT_DEFAULT)
-//<< SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
-#define DEBUG_SC_TIME_LOCAL sc_time_String_Get(SC_TIME_UNIT_DEFAULT,sc_time_stamp()-scTimeBase_Get())
-//<< ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
-//#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << << dec << ", line " << __LINE__
-#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
-#define DEBUG_LOCATION_SHORT string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1)  << dec << ", line " << __LINE__
-//#define DEBUG_SC_RELATIVE_PROLOG(P) P << name() << "@" << DEBUG_SC_TIME_LOCAL << " : \""
-#define DEBUG_SC_PROLOG_LOCAL "." << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \""
-//#define DEBUG_SC_PROLOG(Prompt) "@" << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \"" << Prompt
-#define DEBUG_SC_PROLOG "@" << DEBUG_SC_TIME << "," << name() << "::" << __func__ << ": \""
-#ifdef DEBUG_EVENTS
-    #define DEBUG_SC_EVENT(X)        std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_EVENT_LOCAL(X)  std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-#else
-    #define DEBUG_SC_EVENT(X)
-    #define DEBUG_SC_EVENT_LOCAL(x)
-#endif
-#ifdef DEBUG_PRINTS
-    #define DEBUG_SC_PRINT(X)  std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_PRINT_LOCAL(X)  std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_WARNING(X)  std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_WARNING_LOCAL(X)  std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-#else
-    #define DEBUG_SC_PRINT(x)
-    #define DEBUG_SC_PRINT_LOCAL(X)
-    #define DEBUG_SC_WARNING(x)
-#endif
 // During unit testing, all event tracing messages are suppressed
 #ifdef DEBUG_EVENTS
 //    #define DEBUG_EVENT_OBJECT(x)    if(!UNIT_TESTING)
