@@ -62,8 +62,16 @@ YFromPosition_Get(int x, int y);
 #define SC_TIME_UNIT_S  4
 #define SC_TIME_UNIT_DEFAULT SC_TIME_UNIT_MS
 
+    /**
+     * @brief Return the string corresponding to sc_time T
+     * @param T the SystemC time to convert
+     * @param U the requested unit, see SC_TIME_UNIT_xx
+     * @param d decimals (after period)
+     * @param w width (filed total width
+     * @return the requested string
+     */
     string
-sc_time_String_Get(int32_t U, sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 3, const int32_t w=7);
+sc_time_String_Get( sc_core::sc_time T, int32_t U=SC_TIME_UNIT_DEFAULT, const int32_t d = 2, const int32_t w=7);
 
     string
 sc_time_to_nsec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 2, const int32_t w=6);

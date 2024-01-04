@@ -132,17 +132,17 @@ PositionOfFirstZero_Get(SC_GRIDPOINT_MASK_TYPE Mask, const int Length)
  *  @param[in] d decimals; by default 2
  *  @param[in] w field width; by default
  */
-   string sc_time_String_Get(int32_t U, sc_core::sc_time T, const int32_t d, const int32_t w)
+   string sc_time_String_Get(sc_core::sc_time T, int32_t U, const int32_t d, const int32_t w)
    {   switch(U)
         {
-       // case SC_TIME_UNIT_PS: U = 1000*1000*1000*1000; break;
+        case SC_TIME_UNIT_PS: U = T.value(); break;
         case SC_TIME_UNIT_NS: U = 1000*1000*1000; break;
         case SC_TIME_UNIT_US: U = 1000*1000; break;
         case SC_TIME_UNIT_MS: U = 1000; break;
         case SC_TIME_UNIT_S : U = 1; break;
         default: U=-1;
         };
-        if(T == sc_core::SC_ZERO_TIME) T = sc_core::sc_time_stamp();
+ //       if(T == sc_core::SC_ZERO_TIME) T = sc_core::sc_time_stamp(); // Allow to print also zero time
         ostringstream oss;
         oss << std::fixed << std::setprecision(d) << std::setw(w) << T.to_seconds()*U;
         return oss.str();
