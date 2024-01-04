@@ -43,7 +43,7 @@ Wakeup(scGenComp_PU_Abstract* PU)
     void GenCompStates_Bio::
 Deliver(scGenComp_PU_Abstract* PU)
 {
-        assert(gcsm_Processing != PU->StateFlag_Get());
+    assert(gcsm_Processing == PU->StateFlag_Get());
     PU->StateFlag_Set(gcsm_Delivering);
 }
 
@@ -64,15 +64,8 @@ Process(scGenComp_PU_Abstract* PU)
     if(gcsm_Ready == PU->StateFlag_Get())
     {   // We are still in 'Ready' state, set the mode and
         PU->StateFlag_Set(gcsm_Processing);
-        PU->EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
-                DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
-        PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME);
-                DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
     }
-    else
-    {
-
-    }
+    // We are already in 'Processing'
 }
 
     void GenCompStates_Bio::

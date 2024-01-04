@@ -72,6 +72,8 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *
      * A spike arrived, store spike parameters;
      * If it was the first spike, issue 'Begin_Computing'
+     *
+     * Reimplemented given that the first input also starts processing
      */
     virtual void InputReceived_method();
     /**
@@ -170,12 +172,12 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      */
      void Heartbeat_Relaxing();
     /**
-     * @brief Heartbeat_Recalculate_Membrane_Potential
+     * @brief Calculate_Membrane_Potential
      *
      *  The state of the biological computing is re-calculated (as the simulation time passes)
      *  (solve the differential equation at this time)
      */
-    void HeartbeatRecalculateMembranePotential();
+    void CalculateMembranePotential();
     /** Checks if membrane is completely depolarized during  'Processing'
      *  return true if depolarized
      */
