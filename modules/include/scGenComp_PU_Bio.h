@@ -175,7 +175,11 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *  The state of the biological computing is re-calculated (as the simulation time passes)
      *  (solve the differential equation at this time)
      */
-    void Recalculate_Membrane_Potential();
+    void HeartbeatRecalculateMembranePotential();
+    /** Checks if membrane is completely depolarized during  'Processing'
+     *  return true if depolarized
+     */
+     bool MembraneThresholdExceeded_Processing(void){return false;}
   };// of class scGenComp_PU_Bio
 /** @}*/
 

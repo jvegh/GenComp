@@ -84,20 +84,20 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     Heartbeat_Processing()
 {
-        Recalculate_Membrane_Potential();
-        if (scLocalTime_Get() < sc_time(5*BIO_HEARTBEAT_TIME))
-    {   // We are still processing; re-issue the heartbeat
-        // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
-    }
+    HeartbeatRecalculateMembranePotential();
+    if (scLocalTime_Get() < sc_time(5*BIO_HEARTBEAT_TIME))
+        {   // We are still processing; re-issue the heartbeat
+            // if the limit is not yet reached
+            EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
+            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
+        }
     else
-    {   // We are about finishing processing
-        EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
-        EVENT_GenComp.Heartbeat.cancel();
-        DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
-    }
+        {   // We are about finishing processing
+            EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
+            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
+            EVENT_GenComp.Heartbeat.cancel();
+            DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
+        }
 }
     /**
      *
@@ -158,16 +158,15 @@ void scGenComp_PU_Bio::
     InputReceived_method()
 {
     // In bio mode, any input causes passing to 'Processing' statio
-                DEBUG_SC_EVENT_LOCAL(">>>   ");
+    DEBUG_SC_EVENT_LOCAL("<<<Received input #" << NoOfInputsReceived_Get());
     if(!NoOfInputsReceived_Get())
         {   // This is the first input we received, change the state first
             MachineState->Process(this);
                 DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingBegin");
-                DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat");
+                DEBUG_SC_EVENT("SENT    EVENT_GenComp.HeartBeat");
         }
     // The input is legal, statio is OK, continue receiving it
     MachineState->InputReceive(this);
-                DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 
 
@@ -196,13 +195,14 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     ProcessingEnd_method()
 {
+    DEBUG_SC_EVENT_LOCAL("RCVD    EVENT_GenComp.ProcessingEnd");
     MachineState->Deliver(this);
 
     DEBUG_SC_EVENT_LOCAL("Processing finished");
 }
 
 void scGenComp_PU_Bio::
-    Recalculate_Membrane_Potential()
+    HeartbeatRecalculateMembranePotential()
 {
     int i=1;
 }
