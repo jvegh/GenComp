@@ -19,7 +19,7 @@
 #include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
-#define BIO_HEARTBEAT_TIME sc_core::sc_time(10,SC_US)
+#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(100,SC_US)
 
 /*
  * \class scGenComp_PU_Bio

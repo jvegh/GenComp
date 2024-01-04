@@ -25,11 +25,13 @@ GenCompStates_Abstract* TheGenCompStates_Abstract;
     scGenComp_PU_Abstract::
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
+    ,mHeartbeat(HEARTBEAT_TIME_DEFAULT)
     ,mGenCompPUOperatingBits(gcob_ObserveModule)
  {
-        if(!TheGenCompStates_Abstract)
-            TheGenCompStates_Abstract = new GenCompStates_Abstract();
-        MachineState = TheGenCompStates_Abstract;
+    if(!TheGenCompStates_Abstract)
+        TheGenCompStates_Abstract = new GenCompStates_Abstract();
+    MachineState = TheGenCompStates_Abstract;
+    // The stuff below in the consructor are SystemC specific, do not touch!
     typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
     // Intialize the module with generating an event
     SC_METHOD(Initialize_method);

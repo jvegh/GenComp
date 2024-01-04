@@ -64,10 +64,10 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     Heartbeat_Delivering()
 {
-    if (scLocalTime_Get() < sc_time(8*BIO_HEARTBEAT_TIME))
+    if (scLocalTime_Get() < sc_time(8*HEARTBEAT_TIME_DEFAULT_BIO))
     {   // We are still processing; re-issue the heartbeat
         // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
+        EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else
@@ -84,10 +84,10 @@ void scGenComp_PU_Bio::
     Heartbeat_Processing()
 {
     CalculateMembranePotential();
-    if (scLocalTime_Get() < sc_time(5*BIO_HEARTBEAT_TIME))
+    if (scLocalTime_Get() < sc_time(5*HEARTBEAT_TIME_DEFAULT_BIO))
         {   // We are still processing; re-issue the heartbeat
             // if the limit is not yet reached
-            EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
+            EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
             DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
         }
     else
@@ -105,10 +105,10 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     Heartbeat_Ready()
 {
-    if (scLocalTime_Get() < sc_time(2*BIO_HEARTBEAT_TIME))
+    if (scLocalTime_Get() < sc_time(2*HEARTBEAT_TIME_DEFAULT_BIO))
     {   // We are still processing; re-issue the heartbeat
         // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
+        EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else
@@ -125,10 +125,10 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     Heartbeat_Relaxing()
 {
-    if (scLocalTime_Get() < sc_time(8*BIO_HEARTBEAT_TIME))
+    if (scLocalTime_Get() < sc_time(8*HEARTBEAT_TIME_DEFAULT_BIO))
     {   // We are still processing; re-issue the heartbeat
         // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
+        EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else

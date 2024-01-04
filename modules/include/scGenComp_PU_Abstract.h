@@ -23,6 +23,9 @@ using namespace sc_core; using namespace sc_dt;
 using namespace std;
 static vector<GenCompStates_Abstract*> AbsPU_StateVector;
 
+#define HEARTBEAT_TIME_DEFAULT sc_core::sc_time(1,SC_NS)
+
+
 /**
  *
  * @struct EVENT_GenComp_type
@@ -345,12 +348,16 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * \param B is the bit to set
      * \return is the requested value of the bit
      */
-     bool OperatingBit_Get(GenCompPUOperatingBits_t B)
-     {
+    bool OperatingBit_Get(GenCompPUOperatingBits_t B)
+    {
          assert(B < gcob_Max);
          return mGenCompPUOperatingBits[B];
-     }
-     void GetData(int32_t &A){ A = 1234;}
+    }
+    void GetData(int32_t &A){ A = 1234;}
+
+    sc_core::sc_time Heartbeat_Get(){return mHeartbeat;}
+    void Heartbeat_Set(sc_core::sc_time T){mHeartbeat = T;}
+
    protected:
     GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     /**
@@ -366,8 +373,9 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     virtual void Heartbeat_Relaxing(){};
     GenCompStateMachineType_t mStateFlag;    ///< preserves last state
     int32_t mNoOfInputsNeeded;
-    sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
     vector<int32_t> Inputs; // Stores reference to input source
+    sc_core::sc_time mLocalTimeBase;    ///< The beginning of the local computing
+    sc_core::sc_time mHeartbeat;        ///< The heartbeat length of the unit
 private:
     bitset<gcob_Max>
         mGenCompPUOperatingBits;   ///< The bits of the GenComp_PU state

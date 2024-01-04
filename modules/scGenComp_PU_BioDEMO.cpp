@@ -22,7 +22,9 @@ extern GenCompStates_Bio *TheGenCompStates_Bio;
 scGenComp_PU_BioDEMO::
     scGenComp_PU_BioDEMO(sc_core::sc_module_name nm):
     scGenComp_PU_Bio(nm)
-{   // Needed to avoid using SystemC specific syntax
+
+{   mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
+    // Needed to avoid using SystemC specific syntax
     typedef scGenComp_PU_BioDEMO SC_CURRENT_USER_MODULE;
     // This routine is called after initalizations but before starting simulation
     SC_THREAD(InitializeForDemo_method);
@@ -45,7 +47,7 @@ void scGenComp_PU_BioDEMO::
     //  at 170, BPU  receives its second spike
     // The BPU starts to receive spikes
     wait(50,SC_US);
-            DEBUG_SC_PRINT("Another 'InputReceived' @5 us");
+            DEBUG_SC_PRINT("Another 'InputReceived' @50 us");
             DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.InputReceived");
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
     // Now we sent 2 spikes
