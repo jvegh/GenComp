@@ -144,7 +144,7 @@ PositionOfFirstZero_Get(SC_GRIDPOINT_MASK_TYPE Mask, const int Length)
         };
         if(T == sc_core::SC_ZERO_TIME) T = sc_core::sc_time_stamp();
         ostringstream oss;
-        oss << std::fixed << std::setprecision(d) << std::setw(w) << sc_core::sc_time_stamp().to_seconds()*U;
+        oss << std::fixed << std::setprecision(d) << std::setw(w) << T.to_seconds()*U;
         return oss.str();
 }
 
