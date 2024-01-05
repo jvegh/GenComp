@@ -47,7 +47,7 @@ void scGenComp_PU_BioDEMO::
     //  at 170, BPU  receives its second spike
     // The BPU starts to receive spikes
     wait(50,SC_US);
-            DEBUG_SC_PRINT("Another 'InputReceived' @50 us");
+            DEBUG_SC_PRINT("Another 'InputReceived' @50 (+120) us");
             DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.InputReceived");
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
     // Now we sent 2 spikes

@@ -118,7 +118,11 @@ int sc_main(int argc, char* argv[])
         {   // This is the real simulation cycle: runs until end
             // but allows updateing any state of the simulated object
  //           sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
-            while(MySimulator->Run(gcsm_Continuous,0))
+     /*       gcsm_Continuous,        ///< Runs to the end
+                gcsm_Eventwise,         ///< Stops after a certain number of events
+                gcsm_Timed,             ///< Runs to the defined time
+*/
+            while(MySimulator->Run(gcsm_Timed,2))
             {   // This portion is run repeatedly by the simulator
                 // Update display here
 //                DEBUG_PRINT("Again ");
@@ -138,7 +142,7 @@ int sc_main(int argc, char* argv[])
         std::cerr << " with no error"  << endl;
     if(UseSimulator)
         std::cerr  << "GenComp/DEMO by scGenComp_Simulator " << MySimulator->Time_Get().count()/1000/1000. << " msec CLOCK time" << "//"
-                   <<  sc_time_String_Get(MySimulator->scTime_Get(), SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+                  <<  sc_time_String_Get(MySimulator->scTime_Get(), SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     else
         std::cerr  << "GenComp/DEMO simulation " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT)
                    << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
