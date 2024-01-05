@@ -6,6 +6,12 @@
  *  @author János Végh (jvegh)
  *  @bug No known bugs.
 */
+#include <chrono>
+#define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
+#include "MacroTimeBenchmarking.h"    // Must be after the define to have its effect
+#define SC_MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
+#include "scMacroTimeBenchmarking.h"    // Must be after the define to have its effect
+
 
 #include "scGenComp_Simulator.h"
 // This section configures debug and log printing; must be located AFTER the other includes
@@ -18,18 +24,32 @@
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
-
+string GenCompSimulatorModesStrings[]{};
 scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
     : sc_core::sc_module( nm)
     ,mLocalTimeBase(sc_core::SC_ZERO_TIME)
     ,mMoreEvents(false)
+    ,mSimulationMode(gcsm_Continuous)
+    ,mSimulationUnit(0)
+    ,mToReset(true)             //
 {   // Initialize CLOCK and SIMULATED time counters
     BENCHMARK_TIME_RESET(&t,&x,&s);
     SC_BENCHMARK_TIME_RESET(&SC_t,&SC_x,&SC_s);
 }
 
-bool scGenComp_Simulator::Run()
+
+bool scGenComp_Simulator::Run(GenCompSimulatorModes_t SimulatorMode, int32_t SimulationUnit)
 {
+    if(mToReset)
+    {
+        mToReset = false;
+        sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
+
+    }
+    /*gcsm_Continuous,   ///< Runs to the end
+    gcsm_Eventwise,      ///< Stops after every single  event
+    gcsm_Timed          ///< Runs to
+} GenCompSimulatorModes_t;*/
     BENCHMARK_TIME_BEGIN(&t,&x);
     SC_BENCHMARK_TIME_BEGIN(&SC_t,&SC_x);
     // We are in the process of simulating

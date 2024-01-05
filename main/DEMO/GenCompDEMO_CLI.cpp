@@ -117,8 +117,8 @@ int sc_main(int argc, char* argv[])
         else
         {   // This is the real simulation cycle: runs until end
             // but allows updateing any state of the simulated object
-            sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
-            while(MySimulator->Run())
+ //           sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
+            while(MySimulator->Run(gcsm_Continuous,0))
             {   // This portion is run repeatedly by the simulator
                 // Update display here
 //                DEBUG_PRINT("Again ");
