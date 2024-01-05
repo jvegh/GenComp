@@ -23,7 +23,7 @@
     optimized out as unused ones).
     Alternatively, generating those variables may be protected with
     @code{.cpp}
-#ifdef MAKE_TIME_BENCHMARKING
+#ifdef SC_BENCHMARK_TIME_BEGIN
     @endcode
 
 <b>Example:</b>
@@ -89,7 +89,7 @@
   @param s deliver clock duration since TIME_RESET (only read)
 */
 
-#ifdef SC_MAKE_SCTIME_BENCHMARKING
+#ifdef SC_MAKE_TIME_BENCHMARKING
 #include <systemc>
 #define SC_BENCHMARK_TIME_END(t,x,s)\
 *x = sc_time_stamp() - *t; \

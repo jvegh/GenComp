@@ -23,7 +23,7 @@
     optimized out as unused ones).
     Alternatively, generating those variables may be protected with
     @code{.cpp}
-#ifdef MAKE_TIME_BENCHMARKING
+#ifdef BENCHMARK_TIME_BEGIN
     @endcode
 
 <b>Example:</b>
