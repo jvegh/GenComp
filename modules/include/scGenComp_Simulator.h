@@ -16,12 +16,19 @@
  */
 
 #include "scGenComp_PU_Abstract.h"
-#include <chrono>
 
-#define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
+#include <chrono>
+#define MAKE_TIME_BENCHMARKING  // uncomment to measure the CLOCK time with benchmarking macros
 #include "MacroTimeBenchmarking.h"    // Must be after the define to have its effect
-#define SC_MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
+#define SC_MAKE_TIME_BENCHMARKING  // uncomment to measure the SIMULATED time with benchmarking macros
 #include "scMacroTimeBenchmarking.h"    // Must be after the define to have its effect
+
+// This section configures debug and log printing; must be located AFTER the other includes
+//#define SUPPRESS_LOGGING // Suppress all log messages
+#define DEBUG_EVENTS    ///< Print event debug messages  for this module
+#define DEBUG_PRINTS    ///< Print general debug messages for this module
+// Those defines must be located before 'DebugMacros.h", and are undefined in that file
+#include "DebugMacros.h"
 
 /*
  * \class scGenComp_Simulator
@@ -52,10 +59,10 @@ extern string GenCompSimulatorModesStrings[];
  */
 typedef enum
 {
- //   gcsm_Stopped,       ///< Simulator is not (yet) started of stopped
-    gcsm_Continuous,   ///< Runs to the end
-    gcsm_Eventwise,      ///< Stops after every single  event
-    gcsm_Timed          ///< Runs to
+ //   gcsm_Stopped,         ///< Simulator is not (yet) started of stopped
+    gcsm_Continuous,        ///< Runs to the end
+    gcsm_Eventwise,         ///< Stops after a certain number of events
+    gcsm_Timed,             ///< Runs to the defined time
 } GenCompSimulatorModes_t;
 
 
@@ -80,23 +87,26 @@ public:
      * @param T The beginning of the simulated time of the recent operation
      */
     void scLocalTime_Set(sc_core::sc_time T = sc_core::sc_time_stamp()){    mLocalTimeBase = T;}
-    sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
-    bool HasMoreToDo(void){ return mMoreEvents;}
+    sc_core::sc_time scLocalTime_Get(void){return sc_core::sc_time_stamp()-mLocalTimeBase;}
+//    bool HasMoreToDo(void){ return mMoreEvents;}
     void Reset() {mToReset = true;}
     void Update();
-    sc_core::sc_time scTime_Get(void){ return SC_s;}
+//    sc_core::sc_time scTime_Get(void){ return SC_s;}
     std::chrono::duration<int64_t, nano> Time_Get(void)    {return s;}
     GenCompSimulatorModes_t SimulationMode_Get(void){return mSimulationMode;}
     void SimulationMode_Set(GenCompSimulatorModes_t SM){ mSimulationMode = SM;}
+    sc_core::sc_time scTime_Get(){ return SC_t;}
 protected:
     sc_core::sc_time mLocalTimeBase;    // The beginning of the local computing
-    bool mMoreEvents; ///< If we have more events to simulate
     vector<scGenComp_PU_Abstract*> mWatchedPUs;   /// Store the registered objects here
+#ifdef BENCHMARK_TIME_BEGIN
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
-    sc_core::sc_time SC_t, SC_x, SC_s;
+#endif
+#ifdef SC_BENCHMARK_TIME_BEGIN
+        sc_core::sc_time SC_t, SC_x, SC_s;
+#endif
     GenCompSimulatorModes_t mSimulationMode;    ///< Which mode the simulator runs
-    int32_t mSimulationUnit;    ///< Unit belonging to the simulation session
     bool mToReset;              ///< If to reset the simulator befor running
 };
 
