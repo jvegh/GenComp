@@ -148,6 +148,7 @@ PositionOfFirstZero_Get(SC_GRIDPOINT_MASK_TYPE Mask, const int Length)
         return oss.str();
 }
 
+#if 0
  // Convert simulated time to nsecs
 string sc_time_to_nsec_Get(sc_core::sc_time T, const int d, const int w)
 {
@@ -157,17 +158,6 @@ string sc_time_to_nsec_Get(sc_core::sc_time T, const int d, const int w)
     return oss.str();
 }
 
-
-/*
-// Convert simulated time to string
-string sc_time_Get(int32_t U, sc_core::sc_time T, const int d, const int w)
-{
-    if(T == sc_core::SC_ZERO_TIME) T = sc_core::sc_time_stamp();
-    ostringstream oss;
-    oss << std::fixed << std::setprecision(d) << std::setw(w) << T.to_seconds()*1000.*1000*1000;
-    return oss.str();
-}
-*/
 
 // Convert simulated time to nsecs
 string sc_time_to_usec_Get(sc_core::sc_time T, const int d, const int w)
@@ -186,12 +176,12 @@ string sc_time_to_msec_Get(sc_core::sc_time T, const int d, const int w)
     oss << std::fixed << std::setfill (' ') << std::setprecision(d) << std::setw(w) << T.to_seconds()*1000.;
     return oss.str();
 }
+#endif //0
 
 // Return positive modulo even for negative x
 int moduloN(int x,int N){
     return (x % N + N) %N;
 }
-
 // Return gridpoint Y coordinate from topology position
     int
 YFromPosition_Get(int x, int y){ return (y-moduloN(x,2))/2;}
@@ -212,6 +202,8 @@ int sb_fprintf(FILE *fp, const char *fmt, ...)
   return ret;
 }
 
+#if 0
 string  /// Return the string describing the time
 StringOfTime_Get(void)
 { return sc_time_to_nsec_Get();}
+#endif

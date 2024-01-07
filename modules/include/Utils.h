@@ -8,8 +8,8 @@
  *  @bug No known bugs.
  */
 
-#ifndef EMPA_UTILS_H
-#define EMPA_UTILS_H
+#ifndef GENCOMP_UTILS_H
+#define GENCOMP_UTILS_H
 #include "HWConfig.h"
 using namespace std;
 /** @addtogroup GENCOMP_MODULE_STUFF
@@ -75,7 +75,7 @@ sc_time_String_Get( sc_core::sc_time T, int32_t U=SC_TIME_UNIT_DEFAULT, const in
 
     /**
 */
-    string
+/*    string
 sc_time_to_nsec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int32_t d = 2, const int32_t w=6);
 
      string
@@ -88,6 +88,7 @@ sc_time_to_msec_Get(sc_core::sc_time T = sc_core::sc_time_stamp(), const int d =
 StringOfTime_Get(void);
 
 int sb_fprintf(FILE *fp, const char *fmt, ...) ;
-     /** @}*/
+*/
+    /** @}*/
 
-#endif // EMPA_UTILS_H
+#endif // GENCOMP_UTILS_H
