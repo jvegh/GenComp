@@ -45,9 +45,9 @@ class scGenComp_PU_Bio;
                                   /  HBeat  \    <-InputReceived
                                  /         v v v
                          Relaxing <-Failed- Processing
-                                ^           /
-                                 \         /
-                                  \       v
+                                ^ ^         /
+                                 \  HBeat  /
+                                  \v      v
                                   Delivering<-----Synchronizing
  @endverbatim
  *
@@ -119,21 +119,6 @@ class GenCompStates_Bio : public GenCompStates_Abstract
          */
         virtual void Relax(scGenComp_PU_Abstract *PU);
 
-        /**
-         * @brief Initialize_Do: Sets the state machineto its well-defined initial state
-         *
-         * @param PU The HW to set
-         * A simple subroutine, sets state to 'ready', trigger to
-
-        virtual void Initialize_Do(scGenComp_PU_Abstract* PU);*/
-
-        /**
-         * @brief The machine received new input, administer it
-         *
-         * @param PU The HW to set
-         * A simple subroutine, sets state to 'ready', trigger to
-         */
-        virtual void DoInputReceive(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
@@ -158,11 +143,7 @@ class GenCompStates_Bio : public GenCompStates_Abstract
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          */
         virtual void Wakeup(scGenComp_PU_Abstract* PU);
-        /**
-         * @brief State_Set Set the state of PU to st
-         * @param PU The HW to set
-         */
-#endif // USE_PU_HWSLEEPING
+ #endif // USE_PU_HWSLEEPING
     protected:
         void UpdatePU(scGenComp_PU_Bio& PU);
     private:

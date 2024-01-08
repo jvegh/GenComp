@@ -34,6 +34,7 @@ string GenCompObserveStrings[]{"Group","Module","BrocessingBegin","ProcessingEnd
 // \brief Implement handling the states of computing
 
 GenCompStates_Abstract* TheGenCompStates_Abstract;
+
     scGenComp_PU_Abstract::
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
@@ -46,11 +47,11 @@ scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     mObservedBits[gcob_ObserveModule] = true;   // Enable module observing by default
     // The stuff below in the consructor are SystemC specific, do not touch!
     typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
-    // Intialize the module with generating an event
+
+    // Operating
     SC_METHOD(Initialize_method);
     sensitive << EVENT_GenComp.Initialize;
     dont_initialize();
-        // Operating
     SC_METHOD(InputReceived_method);
     sensitive << EVENT_GenComp.InputReceived;
     dont_initialize();
@@ -144,7 +145,8 @@ void scGenComp_PU_Abstract::
 
 
 // The physical delivery
-void scGenComp_PU_Abstract::
+/*
+ * void scGenComp_PU_Abstract::
     Deliver()
 {
     DEBUG_SC_EVENT_LOCAL("   >>>");
@@ -158,13 +160,13 @@ void scGenComp_PU_Abstract::
         //??           EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
     }
     DEBUG_SC_EVENT_LOCAL("   <<<");
-}
+}*/
 
-// Called when the state 'processing' begins
+// Called when the state 'delivering' begins
 void scGenComp_PU_Abstract::
     DeliveringBegin_method()
 {
-    DEBUG_SC_EVENT_LOCAL("Delivering started");
+                DEBUG_SC_EVENT_LOCAL("Delivering started");
 }
 
 
@@ -172,8 +174,8 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     DeliveringEnd_method()
 {
-    DEBUG_SC_EVENT_LOCAL("Delivering finished");
-    MachineState->Relax(this);    // Pass to "Relaxing"
+                DEBUG_SC_EVENT_LOCAL("Delivering finished");
+//    MachineState->Relax(this);    // Pass to "Relaxing"
 }
 
 
@@ -181,8 +183,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     Heartbeat_method()
 {
-    if(ObservingBit_Get(gcob_ObserveModule) && ObservingBit_Get(gcob_ObserveHeartbeat))
-        DEBUG_SC_PRINT_LOCAL ("Heartbeat observed");
+    ObserverNotify(gcob_ObserveHeartbeat);
     DEBUG_SC_EVENT_LOCAL("In state '" << GenCompStatesString[mStateFlag]);
 
     switch(StateFlag_Get())
@@ -209,7 +210,7 @@ void scGenComp_PU_Abstract::
 {
     ObserverNotify(gcob_ObserveInput);
     Inputs.push_back(NoOfInputsReceived_Get());
-    DEBUG_SC_EVENT_LOCAL("Received " << NoOfInputsReceived_Get() << " inputs");
+                DEBUG_SC_EVENT_LOCAL("Received " << NoOfInputsReceived_Get() << " inputs");
 }
 
 
@@ -227,7 +228,7 @@ void scGenComp_PU_Abstract::
     scLocalTime_Set(sc_time_stamp());      // The clock is synchronized to the beginning of processing
     Inputs.clear();
     ObserverNotify(gcob_ObserveProcessingBegin);
-    DEBUG_SC_EVENT_LOCAL("Processing started");
+                DEBUG_SC_EVENT_LOCAL("Processing started");
 }
 
 // Called when the state 'processing' ends
@@ -240,7 +241,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     ProcessingEnd_Do()
 {
-    DEBUG_SC_EVENT_LOCAL("Processing finished");
+                DEBUG_SC_EVENT_LOCAL("Processing finished");
     MachineState->Deliver(this);    // Pass to "Delivering
 }
 
@@ -250,19 +251,19 @@ void scGenComp_PU_Abstract::
     RelaxingBegin_method()
 {
     MachineState->Relax(this);    // Go to "Relaxsing"
-    DEBUG_SC_EVENT_LOCAL("Relaxing started");
+                DEBUG_SC_EVENT_LOCAL("Relaxing started");
 }
 
 // Called when the state 'processing' ends
 void scGenComp_PU_Abstract::
     RelaxingEnd_method()
 {
-    DEBUG_SC_EVENT_LOCAL("Relaxing finished");
+                DEBUG_SC_EVENT_LOCAL("Relaxing finished");
     MachineState->Initialize(this);    // Pass to "Ready"
 }
 
 
-// After the result delivered internally, reset the processing unit
+/* After the result delivered internally, reset the processing unit
 void scGenComp_PU_Abstract::
    Relax(void)
 {
@@ -277,7 +278,7 @@ void scGenComp_PU_Abstract::
         EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     }
     DEBUG_SC_EVENT_LOCAL("   <<<");
-}
+}*/
 
 void scGenComp_PU_Abstract::
     Synchronize_method(void)

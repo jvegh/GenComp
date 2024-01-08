@@ -39,28 +39,6 @@ Deliver(scGenComp_PU_Abstract* PU)
     PU->StateFlag_Set(gcsm_Delivering);
 }
 
-/*
- *  The machine PU received new input, administer it
- *  Input can be received only in 'Ready' and 'Processing' states
- */
-void GenCompStates_Bio::
-    DoInputReceive(scGenComp_PU_Abstract* PU)
-{
-    if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
-    {   // Inputs are received only in 'processing' mode, otherwise we neglect it
-        if(gcsm_Ready == PU->StateFlag_Get())
-        {   // A new spike in 'Ready' state received; we start processing
-            Process(PU);
-        }
-        // Now the unit is surely in state 'Processing'
-        PU->InputReceived_Do(); // Make the administration of the received input
-    }
-    else
-    {
-        DEBUG_SC_WARNING("Bio event neglected");
-    }
-}
-
 //Can happen only in Processing state; passes to Relaxing state
 void GenCompStates_Bio::
     Fail(scGenComp_PU_Abstract* PU)
@@ -120,9 +98,4 @@ void GenCompStates_Bio::
     //   machine.WakeUp();
 }
 
-    /*            PU->StateFlag_Set(gcsm_Processing);
-PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Issue 'Begin Processing'
-DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
-PU->EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME); // Issue first heartbeat
-DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
-*/
+

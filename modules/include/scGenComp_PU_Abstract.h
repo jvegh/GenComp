@@ -109,9 +109,7 @@ struct EVENT_GenComp_type {
  * - Relax
  * - Transmit
  * - Synchronize
- *
-
-*/
+ */
 #ifndef SCBIOGENCOMP_H
 #ifndef SCTECHGENCOMP_H // Just to exclude for Doxygen
 
@@ -138,7 +136,7 @@ struct EVENT_GenComp_type {
  * - PU_Asynch needs the arrival of  ALL needed operands
  *
  * In all subclasses, there exist EVENT_GenComp_type events
-  *
+ *
  * @see GenCompStates_Abstract
  *
  * The rest of methods are of technical nature.
@@ -174,10 +172,8 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
   public:
     /*!
      * \brief Create an abstract processing unit for the general computing paradigm
-     * @param nm the SystemC name of the module
-     *
+     * @param[in] nm the SystemC name of the module
      */
-
     scGenComp_PU_Abstract(sc_core::sc_module_name nm);
 
     virtual ~scGenComp_PU_Abstract(void); // Must be overridden
@@ -189,14 +185,14 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     void CancelEvents(void);
 
-    /**
+    /* *
       * @brief The physical delivery method
       *
       * The delivery method is called twice; at the beginning and at the end of the 'delivery'Delivering' phase
       * The first phase is executed in state 'Processing', the 2nd one in state 'Delivering'
       * The routine is actived by EVENT_GenComp.End_Processing
-      */
-    virtual void Deliver();
+      *
+    virtual void Deliver();*/
      /**
      * @brief Delivering has started
      *
@@ -289,8 +285,8 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     void Reset(void);
 
-    virtual void Relax_method(){ assert(0);};
-    virtual void Relax();
+    // virtual void Relax_method(){ assert(0);};
+    // virtual void Relax();
     /**
      * @brief Relaxing has started
      *

@@ -27,11 +27,11 @@
  *
  * Operating principle of event processing:
  *
- * "XXX_moethod"s are "sensitive" to specific events. After receiving such an an event,
- * the corresponding virtual routine of AbstractGenCompState is called.
- * If the unit's state and the call are not compatible, that routine asserts. (wrong event)
- * Following a normal return, the HW specific operation of the PU is executed,
- * the time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
+ * The non-virtual "XXX_method"s are "sensitive" to specific events. After receiving such an an event,
+ * the corresponding virtual routine of "XXX_Do" is called.
+ * If the unit's state and the call are not compatible (programming mistake), that routine asserts.
+ * (wrong event)
+  * the time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
  * Optionally, also the next state is invoked by issuing a EVENT_GenComp.XXX.notify() notification.
  * The description is valid for methods
  * - Deliver
@@ -44,7 +44,7 @@
  *
  * The rest of methods are of technical nature.
  * - HeartBeat: technical signal to update PU's state (e.g. integrate a signal)
- * - Fail: sometheing went wrong, retry
+ * - Fail: something went wrong, retry
  * - Sleep: if the unit is unused, sends it logically to sleep
  * - Wakeup: awake it if it was sleeping
  */
@@ -63,51 +63,51 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
       *
      * Creates an abstract biological computing unit
      */
-
     scGenComp_PU_Bio(sc_core::sc_module_name nm);
     virtual ~scGenComp_PU_Bio(void); // Must be overridden
+
     /**
-     * @brief A new spike received
+     * @brief A new spike received; only in 'Ready' and 'Processing' states
      *
-     * A spike arrived, store spike parameters;
+     * A spike arrived, store spike parameters. Receving an input a momentary action, just administer its processing.
+     * Most of the job is done in methods Heartbeat_Ready() and Heartbeat_Processing().
      * If it was the first spike, issue 'Begin_Computing'
      *
-     * Reimplemented given that the first input also starts processing
+     * Called by scGenComp_PU_Abstract::InputReceived_method
+     * Reimplemented given that in biology the first input also starts processing
      */
-
     virtual void InputReceived_Do();
     /**
-     * @brief Receving an input a momentary action, just administer its processing.
-     * It is possible only in 'Ready' and 'Processing' states
+     * @brief
+     * It is possible
      */
-//    virtual void DoInputReceive_Do();
-     /**
+
+    /**
      * @brief Called when the state 'processing' begins
      *
      * The unit passes to phase 'Processing'
      */
-//    void ProcessingBegin_method();
     virtual void ProcessingBegin_Do();
+
     /**
      * @brief Called when the state 'processing' ends
      *
      * The unit passes to phase 'Delivering'
      */
     virtual void ProcessingEnd_Do();
- //   void ProcessingEnd_method();
-    /**
+
+    /* *
      * @brief Deliver
      *
      * Called when the state
-     */
-    virtual void Deliver();
-
-    /**
+     *
+    virtual void Deliver(); */
+    /* *
      * @brief Relax
      *
      *
-     */
-    virtual void Relax();
+
+    virtual void Relax();*/
 
 
     /**

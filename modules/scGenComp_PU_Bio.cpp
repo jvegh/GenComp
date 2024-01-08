@@ -29,11 +29,8 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm):
     if(!TheGenCompStates_Bio)
         TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
     MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
-    // ** Do not reimplement any of the xxx_method functions
-    // until you know what you are doing
-/*    SC_METHOD(InputReceived_method);    // Reimplement because input handling is specific
-    sensitive << EVENT_GenComp.InputReceived;
-    dont_initialize();*/
+    // *** Do not reimplement any of the xxx_method functions
+    // *** until you know what you are doing. Do what you want in methods xxx_Do
 }
 
     scGenComp_PU_Bio::
@@ -42,7 +39,7 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm):
 }
 
 
-
+/*
 void scGenComp_PU_Bio::
     Deliver()
 {   // The state machine ensures that we are in phases either 'Processing' or 'Delivering'
@@ -58,10 +55,10 @@ void scGenComp_PU_Bio::
         MachineState->Relax(this);
     }
 }
+*/
 
-// Heartbeat distributin happens in scGenComp_PU_Abstract
-/**
-     *
+// Heartbeat distribution happens in scGenComp_PU_Abstract
+    /**
      * Handle heartbeats in 'Delivering' mode
      */
 void scGenComp_PU_Bio::
@@ -79,8 +76,8 @@ void scGenComp_PU_Bio::
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.DeliveringEnd");
     }
 }
+
     /**
-     *
      * Handle heartbeats in 'Processing' mode
      */
 void scGenComp_PU_Bio::
@@ -91,18 +88,18 @@ void scGenComp_PU_Bio::
         {   // We are still processing; re-issue the heartbeat
             // if the limit is not yet reached
             EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
-            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
+                    DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
         }
     else
         {   // We are about finishing processing
             EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
+                    DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
             EVENT_GenComp.Heartbeat.cancel();
-            DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
+                    DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
         }
 }
+
     /**
-     *
      * Handle heartbeats in 'Ready' mode
      */
 void scGenComp_PU_Bio::
@@ -117,10 +114,9 @@ void scGenComp_PU_Bio::
     else
     {   // We are about finishing processing
         EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
-        //Do not send an event; just  wait
-                // DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Computing");
     }
 }
+
     /**
      *
      * Handle heartbeats in 'Relaxing' mode
@@ -132,12 +128,12 @@ void scGenComp_PU_Bio::
     {   // We are still processing; re-issue the heartbeat
         // if the limit is not yet reached
         EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
+                DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else
     {   // We are about finishing processing
         EVENT_GenComp.RelaxingEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.RelaxingEnd");
+                DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.RelaxingEnd");
     }
 }
 
@@ -148,12 +144,8 @@ void scGenComp_PU_Bio::
     Initialize_Do(void)
 {
     scGenComp_PU_Abstract::Initialize_Do();
-    DEBUG_SC_EVENT_LOCAL("");
+                DEBUG_SC_EVENT_LOCAL("");
  }
-
-/**
- * A spike arrived, store spike parameters;
- */
 
 
 /*
@@ -169,17 +161,14 @@ void scGenComp_PU_Bio::
 {
     if(!((gcsm_Ready == mStateFlag) || (gcsm_Processing == mStateFlag))) return;
     // inputs are processed only in 'Ready' and 'Processing' states
-    DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
+                DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
     if(gcsm_Ready == mStateFlag)
     {   // we are still in 'Ready' state
         mStateFlag = gcsm_Processing;   // Be sure we do not repeat
-//        EVENT_GenComp.InputReceived.cancel();
-//        DEBUG_SC_EVENT("CNCL EVENT_GenComp.InputReceived");
         EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Put events in order
-        DEBUG_SC_EVENT("SEND EVENT_GenComp.ProcessingBegin");
-//        EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME); // Re-issue InputReceived
+                DEBUG_SC_EVENT("SEND EVENT_GenComp.ProcessingBegin");
         EVENT_GenComp.InputReceived.notify(1,SC_PS); // Re-issue InputReceived
-        DEBUG_SC_EVENT("re-SEND EVENT_GenComp.InputReceived");
+                DEBUG_SC_EVENT("re-SEND EVENT_GenComp.InputReceived");
     }
     else
     {
@@ -202,14 +191,6 @@ void scGenComp_PU_Bio::
                 DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with zero");
 }
 
-// Called when the state 'processing' ends
-/*void scGenComp_PU_Bio::
-    ProcessingEnd_method()
-{
-    DEBUG_SC_EVENT_LOCAL("RCVD    EVENT_GenComp.ProcessingEnd");
-    MachineState->Deliver(this);
-    DEBUG_SC_EVENT_LOCAL("Processing finished");
-}*/
 
 void scGenComp_PU_Bio::
     ProcessingEnd_Do()
@@ -224,6 +205,7 @@ void scGenComp_PU_Bio::
     int i=1;
 }
 
+/*
 void scGenComp_PU_Bio::
     Relax()
 {   // The state machine ensures that we are in phases either 'Delivering' or 'Relaxing'
@@ -239,3 +221,4 @@ void scGenComp_PU_Bio::
         StateFlag_Set(gcsm_Ready);
     }
 }
+*/
