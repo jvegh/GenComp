@@ -119,7 +119,7 @@ void  scGenComp_Simulator::Update(void)
 // Update input information in simulator
 void  scGenComp_Simulator::UpdateInput(scGenComp_PU_Abstract* PU)
 {
-    DEBUG_SC_EVENT(PU->name()<< " #inputs " << PU->NoOfInputsReceived_Get());
+    DEBUG_SC_EVENT(PU->name() << " " << PU->NoOfInputsReceived_Get() << " inputs ");
 }
 
 // Update initialize information in simulator
