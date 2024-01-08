@@ -156,6 +156,7 @@ extern string GenCompStatesString[];
  */
 typedef enum
 {
+    gcob_ObserveGroup,             ///< The scGenComp_PU_Abstract is observed (by the simulator)
     gcob_ObserveModule,             ///< The scGenComp_PU_Abstract is observed (by the simulator)
     gcob_ObserveProcessingBegin,     ///< Observe 'Begin Computing'
     gcob_ObserveProcessingEnd,       ///< Observe 'End Computing'
@@ -164,6 +165,7 @@ typedef enum
     gcob_ObserveInitialize,         ///< Observe 'Initialize's of the PU
     gcob_Max        // just maintains the number of bits used
 } GenCompPUObservingBits_t;
+extern string GenCompObserveStrings[];
 
 
 class scGenComp_PU_Abstract: public sc_core::sc_module
@@ -235,10 +237,10 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * Relaxing: the membrane potential decays
      *
      * Calls
-     *      virtual void Heartbeat_Ready();
-     *      virtual void Heartbeat_Processing();
-     *      virtual void Heartbeat_Delivering();
-     *      virtual void Heartbeat_Relaxing();
+     *      virtual void Heartbeat_Ready_Do();
+     *      virtual void Heartbeat_Processing_Do();
+     *      virtual void Heartbeat_Delivering_Do();
+     *      virtual void Heartbeat_Relaxing_Do();
       */
     void Heartbeat_method();
 
@@ -249,21 +251,19 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     void Initialize_method();
     /**
-     * @brief InputReceived_method
-     *
-     * An external partner signalled that an input was sent
-     */
-    /**
      * @brief The HW initialization
     */
     virtual void Initialize_Do();
 
-    virtual void InputReceived_method();
     /**
-     * @brief Receving an input a momentary action, just administer its processing.
-     * It is possible only in 'Ready' and 'Processing' states
+     * @brief InputReceived_method
+     *
+     * An external partner signalled that an input was sent
      */
-    virtual void InputReceive_Do();
+    void InputReceived_method();
+
+    virtual void InputReceived_Do(void);
+
 
     /**
      * @brief Processing has finished
@@ -382,18 +382,39 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
    protected:
     GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     /**
-     * @brief Heartbeat_Ready
+     * @brief Handle Heartbeat in 'Ready' mode
      *
      * Called by Heartbeat_method();
      *
      * They should be overloaded (by default make nothing)
      */
-    virtual void Heartbeat_Ready(){};
-    virtual void Heartbeat_Processing(){};
-    virtual void Heartbeat_Delivering(){};
-    virtual void Heartbeat_Relaxing(){};
+    virtual void Heartbeat_Ready_Do(){};
+    /**
+     * @brief Handle Heartbeat in 'Processing' mode
+     *
+     * Called by Heartbeat_method();
+     *
+     * They should be overloaded (by default make nothing)
+     */
+    virtual void Heartbeat_Processing_Do(){};
+    /**
+     * @brief Handle Heartbeat in 'Delivering' mode
+     *
+     * Called by Heartbeat_method();
+     *
+     * They should be overloaded (by default make nothing)
+     */
+    virtual void Heartbeat_Delivering_Do(){};
+    /**
+     * @brief Handle Heartbeat in 'Relaxing' mode
+     *
+     * Called by Heartbeat_method();
+     *
+     * They should be overloaded (by default make nothing)
+     */
+    virtual void Heartbeat_Relaxing_Do(){};
     GenCompStateMachineType_t mStateFlag;    ///< preserves last state
-    int32_t mNoOfInputsNeeded;
+    int32_t mNoOfInputsNeeded;          ///< Remember how many inputs needed
     vector<int32_t> Inputs; // Stores reference to input source
     sc_core::sc_time mLocalTimeBase;    ///< The beginning of the local computing
     sc_core::sc_time mHeartbeat;        ///< The heartbeat length of the unit

@@ -31,6 +31,9 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm):
     MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
     // ** Do not reimplement any of the xxx_method functions
     // until you know what you are doing
+/*    SC_METHOD(InputReceived_method);    // Reimplement because input handling is specific
+    sensitive << EVENT_GenComp.InputReceived;
+    dont_initialize();*/
 }
 
     scGenComp_PU_Bio::
@@ -109,13 +112,13 @@ void scGenComp_PU_Bio::
     {   // We are still processing; re-issue the heartbeat
         // if the limit is not yet reached
         EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
+                //DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
     }
     else
     {   // We are about finishing processing
         EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
         //Do not send an event; just  wait
-        //        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Computing");
+                // DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Computing");
     }
 }
     /**
@@ -150,57 +153,39 @@ void scGenComp_PU_Bio::
 
 /**
  * A spike arrived, store spike parameters;
- * If it was the first spike, issue 'Begin_Computing'
  */
-/*void scGenComp_PU_Bio::
-    InputReceived_method()
-{
-    DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived");
-    ObserverNotify(gcob_ObserveInput);
-    // In bio mode, any input causes passing to 'Processing' statio
-    if(!NoOfInputsReceived_Get())
-        {   // This is the first input we received, change the state first
-            MachineState->Process(this);
-            ProcessingBegin();
-            DEBUG_SC_EVENT("SENT implicite 'EVENT_GenComp.ProcessingBegin'");
-        }
-    // The input is legal, statio is OK, continue receiving it
-    MachineState->InputReceive(this);
-}
-*/
 
 
 /*
  * This routine makes actual input processing, although most of the job is done in Process() and Heartbeat()
  * It can be called in state 'Processing' (if not first input)
  * or in state 'Ready' if first input
+ *
+ * If it was the first spike, issue 'ComputingBegin' and re-issue
+
  */
 void scGenComp_PU_Bio::
    InputReceived_Do(void)
 {
-    DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived");
-    if(gcsm_Ready == StateFlag_Get())
-    {// We are still in 'Ready' state; i.e. we change the statio to 'Processing'
-        ProcessingBegin_Do();
-        DEBUG_SC_EVENT("Implied 'EVENT_GenComp.ProcessingBegin'");
-    }
-    if(gcsm_Processing == StateFlag_Get())
-    {
-        scGenComp_PU_Abstract::InputReceive_Do();
+    if(!((gcsm_Ready == mStateFlag) || (gcsm_Processing == mStateFlag))) return;
+    // inputs are processed only in 'Ready' and 'Processing' states
+    DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
+    if(gcsm_Ready == mStateFlag)
+    {   // we are still in 'Ready' state
+        mStateFlag = gcsm_Processing;   // Be sure we do not repeat
+//        EVENT_GenComp.InputReceived.cancel();
+//        DEBUG_SC_EVENT("CNCL EVENT_GenComp.InputReceived");
+        EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Put events in order
+        DEBUG_SC_EVENT("SEND EVENT_GenComp.ProcessingBegin");
+//        EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME); // Re-issue InputReceived
+        EVENT_GenComp.InputReceived.notify(1,SC_PS); // Re-issue InputReceived
+        DEBUG_SC_EVENT("re-SEND EVENT_GenComp.InputReceived");
     }
     else
-    {   // In all other states the input neglected
-
+    {
+        scGenComp_PU_Abstract::InputReceived_Do();
     }
-    // In bio mode, any input causes passing to 'Processing' statio
-/*    if(!NoOfInputsReceived_Get())
-    {   // This is the first input we received, change the state first
-        MachineState->Process(this);
-        ProcessingBegin();
-    }*/
-    // The input is legal, statio is OK, continue receiving it
-//    MachineState->InputReceive(this);
-}
+ }
 
 /*
  * This virtual method makes ProcessingBegin activity
@@ -209,7 +194,11 @@ void scGenComp_PU_Bio::
     ProcessingBegin_Do()
 {
     scGenComp_PU_Abstract::ProcessingBegin_Do();  // Make default processing
-    EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
+    // Technically, just make sure that Heartbeat comes last:
+    // 1st: ProcessingBegin
+    // 2nd: Input
+    // 3rd: Heartbeat
+    EVENT_GenComp.Heartbeat.notify(2,SC_PS);
                 DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with zero");
 }
 

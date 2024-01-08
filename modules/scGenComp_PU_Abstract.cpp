@@ -27,6 +27,9 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in un
 #include "scGenComp_PU_Abstract.h"
 #include "scGenComp_Simulator.h"
 
+string GenCompObserveStrings[]{"Group","Module","BrocessingBegin","ProcessingEnd",
+                               "Heartbeat","Input","Initialize"};
+
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
 
@@ -39,6 +42,7 @@ scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     if(!TheGenCompStates_Abstract)
         TheGenCompStates_Abstract = new GenCompStates_Abstract();
     MachineState = TheGenCompStates_Abstract;
+    mObservedBits[gcob_ObserveGroup] = true;   // Enable this module for its group observing by default
     mObservedBits[gcob_ObserveModule] = true;   // Enable module observing by default
     // The stuff below in the consructor are SystemC specific, do not touch!
     typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
@@ -109,7 +113,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     Initialize_Do(void)
 {
-    DEBUG_SC_EVENT_LOCAL("");
+                //DEBUG_SC_EVENT_LOCAL("");
     // The input is legal, continue receiving it
     ObserverNotify(gcob_ObserveInitialize);
     mLocalTimeBase = sc_time_stamp();
@@ -183,11 +187,11 @@ void scGenComp_PU_Abstract::
 
     switch(StateFlag_Get())
     {
-    case gcsm_Ready: Heartbeat_Ready(); break;
-    case gcsm_Processing: Heartbeat_Processing(); break;
-    case gcsm_Delivering: Heartbeat_Delivering(); break;
-    case gcsm_Relaxing: Heartbeat_Relaxing(); break;
-    default: ; assert(0); break; // do nothing
+        case gcsm_Ready:      Heartbeat_Ready_Do(); break;
+        case gcsm_Processing: Heartbeat_Processing_Do(); break;
+        case gcsm_Delivering: Heartbeat_Delivering_Do(); break;
+        case gcsm_Relaxing:   Heartbeat_Relaxing_Do(); break;
+        default: ; assert(0); break; // do nothing
     }
 }
 
@@ -196,22 +200,16 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
-    InputReceive_Do();
+    InputReceived_Do();
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
 void scGenComp_PU_Abstract::
-    InputReceive_Do(void)
+    InputReceived_Do(void)
 {
     ObserverNotify(gcob_ObserveInput);
-    // The input is legal, continue receiving it
-//    if(ObservingBit_Get(gcob_ObserveModule) && ObservingBit_Get(gcob_ObserveInput))
-  //          DEBUG_SC_PRINT_LOCAL ("Input observed");
-
-            DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
-            DEBUG_SC_EVENT("Received input #" << NoOfInputsReceived_Get());
     Inputs.push_back(NoOfInputsReceived_Get());
-            DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
+    DEBUG_SC_EVENT_LOCAL("Received " << NoOfInputsReceived_Get() << " inputs");
 }
 
 
@@ -231,12 +229,7 @@ void scGenComp_PU_Abstract::
     ObserverNotify(gcob_ObserveProcessingBegin);
     DEBUG_SC_EVENT_LOCAL("Processing started");
 }
-/*
-PU->EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
-DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
-PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME);
-DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
-*/
+
 // Called when the state 'processing' ends
 void scGenComp_PU_Abstract::
     ProcessingEnd_method()

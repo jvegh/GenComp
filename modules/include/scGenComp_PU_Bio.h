@@ -153,7 +153,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *    then issues EVENT_GenComp.DeliveringBegin
      * -  Issues EVENT_GenComp.Fail whey the membrane potential decaya near to its threshold
      */
-    void Heartbeat_Processing();
+    virtual void Heartbeat_Processing();
     /**
      * @brief Handle heartbeats in 'Delivering' mode
      *
