@@ -28,35 +28,45 @@ scGenComp_PU_BioDEMO::
     typedef scGenComp_PU_BioDEMO SC_CURRENT_USER_MODULE;
     // This routine is called after initalizations but before starting simulation
     SC_THREAD(InitializeForDemo_method);
+    sensitive << Demo_Event;
     // ** Do not reimplement any of the xxx_method functions
     // until you know what you are doing
 };
 
 // Prepare events for the demo unit; runs before the other 'method's
-
-// at 20 finishes 'Processing'
+// at 120 finishes 'Processing'
 void scGenComp_PU_BioDEMO::
     InitializeForDemo_method()
 {
-    // The unit is 'Ready', expected to 'live' at 12 us
-            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 120 us");
-    wait(120,SC_US);
-            DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
+    DEBUG_SC_PRINT("Will issue 'Initialize' @ 0 us");
+    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+    ObservingBit_Set(gcob_ObserveInput, true);
+    ObservingBit_Set(gcob_ObserveInitialize, true);
+    ObservingBit_Set(gcob_ObserveProcessingBegin, true);
+    // The unit is 'Ready', expected to 'live' at 120 us
+            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 20 us");
+    wait(20,SC_US);
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
+            DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
     // Receiving an input, also starts 'Processing'
-    //  at 170, BPU  receives its second spike
+    //  at 70, BPU  receives its second spike
     // The BPU starts to receive spikes
     wait(50,SC_US);
-            DEBUG_SC_PRINT("Another 'InputReceived' @50 (+120) us");
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.InputReceived");
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-    // Now we sent 2 spikes
-    // At local time 10, the membrane threshold potential exceeded
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.InputReceived");
+            DEBUG_SC_PRINT("Another 'InputReceived' @50 (+70) us");
+     // Now we sent 2 spikes
+    // At local time 100, the membrane threshold potential exceeded
+    wait(25,SC_US);
+            EVENT_GenComp.Synchronize.notify(SC_ZERO_TIME);
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.Synchronized");
+            DEBUG_SC_PRINT("Another 'Syncronized' @50 (+120) us");
 
     // The BPU starts to receive spikes
-    wait(120,SC_US);
+    wait(50,SC_US);
             DEBUG_SC_EVENT("Now processing must be over");
 }
+
 
     /*
     * Handle heartbeats in 'Processing' mode

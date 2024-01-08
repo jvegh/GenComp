@@ -66,7 +66,6 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
 
     scGenComp_PU_Bio(sc_core::sc_module_name nm);
     virtual ~scGenComp_PU_Bio(void); // Must be overridden
-//    virtual void Initialize_method();
     /**
      * @brief A new spike received
      *
@@ -75,25 +74,27 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *
      * Reimplemented given that the first input also starts processing
      */
-    virtual void InputReceived_method();
+
+    virtual void InputReceived_Do();
     /**
      * @brief Receving an input a momentary action, just administer its processing.
      * It is possible only in 'Ready' and 'Processing' states
      */
-    virtual void DoInputReceive();
+//    virtual void DoInputReceive_Do();
      /**
      * @brief Called when the state 'processing' begins
      *
      * The unit passes to phase 'Processing'
      */
 //    void ProcessingBegin_method();
-    void ProcessingBegin();
+    virtual void ProcessingBegin_Do();
     /**
      * @brief Called when the state 'processing' ends
      *
      * The unit passes to phase 'Delivering'
      */
-    void ProcessingEnd_method();
+    virtual void ProcessingEnd_Do();
+ //   void ProcessingEnd_method();
     /**
      * @brief Deliver
      *
@@ -121,15 +122,15 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * - In 'Delivering' mode, re-calculates membrane's decay potential
       */
 //    virtual void Heartbeat_method();
-/*    virtual void Reinitialize(){assert(0);}
-    virtual void Synchronize(){assert(0);}
+/*     virtual void Synchronize(){assert(0);}
     virtual void Fail(){assert(0);}
 */
   protected:
     /**
      * @brief Puts the PU to its default state (just the HW).
+     * Usually called by Initialize_method, but also  by other methods
     */
-//    virtual void Initialize();
+    virtual void Initialize_Do();
 
 //    virtual bool CanBeginProcessing(void);
     /**

@@ -8,6 +8,14 @@
 */
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in unit testing
+/*
+ *  If this macro is not defined, no code is generated;
+        the variables, however, must be defined (although they will be
+        optimized out as unused ones).
+        Alternatively, the macros may be protected with "\#ifdef MAKE_TIME_BENCHMARKING".
+        The macros have source-module scope. All variables must be passed by reference.
+*/
+
 
 // This section configures debug and log printing
 //#define SUPPRESS_LOGGING // Suppress all log messages
@@ -17,6 +25,7 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in un
 
 #include "DebugMacros.h"
 #include "scGenComp_PU_Abstract.h"
+#include "scGenComp_Simulator.h"
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
@@ -26,11 +35,11 @@ GenCompStates_Abstract* TheGenCompStates_Abstract;
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
     ,mHeartbeat(HEARTBEAT_TIME_DEFAULT)
-    ,mGenCompPUOperatingBits(gcob_ObserveModule)
- {
+  {
     if(!TheGenCompStates_Abstract)
         TheGenCompStates_Abstract = new GenCompStates_Abstract();
     MachineState = TheGenCompStates_Abstract;
+    mObservedBits[gcob_ObserveModule] = true;   // Enable module observing by default
     // The stuff below in the consructor are SystemC specific, do not touch!
     typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
     // Intialize the module with generating an event
@@ -72,13 +81,14 @@ scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     dont_initialize();
 #endif// USE_PU_HWSLEEPING
 
-    SC_METHOD(Fail_method);
-    sensitive << EVENT_GenComp.Fail;
+    SC_METHOD(Failed_method);
+    sensitive << EVENT_GenComp.Failed;
     dont_initialize();
     SC_METHOD(Synchronize_method);
     sensitive << EVENT_GenComp.Synchronize;
     dont_initialize();
  }
+
 scGenComp_PU_Abstract::
 ~scGenComp_PU_Abstract(void)
 {
@@ -89,21 +99,42 @@ scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     Initialize_method(void)
 {
-    DEBUG_SC_EVENT_LOCAL(">>>   ");
-    MachineState->Initialize(this);   // Change status to 'Ready' and call DoInitialize()
-    DEBUG_SC_EVENT_LOCAL("<<<   ");
+    Initialize_Do();
 }
+
 
 /*
  * Initialize the GenComp unit. Usually called by the state machine
  */
 void scGenComp_PU_Abstract::
-    DoInitialize(void)
+    Initialize_Do(void)
 {
-    DEBUG_SC_EVENT_LOCAL(">>>   ");
+    DEBUG_SC_EVENT_LOCAL("");
+    // The input is legal, continue receiving it
+    ObserverNotify(gcob_ObserveInitialize);
     mLocalTimeBase = sc_time_stamp();
     Inputs.clear();
-    DEBUG_SC_EVENT_LOCAL("<<<   ");
+}
+
+// Cancel all possible events in the air
+void scGenComp_PU_Abstract::
+    CancelEvents(void)
+{
+    EVENT_GenComp.DeliveringBegin.cancel();
+    EVENT_GenComp.DeliveringEnd.cancel();
+    EVENT_GenComp.ProcessingBegin.cancel();
+    EVENT_GenComp.ProcessingEnd.cancel();
+    EVENT_GenComp.RelaxingBegin.cancel();
+    EVENT_GenComp.RelaxingEnd.cancel();
+    EVENT_GenComp.SleepingBegin.cancel();
+    EVENT_GenComp.SleepingEnd.cancel();
+    EVENT_GenComp.TransmittingBegin.cancel();
+    EVENT_GenComp.TransmittingEnd.cancel();
+    EVENT_GenComp.Failed.cancel();
+    EVENT_GenComp.Heartbeat.cancel();
+    EVENT_GenComp.InputReceived.cancel();
+    EVENT_GenComp.Synchronize.cancel();
+    EVENT_GenComp.Wakeup.cancel();
 }
 
 
@@ -146,7 +177,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     Heartbeat_method()
 {
-    if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveHeartbeat))
+    if(ObservingBit_Get(gcob_ObserveModule) && ObservingBit_Get(gcob_ObserveHeartbeat))
         DEBUG_SC_PRINT_LOCAL ("Heartbeat observed");
     DEBUG_SC_EVENT_LOCAL("In state '" << GenCompStatesString[mStateFlag]);
 
@@ -165,24 +196,22 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
-    DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
-    if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
-        DEBUG_SC_PRINT_LOCAL ("Input observed");
-    // The input is legal, continue receiving it
-    DoInputReceive();
-
+    InputReceive_Do();
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
 void scGenComp_PU_Abstract::
-    DoInputReceive(void)
+    InputReceive_Do(void)
 {
-     if(OperatingBit_Get(gcob_ObserveModule) && OperatingBit_Get(gcob_ObserveInput))
-            DEBUG_SC_PRINT_LOCAL ("Input observed");
+    ObserverNotify(gcob_ObserveInput);
+    // The input is legal, continue receiving it
+//    if(ObservingBit_Get(gcob_ObserveModule) && ObservingBit_Get(gcob_ObserveInput))
+  //          DEBUG_SC_PRINT_LOCAL ("Input observed");
 
-     DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
-     DEBUG_SC_EVENT("Received input #" << NoOfInputsReceived_Get());
+            DEBUG_SC_EVENT_LOCAL("Received input #" << NoOfInputsReceived_Get());
+            DEBUG_SC_EVENT("Received input #" << NoOfInputsReceived_Get());
     Inputs.push_back(NoOfInputsReceived_Get());
+            DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
 }
 
 
@@ -190,14 +219,16 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     ProcessingBegin_method()
 {
-    ProcessingBegin();
+    ProcessingBegin_Do();
 }
 
 void scGenComp_PU_Abstract::
-    ProcessingBegin()
+    ProcessingBegin_Do()
 {
+    StateFlag_Set(gcsm_Processing);
     scLocalTime_Set(sc_time_stamp());      // The clock is synchronized to the beginning of processing
     Inputs.clear();
+    ObserverNotify(gcob_ObserveProcessingBegin);
     DEBUG_SC_EVENT_LOCAL("Processing started");
 }
 /*
@@ -210,11 +241,11 @@ DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
 void scGenComp_PU_Abstract::
     ProcessingEnd_method()
 {
-    ProcessingEnd();
+    ProcessingEnd_Do();
 }
 
 void scGenComp_PU_Abstract::
-    ProcessingEnd()
+    ProcessingEnd_Do()
 {
     DEBUG_SC_EVENT_LOCAL("Processing finished");
     MachineState->Deliver(this);    // Pass to "Delivering
@@ -286,16 +317,29 @@ void scGenComp_PU_Abstract::
 
 #endif // USE_PU_HWSLEEPING
 void scGenComp_PU_Abstract::
-    Fail_method(void)
+    Failed_method(void)
 {
     DEBUG_SC_EVENT_LOCAL(">>>   ");
     EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     DEBUG_SC_EVENT_LOCAL("<<<   ");
 }
 void scGenComp_PU_Abstract::
-    Fail(void)
+    Failed_Do()
 {
     DEBUG_SC_EVENT_LOCAL("   ---");
 }
 
+void scGenComp_PU_Abstract::
+    RegisterSimulator(scGenComp_Simulator* Observer)
+{
+    MySimulator = Observer;
+}
+
+void scGenComp_PU_Abstract::
+    ObserverNotify(GenCompPUObservingBits_t  ObservedBit)
+{
+    assert(MySimulator); // Module not registered
+    if(ObservingBit_Get(ObservedBit))
+        MySimulator->Observe(this,ObservedBit);
+}
 

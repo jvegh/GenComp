@@ -136,27 +136,27 @@ void scGenComp_PU_Bio::
         EVENT_GenComp.RelaxingEnd.notify(SC_ZERO_TIME);
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.RelaxingEnd");
     }
-
 }
 
 /*
-
-// Puts the PU in its default state
+ * Initialize the GenComp unit.
+ */
 void scGenComp_PU_Bio::
-    Initialize_method(void)
+    Initialize_Do(void)
 {
-    DoInitialize();
-}
-*/
+    scGenComp_PU_Abstract::Initialize_Do();
+    DEBUG_SC_EVENT_LOCAL("");
+ }
 
 /**
  * A spike arrived, store spike parameters;
  * If it was the first spike, issue 'Begin_Computing'
  */
-void scGenComp_PU_Bio::
+/*void scGenComp_PU_Bio::
     InputReceived_method()
 {
     DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived");
+    ObserverNotify(gcob_ObserveInput);
     // In bio mode, any input causes passing to 'Processing' statio
     if(!NoOfInputsReceived_Get())
         {   // This is the first input we received, change the state first
@@ -167,35 +167,66 @@ void scGenComp_PU_Bio::
     // The input is legal, statio is OK, continue receiving it
     MachineState->InputReceive(this);
 }
+*/
 
 
 /*
  * This routine makes actual input processing, although most of the job is done in Process() and Heartbeat()
- * It is surely called in state 'Processing'
+ * It can be called in state 'Processing' (if not first input)
+ * or in state 'Ready' if first input
  */
 void scGenComp_PU_Bio::
-    DoInputReceive(void)
+   InputReceived_Do(void)
 {
-    scGenComp_PU_Abstract::DoInputReceive();
+    DEBUG_SC_EVENT("RCVD EVENT_GenComp.InputReceived");
+    if(gcsm_Ready == StateFlag_Get())
+    {// We are still in 'Ready' state; i.e. we change the statio to 'Processing'
+        ProcessingBegin_Do();
+        DEBUG_SC_EVENT("Implied 'EVENT_GenComp.ProcessingBegin'");
+    }
+    if(gcsm_Processing == StateFlag_Get())
+    {
+        scGenComp_PU_Abstract::InputReceive_Do();
+    }
+    else
+    {   // In all other states the input neglected
+
+    }
+    // In bio mode, any input causes passing to 'Processing' statio
+/*    if(!NoOfInputsReceived_Get())
+    {   // This is the first input we received, change the state first
+        MachineState->Process(this);
+        ProcessingBegin();
+    }*/
+    // The input is legal, statio is OK, continue receiving it
+//    MachineState->InputReceive(this);
 }
 
-
+/*
+ * This virtual method makes ProcessingBegin activity
+ * */
 void scGenComp_PU_Bio::
-    ProcessingBegin()
+    ProcessingBegin_Do()
 {
-    scGenComp_PU_Abstract::ProcessingBegin();  // Make default processing
+    scGenComp_PU_Abstract::ProcessingBegin_Do();  // Make default processing
     EVENT_GenComp.Heartbeat.notify(SC_ZERO_TIME);
                 DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with zero");
 }
 
 // Called when the state 'processing' ends
-void scGenComp_PU_Bio::
+/*void scGenComp_PU_Bio::
     ProcessingEnd_method()
 {
     DEBUG_SC_EVENT_LOCAL("RCVD    EVENT_GenComp.ProcessingEnd");
     MachineState->Deliver(this);
-
     DEBUG_SC_EVENT_LOCAL("Processing finished");
+}*/
+
+void scGenComp_PU_Bio::
+    ProcessingEnd_Do()
+{
+    DEBUG_SC_EVENT_LOCAL("Processing finished");
+    MachineState->Deliver(this);    // Pass to "Delivering
 }
 
 void scGenComp_PU_Bio::

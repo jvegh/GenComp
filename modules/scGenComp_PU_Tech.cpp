@@ -47,7 +47,7 @@ void scGenComp_PU_Tech::
         DEBUG_SC_EVENT_LOCAL(">>>   Intializing");
         scGenComp_PU_Abstract::Initialize_method();
         MachineState->Initialize(this);   // Change status to 'Ready'
-        DoInitialize(); // Initialize the unit, HW and temporary variables
+        Initialize_Do(); // Initialize the unit, HW and temporary variables
         // Put PU in its default state
         DEBUG_SC_EVENT_LOCAL("<<<   Intializing");
 }
