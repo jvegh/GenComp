@@ -34,33 +34,39 @@ scGenComp_PU_BioDEMO::
 };
 
 // Prepare events for the demo unit; runs before the other 'method's
-// at 120 finishes 'Processing'
+// at 120 ms finishes 'Processing'
 void scGenComp_PU_BioDEMO::
     InitializeForDemo_method()
 {
-    DEBUG_SC_PRINT("Will issue 'Initialize' @ 0 us");
-    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+    // Set up which events are to be monitored
+    // group and module observing are enabled by default
+//    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+    // Not really needed: done in constructor
     ObservingBit_Set(gcob_ObserveInput, true);
     ObservingBit_Set(gcob_ObserveInitialize, true);
     ObservingBit_Set(gcob_ObserveProcessingBegin, true);
+    ObservingBit_Set(gcob_ObserveHeartbeat, true);
     // The unit is 'Ready', expected to 'live' at 120 us
-            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 20 us");
-    wait(20,SC_US);
+            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 10 ms");
+    wait(10,SC_MS);
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("SENT EVENT_GenComp.InputReceived");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #1 EVENT_GenComp.InputReceived  @10,000 (000) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.BeginProcessing");
     // Receiving an input, also starts 'Processing'
-    //  at 70, BPU  receives its second spike
     // The BPU starts to receive spikes
-    wait(50,SC_US);
+    wait(200,SC_US);
+     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #2 EVENT_GenComp.InputReceived  @10,200 (200) us");
+    wait(500,SC_US);
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.InputReceived");
-            DEBUG_SC_PRINT("Another 'InputReceived' @50 (+70) us");
-     // Now we sent 2 spikes
-    // At local time 100, the membrane threshold potential exceeded
-    wait(25,SC_US);
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #3 InputReceived  @10,500 (500) us");
+     // Now we sent 3 spikes
+    // At local time 900, the membrane threshold potential exceeded
+            DEBUG_SC_PRINT("Another 'InputReceived' @10,500 (500) us");
+    wait(200,SC_US);
             EVENT_GenComp.Synchronize.notify(SC_ZERO_TIME);
             DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.Synchronized");
-            DEBUG_SC_PRINT("Another 'Syncronized' @50 (+120) us");
+            DEBUG_SC_PRINT("Another 'Syncronized' @10,900 (+900 us");
 
     // The BPU starts to receive spikes
     wait(50,SC_US);
@@ -90,10 +96,11 @@ void scGenComp_PU_BioDEMO::
         }
  }
 
+ // NO PDE solving, just exceeded some characteristic tims
 bool scGenComp_PU_BioDEMO::
      MembraneThresholdExceeded_Processing(void)
 {
-    return scLocalTime_Get() >= sc_time(3*BIO_HEARTBEAT_TIME);
+    return scLocalTime_Get() >= sc_core::sc_time(600,SC_US);
 }
 
 

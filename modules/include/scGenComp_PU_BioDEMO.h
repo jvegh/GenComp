@@ -42,7 +42,8 @@ class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
      * \brief Creates a demo biological general computing unit
      * @param nm the SystemC name of the module
       *
-     * Creates a demo abstract biological computing unit
+     * Creates a demo abstract biological computing unit.
+     * A template for developing and testing your own units
      */
       scGenComp_PU_BioDEMO(sc_core::sc_module_name nm);
 
