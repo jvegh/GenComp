@@ -32,51 +32,11 @@ GenCompStates_Bio::
 }
 
 
-
-// Overload if want to use "dormant" state
-   void GenCompStates_Bio::
-Wakeup(scGenComp_PU_Abstract* PU)
-{
- //   machine.WakeUp();
-}
-
     void GenCompStates_Bio::
 Deliver(scGenComp_PU_Abstract* PU)
 {
     assert(gcsm_Processing == PU->StateFlag_Get());
     PU->StateFlag_Set(gcsm_Delivering);
-}
-
-// Put the PU electronics to low-power mode
-// Must come from 'Ready' state; otherwise fail
-    void GenCompStates_Bio::
-Sleep(scGenComp_PU_Abstract* PU)
-{
-    assert(gcsm_Sleeping != PU->StateFlag_Get());
-    PU->StateFlag_Set(gcsm_Sleeping);
-}
-
-    void GenCompStates_Bio::
-Process(scGenComp_PU_Abstract* PU)
-{
-    assert((gcsm_Processing == PU->StateFlag_Get()) || (gcsm_Ready == PU->StateFlag_Get())); // No other case allowed
-        // Legally received a 'Begin processing' signal
-    if(gcsm_Ready == PU->StateFlag_Get())
-    {   // We are still in 'Ready' state, set the mode and
-        PU->StateFlag_Set(gcsm_Processing);
-    }
-    // We are already in 'Processing'
-}
-
-    void GenCompStates_Bio::
-Relax(scGenComp_PU_Abstract* PU)
-{
-
-}
-    void GenCompStates_Bio::
-Initialize(scGenComp_PU_Abstract* PU)
-{
-    PU->StateFlag_Set(gcsm_Ready);
 }
 
 /*
@@ -93,33 +53,56 @@ void GenCompStates_Bio::
             Process(PU);
         }
         // Now the unit is surely in state 'Processing'
-        PU->DoInputReceive(); // Make the administration of the received input
+        PU->InputReceive_Do(); // Make the administration of the received input
     }
     else
     {
         DEBUG_SC_WARNING("Bio event neglected");
     }
- }
-
-/*            PU->StateFlag_Set(gcsm_Processing);
-            PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Issue 'Begin Processing'
-                    DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
-            PU->EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME); // Issue first heartbeat
-                    DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
- */
-void GenCompStates_Bio::
-    Synchronize(scGenComp_PU_Abstract* PU)
-{
 }
 
 //Can happen only in Processing state; passes to Relaxing state
-    void GenCompStates_Bio::
-Fail(scGenComp_PU_Abstract* PU)
+void GenCompStates_Bio::
+    Fail(scGenComp_PU_Abstract* PU)
 {
     if(gcsm_Processing== PU->StateFlag_Get())
-        PU->Fail();
+        PU->Failed_Do();
     // Otherwise neglect it
 
+}
+
+
+void GenCompStates_Bio::
+    Process(scGenComp_PU_Abstract* PU)
+{
+    assert((gcsm_Processing == PU->StateFlag_Get()) || (gcsm_Ready == PU->StateFlag_Get())); // No other case allowed
+        // Legally received a 'Begin processing' signal
+    if(gcsm_Ready == PU->StateFlag_Get())
+    {   // We are still in 'Ready' state, set the mode and
+        PU->StateFlag_Set(gcsm_Processing);
+    }
+    // We are already in 'Processing'
+}
+
+
+void GenCompStates_Bio::
+    Relax(scGenComp_PU_Abstract* PU)
+{
+
+}
+
+// Put the PU electronics to low-power mode
+// Must come from 'Ready' state; otherwise fail
+    void GenCompStates_Bio::
+Sleep(scGenComp_PU_Abstract* PU)
+{
+    assert(gcsm_Sleeping != PU->StateFlag_Get());
+    PU->StateFlag_Set(gcsm_Sleeping);
+}
+
+void GenCompStates_Bio::
+    Synchronize(scGenComp_PU_Abstract* PU)
+{
 }
 
     void GenCompStates_Bio::
@@ -127,3 +110,19 @@ State_Set(scGenComp_PU_Abstract* PU, GenCompStateMachineType_t& State)
 {
     PU-> StateFlag_Set( State);
 }
+
+
+
+// Overload if want to use "dormant" state
+void GenCompStates_Bio::
+    Wakeup(scGenComp_PU_Abstract* PU)
+{
+    //   machine.WakeUp();
+}
+
+    /*            PU->StateFlag_Set(gcsm_Processing);
+PU->EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Issue 'Begin Processing'
+DEBUG_SC_PRINT("SENT EVENT_GenComp.ProcessingBegin");
+PU->EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME); // Issue first heartbeat
+DEBUG_SC_PRINT("SENT EVENT_GenComp.Heartbeat");
+*/

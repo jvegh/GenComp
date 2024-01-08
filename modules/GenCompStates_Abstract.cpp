@@ -74,8 +74,8 @@ Relax(scGenComp_PU_Abstract* PU)
     void GenCompStates_Abstract::
 Initialize(scGenComp_PU_Abstract* PU)
 {
-    PU-> StateFlag_Set(gcsm_Ready);
-    PU->DoInitialize();
+    PU->StateFlag_Set(gcsm_Ready);
+    PU->Initialize_Do();
 }
 
 /*
@@ -90,7 +90,7 @@ void GenCompStates_Abstract::
         DEBUG_SC_WARNING("Unit received input in state '" << GenCompStatesString[T] << "' ; neglected");
         return; // Neglect it
     }
-    PU->DoInputReceive();
+    PU->InputReceive_Do();
 }
 
 
@@ -106,7 +106,7 @@ void GenCompStates_Abstract::
 Fail(scGenComp_PU_Abstract* PU)
 {
     if(gcsm_Processing== PU->StateFlag_Get())
-        PU->Fail();
+        PU->Failed_Do();
     // Otherwise neglect it
 
 }

@@ -77,7 +77,7 @@ void GenCompStates_Tech::
     InputReceived(scGenComp_PU_Tech* PU)
 {
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
-        PU->DoInputReceive();
+        PU->InputReceive_Do();
     // Otherwise neglect it
 }
 
@@ -91,8 +91,8 @@ void GenCompStates_Tech::
     void GenCompStates_Tech::
 Fail(scGenComp_PU_Tech* PU)
 {
-    if(gcsm_Processing== PU->StateFlag_Get())
-        PU->Fail();
+/*    if(gcsm_Processing== PU->StateFlag_Get())
+        PU->Failed();*/
     // Otherwise neglect it
 
 }

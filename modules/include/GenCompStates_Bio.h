@@ -120,12 +120,12 @@ class GenCompStates_Bio : public GenCompStates_Abstract
         virtual void Relax(scGenComp_PU_Abstract *PU);
 
         /**
-         * @brief Initialize: Sets the state machineto its well-defined initial state
+         * @brief Initialize_Do: Sets the state machineto its well-defined initial state
          *
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
-         */
-        virtual void Initialize(scGenComp_PU_Abstract* PU);
+
+        virtual void Initialize_Do(scGenComp_PU_Abstract* PU);*/
 
         /**
          * @brief The machine received new input, administer it
