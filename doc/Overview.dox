@@ -11,10 +11,49 @@ The lack of understanding of computing principles result also in ideas such as a
 building zetta-scale supercomputers, using supercomputers for heavy workload (such as \gls{AI}) applications,
 and 'growing supercomputers in a dish'.
 
+
+<div class="fallacy">
+\anchor Fig_GraphicAbstract
+@image html GraphicAbstract.png "Graphic abstract on time-aware computing and its implementation-dependent effects " width=620px
+\latexonly @image latex GraphicAbstract.pdf "Graphic abstract on time-aware computing and its implementation-dependent effects " width=.8\textwidth  \endlatexonly
+</div>
+
+
+
+On one side, the present state of technical computing, however, is the result of a several decades long development, technically
+perfect in nearly all fields it needs, from electronic technology to software engineering, from
+using high-tech effects for computing and communication <b>as separate subfields</b> in the present-day dominating technology.
+There is no theory (or better: only ad-hoc ideas for achieving some short-term goal), and as approaching
+the limitations science offers for technology, the implementations become less effective in their
+computing efficiency and are wasting power.
+On the other side, the idea that the biological brain computes, is also decades old and its principles not understood.
+Their intersections, such as simulating brain, and understanding its operation, building technical systems
+attempting imitating biological principles we little understand, or building technical-purpose computing devices
+from biological components is hopeless until we understand that all kinds of computing follows the same general principles,
+their implementations force us using approximations and those approximations make the operation of
+the different implementations of computing different.
+
+The present developments details the theoretical idea, builds up a system of components
+which targets the demonstration of implementing the ideas, provides a model fortheir operation.
+The goal is to demonstrate that the ideas are feasible and useful, and the immediate effective impentation
+is just a remote goal. The ideas use components, design facilities and also implement traditional facilities
+to achieve traditional goals, so be patient when reading: yes, it is ebolutely different from that
+what you learned in your high school and can be found in the text books. However, that is what needed
+to renew computing. Decades ago, von Neumann followed a "zigzag" way to describe the idea of computing.
+We do the same, given that following a linear path is not possible. We need to make a fresh start:
+what we call the theory of computing, theory of communication and theory of biological computing,
+started from the outdated idea of calssic science. Everithing needs renewal, from the mathematical
+background to orginizing the computing stack and building computers from unusual elements.
+
+
+The major chapters are:
+ - @link GENCOMP_GENERAL_MAIN_PAGE GENERAL: Non-software-related docs @endlink
+ - @link GENCOMP_MODULE_SOURCES SOURCES: The simulation source files @endlink
+
 Von Neumann's theory of computing@cite EDVACreport1945 and
 Shannon's theory of communication@cite ShannonOriginal:1948
 must be unified and generalized.
-Their common point is that they are based on the idea of instant interaction (inherited from the classic phycsics).
+Their common point is that they are based on the idea of instant interaction (inherited from the classic physics).
 Both biological and technical computing (based on today's modern technology) must consider the
 limited  interaction speed (conduction velocity in biology and speed of \gls{EM} waves in technology).
 This change needs a different theoretical background, implementation principles and implementations.
@@ -39,13 +78,6 @@ the theory of \gls{TAC}; its effect on large-scale technological computing;
 explaining the information storage method and learning ability in biological computing systems.
 You can <a href="TAC-doc.tgz"><b>download</b></a> this documentation as a tgz archive for offline reading.
 <br>
-
-
-<div class="fallacy">
-\anchor Fig_GraphicAbstract
-@image html GraphicAbstract.png "Graphic abstract on time-aware computing and its implementation-dependent effects " width=620px
-\latexonly @image latex GraphicAbstract.pdf "Graphic abstract on time-aware computing and its implementation-dependent effects " width=.8\textwidth  \endlatexonly
-</div>
 
 
 
