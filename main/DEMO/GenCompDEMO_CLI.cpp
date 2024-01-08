@@ -98,8 +98,9 @@ int sc_main(int argc, char* argv[])
     else
     {// Create a simulator
         MySimulator = new scGenComp_Simulator("MySim");
-        // All units must be created before registering
+        // Create all units you need
         MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+        // All units must be created before registering
         MySimulator->RegisterPU(MyBioDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
@@ -116,21 +117,15 @@ int sc_main(int argc, char* argv[])
             sc_start(); // Will run until dies
         else
         {   // This is the real simulation cycle: runs until end
-            // but allows updateing any state of the simulated object
- //           sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
-     /*       gcsm_Continuous,        ///< Runs to the end
-                gcsm_Eventwise,         ///< Stops after a certain number of events
-                gcsm_Timed,             ///< Runs to the defined time
-*/
-            while(MySimulator->Run(gcsm_Timed,2))
+            // but allows updating any state of the simulated object
+            while(MySimulator->Run(gcsm_Eventwise,1))
             {   // This portion is run repeatedly by the simulator
                 // Update display here
-//                DEBUG_PRINT("Again ");
             }
         };
         BENCHMARK_TIME_END(&t,&x,&s);
         SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
-        std::cerr  << "  -Elapsed for running the simulation: " << x.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+        std::cerr  << "  -Elapsed for running the simulation: " << MySimulator->Time_Get().count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     }
     else
         std::cerr  << "  -Error " << returnValue << " during preparing objects" << endl;
