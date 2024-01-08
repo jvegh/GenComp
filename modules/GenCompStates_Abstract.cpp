@@ -90,7 +90,7 @@ void GenCompStates_Abstract::
         DEBUG_SC_WARNING("Unit received input in state '" << GenCompStatesString[T] << "' ; neglected");
         return; // Neglect it
     }
-    PU->InputReceive_Do();
+    PU->InputReceived_Do();
 }
 
 

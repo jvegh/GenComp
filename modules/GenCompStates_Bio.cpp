@@ -53,7 +53,7 @@ void GenCompStates_Bio::
             Process(PU);
         }
         // Now the unit is surely in state 'Processing'
-        PU->InputReceive_Do(); // Make the administration of the received input
+        PU->InputReceived_Do(); // Make the administration of the received input
     }
     else
     {

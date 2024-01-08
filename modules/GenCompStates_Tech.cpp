@@ -77,7 +77,7 @@ void GenCompStates_Tech::
     InputReceived(scGenComp_PU_Tech* PU)
 {
     if((gcsm_Ready == PU->StateFlag_Get()) || (gcsm_Processing== PU->StateFlag_Get()))
-        PU->InputReceive_Do();
+        PU->InputReceived_Do();
     // Otherwise neglect it
 }
 
