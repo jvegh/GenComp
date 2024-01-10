@@ -196,7 +196,9 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      /**
      * @brief Delivering has started
      *
-     * Internal result delivering has started
+     * Internal result delivering has started.
+     * Usually activated by         EVENT_GenComp.DeliveringBegin,        // Begin delivering the result (internally)
+
      */
     virtual void DeliveringBegin_method();
 
@@ -204,29 +206,33 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /**
      * @brief Delivering has finished
      *
-     * Internal result delivering has finished
+     * Internal result delivering has finished.
+     * Usually activated by         EVENT_GenComp.DeliveringEnd,        // Begin delivering the result (internally)
      */
     virtual void DeliveringEnd_method();
 
-    virtual void Failed_method();
     /**
      * @brief Module failed
+     * Usually activated by         EVENT_GenComp.Failed,        // module failed to compute
      * - In biological computing, it means a failed charging-up; passes to 'Ready state'
      * - In technical computing, it results a failed operation
      */
     virtual void Failed_Do();
+    void Failed_method();
+
 
     /**
      * @brief Heartbeat_method
      *
      * A periodic signal as a timebase to refresh state; to avoid using clock signals
+     * Usually activated by      EVENT_GenComp.Heartbeat,        // Represeh PUs state
      *
      *   - For technical computing, it is used to display time delays
      *   - For biological computing, it is used to refresh PU's state
      *   - The unit receives a signal EVENT_GenComp.HeartBeat
      * and branches according to PU's state
      *
-     * A heartbeat can be usesful in states
+     * A heartbeat can be useful in states
      * Ready : the potential is leaking
      * Processing: the potencial is leaking and charging up
      * Delivering: the membrane voltage builds up
@@ -244,6 +250,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * @brief Initialize_method
      *
      * The method called upon EVENT_GenComp.Initialize
+     * Usually activated by      EVENT_GenComp.Initialize,       // Put the unit to its ground state
      */
     void Initialize_method();
     /**
@@ -254,29 +261,34 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /**
      * @brief InputReceived_method
      *
-     * An external partner signalled that an input was sent
+     * An external input received to the terminal.
+     * Usually activated by      EVENT_GenComp.InputReceived,       // Put the unit to its ground state
      */
-    void InputReceived_method();
-
-    virtual void InputReceived_Do(void);
-
-
+     void InputReceived_method();
     /**
-     * @brief Processing has finished
-     *
+     * @brief Prepare external input for processing
+     * Usually activated by      EVENT_GenComp.InputReceived,          // New input received
      */
-    virtual void ProcessingEnd_method();
+    virtual void InputReceived_Do(void);
 
     /**
      * @brief Processing has started
      *
+     * Usually activated by      EVENT_GenComp.ProcessingBegin,        // Begin data processing
      */
     void ProcessingBegin_method();
     virtual void ProcessingBegin_Do();
-    virtual void ProcessingEnd_Do();
 
     /**
-     * @brief Resetting the unix to its operating state
+     * @brief Processing has finished
+     * Usually activated by         EVENT_GenComp.ProcessingEnd,          // End data processing
+     *
+     */
+    void ProcessingEnd_method();
+     virtual void ProcessingEnd_Do();
+
+    /**
+     * @brief Resetting the unit to its operating state
      *
      * No input received; basically just spends time
      * (plus resets unit to "Ready" state)
@@ -285,29 +297,54 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     void Reset(void);
 
-    // virtual void Relax_method(){ assert(0);};
-    // virtual void Relax();
-    /**
+     /**
      * @brief Relaxing has started
      *
+     * Usually activated by RelaxingBegin,          // Begin restoring the 'Ready' state
      * After delivered the result internally to the 'output section', resetting begins
      */
-    virtual void RelaxingBegin_method();
+    void RelaxingBegin_method();
+    virtual void RelaxingBegin_Do(){};
+
     /**
      * @brief Relaxing has finished
      *
+     * Usually activated by    EVENT_GenComp.RelaxingEnd,            // End restoring the 'Ready' state
      * After delivered the result internally to the 'output section', resetting begins
      */
-    virtual void RelaxingEnd_method();
+    void RelaxingEnd_method();
+    virtual void RelaxEndBegin_Do(){};
+
+ /*
+    struct _type {
+        sc_core::sc_event
+            * Usually activated by      EVENT_GenComp.Initialize,       // Put the unit to its ground state
+
+            * Usually activated by      SleepingBegin,
+            * Usually activated by      SleepingEnd,
+
+            * Usually activated by     EVENT_GenComp.TransmittingBegin,      // Begin transmitting the result (externally); unattended
+            * Usually activated by     EVENT_GenComp.TransmittingEnd,        // Feedback from transmission unit; unattended
+            PotentialRestored,      //
+            // HW-related
+            Awaken,                  // Signals that is ready to use
+            Wakeup;                  // The HW is needed again, awake it
+    };
+
+  */
 
 
-     /**
+    /**
      * @brief Synchronize the PU to some external condition
+     *
+     * Usually activated by     EVENT_GenComp.Synchronize,             // External synhronize signal
+
      * - In biological computing, it results in issuing 'End Computing' (immediate spiking; passing to 'Delivering')
      * - In technical computing, it results in issuing 'Begin Computing' (starting computing; passing to 'Processing')
-    */
-
+     */
     virtual void Synchronize_method();
+
+
 #ifdef USE_PU_HWSLEEPING
     /*!
      * \brief Sleep_method: the unit can auto-power-off if idle for a longer time.
@@ -340,43 +377,49 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
      /*!
      * \brief Set an observing bit for this scGenComp_PU_Abstract
-     * \param B is the bit to set
+     * \param B is the bit to set  in mObservedBit
      * \param V is the requested value of the bit
      */
     void ObservingBit_Set(GenCompPUObservingBits_t B, bool V)
      {
-        assert(B < gcob_Max);
+        assert(B < gcob_Max);  // Check if wrong bit
         mObservedBits[B] = V;
     }
 
      /*!
      * \brief Set an observing bit for this scGenComp_PU_Abstract
-     * \param B is the bit to set
+     * \param B is the bit to get in mObservedBits
      * \return is the requested value of the bit
      */
     bool ObservingBit_Get(GenCompPUObservingBits_t B)
     {
-         assert(B < gcob_Max);
+         assert(B < gcob_Max);  // Check if wrong bit
          return mObservedBits[B];
     }
-    void GetData(int32_t &A){ A = 1234;}
 
+    /**
+     * @brief Heartbeat_Get
+     * @return The actual heartbeat time
+     */
     sc_core::sc_time Heartbeat_Get(){return mHeartbeat;}
+    /**
+     * @brief Heartbeat_Set
+     * @param T the requested heartbeat time
+     */
     void Heartbeat_Set(sc_core::sc_time T){mHeartbeat = T;}
     /**
-     * Save the address of the observer simulator
+     * Save the address of the observer simulator in the PU
      */
     void RegisterSimulator(scGenComp_Simulator*);
     /**
     * @brief ObserverNotify
     *
     * Notify the observer about some important change
+    * @param[in] ObservedBit The event that occured
     */
     void ObserverNotify(GenCompPUObservingBits_t ObservedBit);
 
-
    protected:
-    GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     /**
      * @brief Handle Heartbeat in 'Ready' mode
      *
@@ -409,12 +452,23 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * They should be overloaded (by default make nothing)
      */
     virtual void Heartbeat_Relaxing_Do(){};
+
+    GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     GenCompStateMachineType_t mStateFlag;    ///< preserves last state
+
     int32_t mNoOfInputsNeeded;          ///< Remember how many inputs needed
     vector<int32_t> Inputs; // Stores reference to input source
+    /**
+     * @brief mLocalTimeBase: the PUs have a local time: the time spent since starting processing
+     */
     sc_core::sc_time mLocalTimeBase;    ///< The beginning of the local computing
     sc_core::sc_time mHeartbeat;        ///< The heartbeat length of the unit
 private:
+    /**
+     * @brief mObservedBits: Store here which events the unit wants to be observed
+     *
+     * @see GenCompPUObservingBits_t
+     */
     bitset<gcob_Max> mObservedBits;   ///< The bits of the GenComp_PU state
     scGenComp_Simulator* MySimulator;     ///< The simulator that observes us
  };// of class scGenComp_PU_Abstract

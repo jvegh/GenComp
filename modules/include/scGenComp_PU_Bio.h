@@ -19,7 +19,7 @@
 #include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
-#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(100,SC_US)
+#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(10,SC_US)
 
 /*
  * \class scGenComp_PU_Bio
@@ -60,10 +60,12 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
     /*!
      * \brief Creates a biological general computing unit
      * @param nm the SystemC name of the module
+     * @param[in] Heartbeat the state refresh time
       *
      * Creates an abstract biological computing unit
      */
-    scGenComp_PU_Bio(sc_core::sc_module_name nm);
+    scGenComp_PU_Bio(sc_core::sc_module_name nm   // Module name
+                   ,sc_core::sc_time Heartbeat);  // Heartbeat time
     virtual ~scGenComp_PU_Bio(void); // Must be overridden
 
     /**
@@ -121,7 +123,6 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * - In 'Ready' mode, re-calculates membrane's decay potential
      * - In 'Delivering' mode, re-calculates membrane's decay potential
       */
-//    virtual void Heartbeat_method();
 /*     virtual void Synchronize(){assert(0);}
     virtual void Fail(){assert(0);}
 */
@@ -132,18 +133,11 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
     */
     virtual void Initialize_Do();
 
-//    virtual bool CanBeginProcessing(void);
-    /**
-     * @brief Heartbeat
-     *
-      * Generate
-     */
-    void Heartbeat();
     /**
      *
      * Handle heartbeats in 'Ready' mode
      */
-    void Heartbeat_Ready();
+    void Heartbeat_Ready_Do();
     /**
      * @brief Handle heartbeats in 'Processing' mode
      *
@@ -153,7 +147,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *    then issues EVENT_GenComp.DeliveringBegin
      * -  Issues EVENT_GenComp.Fail whey the membrane potential decaya near to its threshold
      */
-    virtual void Heartbeat_Processing();
+    virtual void Heartbeat_Processing_Do();
     /**
      * @brief Handle heartbeats in 'Delivering' mode
      *
@@ -162,7 +156,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * -  Stops generating heartbeats after EVENT_GenComp.DeliveringEnd arrives
      *     then issues EVENT_GenComp.RelaxingBegin
      */
-    void Heartbeat_Delivering();
+    void Heartbeat_Delivering_Do();
     /**
      * @brief Handle heartbeats in 'Relaxing' mode
      *
@@ -171,7 +165,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * -  Stops generating heartbeats after EVENT_GenComp.DeliveringEnd  arrives
      *     then issues EVENT_GenComp.Initializing
      */
-     void Heartbeat_Relaxing();
+     void Heartbeat_Relaxing_Do();
     /**
      * @brief Calculate_Membrane_Potential
      *
@@ -183,6 +177,15 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *  return true if depolarized
      */
      bool MembraneThresholdExceeded_Processing(void){return false;}
+    /**
+     * @brief Processing_Finished
+     * @return true if processing finished and 'Delivering' follows
+     *
+     * true if membrane potential reached its threshold value
+     *
+     * (return 'true' @900 us
+     */
+    virtual bool Processing_Finished(void);
   };// of class scGenComp_PU_Bio
 /** @}*/
 

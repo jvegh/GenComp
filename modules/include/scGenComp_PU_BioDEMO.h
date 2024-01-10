@@ -19,7 +19,7 @@
 #include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Bio.h"
 
-#define BIO_HEARTBEAT_TIME sc_core::sc_time(100,SC_US)
+#define BIO_DEMO_HEARTBEAT_TIME sc_core::sc_time(100,SC_US)
 
 /*
  * \class scGenComp_PU_BioDemo
@@ -45,10 +45,11 @@ class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
      * Creates a demo abstract biological computing unit.
      * A template for developing and testing your own units
      */
-      scGenComp_PU_BioDEMO(sc_core::sc_module_name nm);
+      scGenComp_PU_BioDEMO(sc_core::sc_module_name nm   // Module name
+                           , sc_core::sc_time HeartBeat = BIO_DEMO_HEARTBEAT_TIME);  // Heartbeat time
 
-      /**
-     * @brief Handle heartbeats in 'Delivering' mode
+    /**
+     * @brief Handle heartbeats in 'Processing' mode
      *
      * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential at hillock reaches its threshold value
      * -  Starts to receive heartbeats after EVENT_GenComp.DeliveringBegin arrives
@@ -56,16 +57,13 @@ class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
      *     then issues EVENT_GenComp.RelaxingBegin
      * -  Heartbeat frequency is set to BIO_HEARTBEAT_TIME (10 us)
      */
-      void Heartbeat_Processing();
+      virtual void Heartbeat_Processing_Do();
 
     /**
-      *  Prepare events for the demo unit; run before the other 'method's
-      * The unit is 'Ready', expected to 'live' at 120 us
-      * Until 125 us receives heartbeats, in 'Processing' mode
-      * Until 130 us receives heartbeats, in 'Delivering' mode
-      * Until 135 us receives heartbeats, in 'Relaxing' mode
-      * Until 140 us receives heartbeats, in 'Ready' mode
-    */
+      * Prepare events for the demo unit; run before the other 'method's
+      *
+      * See the operation in scGenComp_PU_BioDEMO.cpp, InitializeForDemo_method()
+      */
     void InitializeForDemo_method();
 
     /** @brief MembraneThresholdExceeded
@@ -73,6 +71,7 @@ class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
      *  if ihis case, returns true at 31 us local time
      */
     bool MembraneThresholdExceeded_Processing(void);
+
     /**
      * @brief Heartbeat_Recalculate_Membrane_Potential
      *
@@ -80,6 +79,14 @@ class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
      *  (solve the differential equation at this time)
      */
     void HeartbeatRecalculateMembranePotential();
+
+    /**
+     * @brief Processing_Finished
+     * @return true if processing finished and 'Delivering' follows
+     *
+     * (return 'true' @900 us
+     */
+    virtual bool Processing_Finished(void);
 protected:
     sc_core::sc_event Demo_Event;
 };

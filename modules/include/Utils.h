@@ -4,7 +4,7 @@
  *
  *  This contains the prototypes for some useful stuff for the simulator, utilities.
  */
- /*  @author János Végh (jvegh)
+/*  @author János Végh (jvegh)
  *  @bug No known bugs.
  */
 
