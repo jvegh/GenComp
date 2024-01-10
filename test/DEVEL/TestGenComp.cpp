@@ -21,7 +21,7 @@ extern bool UNIT_TESTING;		// Switched off by default
 
 /*scGenComp_PU_Abstract PU("myAbs");
 scGenComp_PU_Tech TPU("myTech",2);*/
-scGenComp_PU_Bio BPU("myBio");
+scGenComp_PU_Bio BPU("myBio",HEARTBEAT_TIME_DEFAULT_BIO);
 
 // A new test class  of these is created for each test
 class GenCompTest : public testing::Test

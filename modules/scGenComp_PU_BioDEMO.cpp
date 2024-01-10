@@ -20,11 +20,11 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing
 extern GenCompStates_Bio *TheGenCompStates_Bio;
 
 scGenComp_PU_BioDEMO::
-    scGenComp_PU_BioDEMO(sc_core::sc_module_name nm):
-    scGenComp_PU_Bio(nm)
+    scGenComp_PU_BioDEMO(sc_core::sc_module_name nm   // Module name
+                        ,sc_core::sc_time HeartBeat ):  // Heartbeat time
+    scGenComp_PU_Bio(nm,HeartBeat)
 
-{   mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
-    // Needed to avoid using SystemC specific syntax
+{   // Needed to avoid using SystemC specific syntax
     typedef scGenComp_PU_BioDEMO SC_CURRENT_USER_MODULE;
     // This routine is called after initalizations but before starting simulation
     SC_THREAD(InitializeForDemo_method);
@@ -33,41 +33,46 @@ scGenComp_PU_BioDEMO::
     // until you know what you are doing
 };
 
+// For demonstration purposes, drives generic 'Bio' PU through all states
 // Prepare events for the demo unit; runs before the other 'method's
 // at 120 ms finishes 'Processing'
 void scGenComp_PU_BioDEMO::
     InitializeForDemo_method()
 {
+
     // Set up which events are to be monitored
     // group and module observing are enabled by default
-//    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
-    // Not really needed: done in constructor
     ObservingBit_Set(gcob_ObserveInput, true);
     ObservingBit_Set(gcob_ObserveInitialize, true);
     ObservingBit_Set(gcob_ObserveProcessingBegin, true);
+    ObservingBit_Set(gcob_ObserveProcessingBegin, true);
     ObservingBit_Set(gcob_ObserveHeartbeat, true);
+    //    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
+    Heartbeat_Set(BIO_DEMO_HEARTBEAT_TIME); // Just to speed up demo
+    DEBUG_SC_PRINT_LOCAL("Heartbeat is set to: "  << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
+    // Not really needed: done in constructor
     // The unit is 'Ready', expected to 'live' at 120 us
             DEBUG_SC_PRINT("Will issue 'InputReceived' @ 10 ms");
     wait(10,SC_MS);
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT #1 EVENT_GenComp.InputReceived  @10,000 (000) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #0 EVENT_GenComp.InputReceived  @10,000 (000) us");
             DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.BeginProcessing");
     // Receiving an input, also starts 'Processing'
     // The BPU starts to receive spikes
     wait(200,SC_US);
      EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT #2 EVENT_GenComp.InputReceived  @10,200 (200) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #1 EVENT_GenComp.InputReceived  @10,200 (200) us");
     wait(500,SC_US);
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT #3 InputReceived  @10,500 (500) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #2 InputReceived  @10,700 (500) us");
      // Now we sent 3 spikes
     // At local time 900, the membrane threshold potential exceeded
-            DEBUG_SC_PRINT("Another 'InputReceived' @10,500 (500) us");
     wait(200,SC_US);
-            EVENT_GenComp.Synchronize.notify(SC_ZERO_TIME);
+            // Now we are at @10,900 (900) us
+/*            EVENT_GenComp.Synchronize.notify(SC_ZERO_TIME);
             DEBUG_SC_EVENT("DEMO_DRIVER SENT EVENT_GenComp.Synchronized");
             DEBUG_SC_PRINT("Another 'Syncronized' @10,900 (+900 us");
-
+*/
     // The BPU starts to receive spikes
     wait(50,SC_US);
             DEBUG_SC_EVENT("Now processing must be over");
@@ -78,10 +83,10 @@ void scGenComp_PU_BioDEMO::
     * Handle heartbeats in 'Processing' mode
     */
     void scGenComp_PU_BioDEMO::
-    Heartbeat_Processing()
+    Heartbeat_Processing_Do()
 {
     HeartbeatRecalculateMembranePotential();
-    if (MembraneThresholdExceeded_Processing())
+    if (Processing_Finished())
         {   // We are about finishing processing
             EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
                 DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
@@ -91,16 +96,16 @@ void scGenComp_PU_BioDEMO::
     else
         {   // We are still processing; re-issue the heartbeat
             // if the limit is not yet reached
-            EVENT_GenComp.Heartbeat.notify(BIO_HEARTBEAT_TIME);
-                DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with " << sc_time_String_Get(BIO_HEARTBEAT_TIME, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
+            EVENT_GenComp.Heartbeat.notify( mHeartbeat);
+                DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with " << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
         }
  }
 
  // NO PDE solving, just exceeded some characteristic tims
 bool scGenComp_PU_BioDEMO::
-     MembraneThresholdExceeded_Processing(void)
+    Processing_Finished(void)
 {
-    return scLocalTime_Get() >= sc_core::sc_time(600,SC_US);
+    return scLocalTime_Get() >= sc_core::sc_time(900,SC_US);
 }
 
 

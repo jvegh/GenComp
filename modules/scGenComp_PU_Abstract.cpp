@@ -209,8 +209,8 @@ void scGenComp_PU_Abstract::
     InputReceived_Do(void)
 {
     ObserverNotify(gcob_ObserveInput);
+    DEBUG_SC_EVENT_LOCAL("Received input#" << NoOfInputsReceived_Get());
     Inputs.push_back(NoOfInputsReceived_Get());
-                DEBUG_SC_EVENT_LOCAL("Received " << NoOfInputsReceived_Get() << " inputs");
 }
 
 

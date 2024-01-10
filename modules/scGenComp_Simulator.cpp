@@ -119,28 +119,28 @@ void  scGenComp_Simulator::Update(void)
 // Update input information in simulator
 void  scGenComp_Simulator::UpdateInput(scGenComp_PU_Abstract* PU)
 {
-    DEBUG_SC_EVENT(PU->name() << " " << PU->NoOfInputsReceived_Get() << " inputs ");
+    DEBUG_SC_PRINT(PU->name() << " received " << PU->NoOfInputsReceived_Get() << " inputs ");
 }
 
 // Update initialize information in simulator
 void  scGenComp_Simulator::UpdateInitialize(scGenComp_PU_Abstract* PU)
 {
-    DEBUG_SC_EVENT(PU->name() << " Inited");
+    DEBUG_SC_PRINT(PU->name() << " Inited");
 }
 // Update ''ProcessingBegin' information in simulator
 void  scGenComp_Simulator::UpdateProcessingBegin(scGenComp_PU_Abstract* PU)
 {
-    DEBUG_SC_EVENT(PU->name()<< " ProcessingBegin");
+    DEBUG_SC_PRINT(PU->name()<< " ProcessingBegin");
 }
 // Update ''ProcessingEnd' information in simulator
 void  scGenComp_Simulator::UpdateProcessingEnd(scGenComp_PU_Abstract* PU)
 {
-    DEBUG_SC_EVENT(PU->name() << " ProcessingEnd");
+    DEBUG_SC_PRINT(PU->name() << " ProcessingEnd");
 }
 // Update 'Heartbeat' information in simulator
 void  scGenComp_Simulator::UpdateHeartbeat(scGenComp_PU_Abstract* PU)
 {
-    DEBUG_SC_EVENT(PU->name() << " Heartbeat");
+    DEBUG_SC_PRINT(PU->name() << " Heartbeat");
 }
 void scGenComp_Simulator::
     Observe(scGenComp_PU_Abstract* PU, GenCompPUObservingBits_t B)
