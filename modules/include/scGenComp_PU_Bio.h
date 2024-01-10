@@ -98,18 +98,13 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      */
     virtual void ProcessingEnd_Do();
 
-    /* *
-     * @brief Deliver
+    /**
+     * @brief Relaxing has finished
      *
-     * Called when the state
-     *
-    virtual void Deliver(); */
-    /* *
-     * @brief Relax
-     *
-     *
+     * Usually activated by    EVENT_GenComp.RelaxingEnd,            // End restoring the 'Ready' state
+     * After delivered the result internally to the 'output section', resetting begins
+     */
 
-    virtual void Relax();*/
 
 
     /**
@@ -126,6 +121,14 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
 /*     virtual void Synchronize(){assert(0);}
     virtual void Fail(){assert(0);}
 */
+    /**
+     * @brief IdleTime_Get
+     * @return
+     */
+    sc_core::sc_time LastIdleTime_Get(void)
+    { return sc_core::sc_time_stamp() - mLastRelaxingEndTime;}   ///< Remember the beginning of the 'Idle' period
+    sc_core::sc_time mLastProcessingTime; ///< Remember last time duration  (the result)
+
   protected:
     /**
      * @brief Puts the PU to its default state (just the HW).

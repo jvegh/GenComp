@@ -158,6 +158,8 @@ typedef enum
     gcob_ObserveModule,             ///< The scGenComp_PU_Abstract is observed (by the simulator)
     gcob_ObserveProcessingBegin,     ///< Observe 'Begin Computing'
     gcob_ObserveProcessingEnd,       ///< Observe 'End Computing'
+    gcob_ObserveDeliveringBegin,     ///< Observe 'Begin Delivering'
+    gcob_ObserveDeliveringEnd,       ///< Observe 'End Delivering'
     gcob_ObserveHeartbeat,          ///< Observe 'Heartbeat's of the PU
     gcob_ObserveInput,              ///< Observe 'Input's of the PU
     gcob_ObserveInitialize,         ///< Observe 'Initialize's of the PU
@@ -285,7 +287,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      *
      */
     void ProcessingEnd_method();
-     virtual void ProcessingEnd_Do();
+    virtual void ProcessingEnd_Do();
 
     /**
      * @brief Resetting the unit to its operating state
@@ -313,7 +315,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * After delivered the result internally to the 'output section', resetting begins
      */
     void RelaxingEnd_method();
-    virtual void RelaxEndBegin_Do(){};
+    virtual void RelaxingEnd_Do();
 
  /*
     struct _type {
@@ -463,6 +465,10 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     sc_core::sc_time mLocalTimeBase;    ///< The beginning of the local computing
     sc_core::sc_time mHeartbeat;        ///< The heartbeat length of the unit
+    sc_core::sc_time mLastProcessingTime; ///< Remember last processing time duration  (the result)
+    sc_core::sc_time mLastIdleTime;     ///< Time duration from Last mLastRelaxingEndTime to ProcessingBegin
+    sc_core::sc_time mLastRelaxingEndTime;   ///< Remember the beginning of the 'Idle' period
+    sc_core::sc_time mLastComputingTime; ///< Remember last computing time duration  (the result)
 private:
     /**
      * @brief mObservedBits: Store here which events the unit wants to be observed
@@ -471,7 +477,7 @@ private:
      */
     bitset<gcob_Max> mObservedBits;   ///< The bits of the GenComp_PU state
     scGenComp_Simulator* MySimulator;     ///< The simulator that observes us
- };// of class scGenComp_PU_Abstract
+};// of class scGenComp_PU_Abstract
 
 /** @}*/
 

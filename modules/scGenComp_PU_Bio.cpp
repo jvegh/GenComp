@@ -146,7 +146,7 @@ void scGenComp_PU_Bio::
     Initialize_Do(void)
 {
     scGenComp_PU_Abstract::Initialize_Do();
-                DEBUG_SC_EVENT_LOCAL("");
+                DEBUG_SC_EVENT_LOCAL("Initialized for BIO mode");
  }
 
 

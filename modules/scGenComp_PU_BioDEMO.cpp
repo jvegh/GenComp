@@ -90,8 +90,8 @@ void scGenComp_PU_BioDEMO::
         {   // We are about finishing processing
             EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
                 DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
-            EVENT_GenComp.Heartbeat.cancel();
-                DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
+        /*    EVENT_GenComp.Heartbeat.cancel();
+                DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");  obsolete*/
         }
     else
         {   // We are still processing; re-issue the heartbeat

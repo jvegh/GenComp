@@ -39,7 +39,10 @@ GenCompStates_Abstract* TheGenCompStates_Abstract;
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
     ,mHeartbeat(HEARTBEAT_TIME_DEFAULT)
-  {
+    ,mLastProcessingTime(SC_ZERO_TIME) ///< Remember last time duration  (the result)
+    ,mLastIdleTime(SC_ZERO_TIME) ///< Remember the beginning of the 'Idle' period
+    ,mLastRelaxingEndTime(sc_core::sc_time_stamp())  ///< Remember the beginning of the 'Idle' period
+{
     if(!TheGenCompStates_Abstract)
         TheGenCompStates_Abstract = new GenCompStates_Abstract();
     MachineState = TheGenCompStates_Abstract;
@@ -119,6 +122,7 @@ void scGenComp_PU_Abstract::
     ObserverNotify(gcob_ObserveInitialize);
     mLocalTimeBase = sc_time_stamp();
     Inputs.clear();
+            DEBUG_SC_EVENT_LOCAL("Initialized for abstract mode");
 }
 
 // Cancel all possible events in the air
@@ -143,29 +147,11 @@ void scGenComp_PU_Abstract::
 }
 
 
-
-// The physical delivery
-/*
- * void scGenComp_PU_Abstract::
-    Deliver()
-{
-    DEBUG_SC_EVENT_LOCAL("   >>>");
-    if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the end of Processing phase, the phase 'Delivering' follows
-        StateFlag_Set(gcsm_Delivering);    // Now delivering
-    }
-    else
-    {   // We are at the end of phase 'Delivering'
-        DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.Relax");
-        //??           EVENT_GenComp.Relax.notify(SC_ZERO_TIME);
-    }
-    DEBUG_SC_EVENT_LOCAL("   <<<");
-}*/
-
 // Called when the state 'delivering' begins
 void scGenComp_PU_Abstract::
     DeliveringBegin_method()
 {
+    ObserverNotify(gcob_ObserveDeliveringBegin);
                 DEBUG_SC_EVENT_LOCAL("Delivering started");
 }
 
@@ -176,6 +162,7 @@ void scGenComp_PU_Abstract::
 {
                 DEBUG_SC_EVENT_LOCAL("Delivering finished");
 //    MachineState->Relax(this);    // Pass to "Relaxing"
+                ObserverNotify(gcob_ObserveDeliveringBegin);
 }
 
 
@@ -201,6 +188,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
+    ObserverNotify(gcob_ObserveInput);
     InputReceived_Do();
 }
 
@@ -208,7 +196,6 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_Do(void)
 {
-    ObserverNotify(gcob_ObserveInput);
     DEBUG_SC_EVENT_LOCAL("Received input#" << NoOfInputsReceived_Get());
     Inputs.push_back(NoOfInputsReceived_Get());
 }
@@ -218,17 +205,19 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     ProcessingBegin_method()
 {
+    ObserverNotify(gcob_ObserveProcessingBegin);
+    // For statistic, remember the duration of 'Idle' state
+    mLastIdleTime = sc_core::sc_time_stamp() - mLastRelaxingEndTime;
+    StateFlag_Set(gcsm_Processing);
+    scLocalTime_Set(sc_time_stamp());      // The clock is synchronized to the beginning of processing
     ProcessingBegin_Do();
+    DEBUG_SC_EVENT_LOCAL("Processing started");
 }
 
 void scGenComp_PU_Abstract::
     ProcessingBegin_Do()
 {
-    StateFlag_Set(gcsm_Processing);
-    scLocalTime_Set(sc_time_stamp());      // The clock is synchronized to the beginning of processing
     Inputs.clear();
-    ObserverNotify(gcob_ObserveProcessingBegin);
-                DEBUG_SC_EVENT_LOCAL("Processing started");
 }
 
 // Called when the state 'processing' ends
@@ -236,30 +225,45 @@ void scGenComp_PU_Abstract::
     ProcessingEnd_method()
 {
     ProcessingEnd_Do();
+    mLastProcessingTime = sc_core::sc_time_stamp()-scLocalTime_Get();    // Remember when we were ready
+    ObserverNotify(gcob_ObserveProcessingBegin);
+    DEBUG_SC_EVENT_LOCAL("Processing finished");
 }
 
 void scGenComp_PU_Abstract::
     ProcessingEnd_Do()
 {
-                DEBUG_SC_EVENT_LOCAL("Processing finished");
-    MachineState->Deliver(this);    // Pass to "Delivering
 }
 
 
-// Called when the state 'processing' begins
+// Called when the state 'Relaxing' begins
 void scGenComp_PU_Abstract::
     RelaxingBegin_method()
 {
-    MachineState->Relax(this);    // Go to "Relaxsing"
+    MachineState->Relax(this);    // Go to "Relaxing"
                 DEBUG_SC_EVENT_LOCAL("Relaxing started");
 }
 
-// Called when the state 'processing' ends
+
+
+/**
+     * @brief Relaxing has finished
+     *
+     * Usually activated by    EVENT_GenComp.RelaxingEnd,            // End restoring the 'Ready' state
+     * After delivered the result internally to the 'output section', resetting begins
+     */
 void scGenComp_PU_Abstract::
     RelaxingEnd_method()
 {
+    RelaxingEnd_Do();
+    mLastRelaxingEndTime = sc_core::sc_time_stamp();    // Remember when we were ready
+    mLastProcessingTime = sc_core::sc_time_stamp()-scLocalTime_Get();    // Remember when we were ready
                 DEBUG_SC_EVENT_LOCAL("Relaxing finished");
-    MachineState->Initialize(this);    // Pass to "Ready"
+}
+
+void scGenComp_PU_Abstract::
+    RelaxingEnd_Do()
+{
 }
 
 
