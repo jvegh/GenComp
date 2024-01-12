@@ -28,7 +28,7 @@
 unsigned errors = 0;
 GenCompDEVEL_simpleTB_t* GenCompDEVEL_simpleTB;
 
-bool UNIT_TESTING = true;	// Whether in course of unit testing
+bool UNIT_TESTING = false;	// Whether in course of unit testing
 //extern bool OBJECT_FILE_PRINTED;
 extern    string SC_TIME_UNIT[];
 
@@ -79,7 +79,8 @@ int sc_main(int argc, char* argv[]) {
         std::cerr << " error code " << returnValue << endl;
     else
         std::cerr << "no error"  << endl;
-    std::cerr  << "SystemC unit testing took " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+    std::cerr  << "SystemC unit testing took " << s.count()/1000/1000. << " msec CLOCK time" << "//"
+               << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     return(returnValue);
 }
 

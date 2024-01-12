@@ -73,19 +73,47 @@ TEST_F(GenCompTest, AbstractPU)
  */
 TEST_F(GenCompTest, BioPU)
 {
-    scGenComp_PU_Bio* MyBPU = &BPU;
-    EXPECT_EQ( gcsm_Ready, MyBPU->StateFlag_Get());  // The unit is initialized to 'Ready' state
-    // Now the 1st spike arrives
-    BPU.EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);     // The BPU starts to receive spikes
-    wait(BPU.EVENT_GenComp.ProcessingBegin);
-    EXPECT_EQ( gcsm_Processing, MyBPU->StateFlag_Get());  // The unit goes to 'Processing' state
-    wait(BPU.EVENT_GenComp.Heartbeat);
-    BPU.EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);     // The BPU starts to receive spikes
-    wait(BPU.EVENT_GenComp.ProcessingEnd);
-    EXPECT_EQ( gcsm_Delivering, MyBPU->StateFlag_Get());  // The unit goes to 'Delivering' state
-    wait(BPU.EVENT_GenComp.DeliveringEnd);
-    EXPECT_EQ( gcsm_Relaxing, MyBPU->StateFlag_Get());  // The unit goes to 'Delivering' state
 
+    // We begin testing independently
+    BPU.EVENT_GenComp.Initialize.notify(SC_ZERO_TIME); // Be sure we are reset
+    wait(SC_ZERO_TIME);
+    //
+    BPU.Heartbeat_Set(sc_core::sc_time(100,SC_US));
+    EXPECT_EQ( gcsm_Ready, BPU.StateFlag_Get());  // The unit is initialized to 'Ready' state
+    // Now the 1st spike arrives
+    BPU.EVENT_GenComp.InputReceived.notify();
+    // The unit replied with ProcessingBegin
+    //wait(SC_ZERO_TIME);
+    wait(200,SC_US);
+
+    wait(BPU.EVENT_GenComp.ProcessingBegin);
+    EXPECT_EQ( gcsm_Processing, BPU.StateFlag_Get());
+    EXPECT_EQ(0,BPU.NoOfInputsReceived_Get());
+    // The unit goes to 'Processing' state
+    wait(SC_ZERO_TIME);
+    wait(BPU.EVENT_GenComp.InputReceived);
+    wait(SC_ZERO_TIME);
+    EXPECT_EQ(1,BPU.NoOfInputsReceived_Get());
+    wait(sc_core::sc_time(17,SC_US));
+    BPU.EVENT_GenComp.InputReceived.notify();
+    wait(SC_ZERO_TIME);
+    wait(BPU.EVENT_GenComp.InputReceived);
+    EXPECT_EQ(2,BPU.NoOfInputsReceived_Get());
+    //
+    // Now we are 'Processing', after two inputs and heartbeat
+    //
+    EXPECT_EQ(SC_ZERO_TIME,BPU.LastIdleTime_Get());
+
+
+    EXPECT_EQ(0,1);
+
+
+    BPU.EVENT_GenComp.InputReceived.notify(10,SC_MS);     // The BPU starts to receive spikes
+
+    wait(BPU.EVENT_GenComp.ProcessingEnd);
+    EXPECT_EQ( gcsm_Delivering, BPU.StateFlag_Get());  // The unit goes to 'Delivering' state
+    wait(BPU.EVENT_GenComp.DeliveringEnd);
+    EXPECT_EQ( gcsm_Relaxing, BPU.StateFlag_Get());  // The unit goes to 'Delivering' state
 }
 
 /**
