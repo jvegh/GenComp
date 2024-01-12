@@ -1,8 +1,7 @@
-/** @file scGenComp_PU_BioDEMO.h
+/** @file scGenComp_PU_Bio_IzkievichDEMO.h
  *  @ingroup GENCOMP_MODULE_DEMO
 
- *  @brief A demo unit to demonstrate the operation of biological processing unit
- *  It is just event handling, timed actions, no real activity
+ *  @brief A demo unit to demonstrate the operation of an Izkievich-type biological processing unit
  */
 /*
  *  @author János Végh (jvegh)
@@ -17,13 +16,13 @@
  */
 
 #include "GenCompStates_Bio.h"
-#include "scGenComp_PU_Bio.h"
+#include "scGenComp_PU_Bio_Izkievich.h"
 
 #define BIO_DEMO_HEARTBEAT_TIME sc_core::sc_time(100,SC_US)
 #define BIO_DEMO_INITIAL_DELAY sc_core::sc_time(10,SC_MS)
 
 /*
- * \class scGenComp_PU_BioDemo
+ * \class scGenComp_PU_Bio_IzkievichDemo
  * \brief  A simple demo class to implement the operation of a general bio computing unit
  *
  * Operating principle of event processing:
@@ -32,22 +31,22 @@
  */
 
 /*!
- * \class scGenComp_PU_BioDEMO
+ * \class scGenComp_PU_Bio_IzkievichDEMO
  * \brief  Implements a demo of general biological-type computing PU
  *
  */
-class scGenComp_PU_BioDEMO : public scGenComp_PU_Bio
+class scGenComp_PU_Bio_IzkievichDEMO : public scGenComp_PU_Bio_Izkievich
 {
   public:
     /*!
-     * \brief Creates a demo biological general computing unit
+     * \brief Creates a demo Izkievich-type biological general computing unit
      * @param[in] nm the SystemC name of the module
      * @param[in] Heartbeat the integration time lap
       *
      * Creates a demo abstract biological computing unit.
      * A template for developing and testing your own units
      */
-      scGenComp_PU_BioDEMO(sc_core::sc_module_name nm   // Module name
+      scGenComp_PU_Bio_IzkievichDEMO(sc_core::sc_module_name nm   // Module name
                            , sc_core::sc_time Heartbeat = BIO_DEMO_HEARTBEAT_TIME);  // Heartbeat time
 
     /**

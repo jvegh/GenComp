@@ -1,13 +1,14 @@
-/** @file scGenComp_PU_Bio.cpp
- *  @ingroup GENCOMP_MODULE_PROCESS
+/** @file scGenComp_PU_Bio_Izkievits.cpp
+ *  @ingroup GENCOMP_MODULE_BIOLOGY
  *  @brief  The abstract processing unit for generalized computing
+ *  Implements Izkievits's model
  */
 /*
  *  @author János Végh (jvegh)
  *  @bug No known bugs.
  */
 
-#include "scGenComp_PU_Bio.h"
+#include "scGenComp_PU_Bio_Izkievits.h"
 // This section configures debug and log printing; must be located AFTER the other includes
 //#define SUPPRESS_LOGGING // Suppress all log messages
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
@@ -21,68 +22,27 @@ static GenCompStates_Bio *TheGenCompStates_Bio;
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
-    scGenComp_PU_Bio::
-scGenComp_PU_Bio(sc_core::sc_module_name nm
-                ,sc_core::sc_time HeartBeat ):  // Heartbeat time
-    scGenComp_PU_Abstract(nm)
+    scGenComp_PU_Bio_Izkievits::
+scGenComp_PU_Bio_Izkievits(sc_core::sc_module_name nm
+                ,sc_core::sc_time Heartbeat ):  // Heartbeat time
+    scGenComp_PU_Bio(nm, Heartbeat)
 {
-    mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
     typedef scGenComp_PU_Bio SC_CURRENT_USER_MODULE;
-    if(!TheGenCompStates_Bio)
-        TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
-    MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
 }
 
-    scGenComp_PU_Bio::
-~scGenComp_PU_Bio(void)
+    scGenComp_PU_Bio_Izkievits::
+~scGenComp_PU_Bio_Izkievits(void)
 {
 }
 
 
-/*
-void scGenComp_PU_Bio::
-    Deliver()
-{   // The state machine ensures that we are in phases either 'Processing' or 'Delivering'
-    DEBUG_SC_EVENT_LOCAL("   ---");
-    if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the beginning of the 'Delivering' phase
-        StateFlag_Set(gcsm_Delivering);
-    }
-    else
-    {   // We are at the end of the 'Delivering' phase
-        EVENT_GenComp.DeliveringEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Delivering");
-        MachineState->Relax(this);
-    }
-}
-*/
-
-// Heartbeat distribution happens in scGenComp_PU_Abstract
-    /**
-     * Handle heartbeats in 'Delivering' mode
-     */
-void scGenComp_PU_Bio::
-    Heartbeat_Delivering_Do()
-{
-    if (scLocalTime_Get() < sc_time(8*HEARTBEAT_TIME_DEFAULT_BIO))
-    {   // We are still processing; re-issue the heartbeat
-        // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
-    }
-    else
-    {   // We are about finishing processing
-        EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.DeliveringEnd");
-    }
-}
 
     /**
      * Handle heartbeats in 'Processing' mode
      */
-void scGenComp_PU_Bio::
+void scGenComp_PU_Bio_Izkievits::
     Heartbeat_Processing_Do()
 {
     SolvePDE();
@@ -101,29 +61,13 @@ void scGenComp_PU_Bio::
     }
 }
 
-    /**
-     * Handle heartbeats in 'Ready' mode
-     */
-void scGenComp_PU_Bio::
-    Heartbeat_Ready_Do()
-{
-    if (scLocalTime_Get() < sc_time(2*HEARTBEAT_TIME_DEFAULT_BIO))
-    {   // We are still processing; re-issue the heartbeat
-        // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify(HEARTBEAT_TIME_DEFAULT_BIO);
-                //DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with BIO_HEARTBEAT_TIME");
-    }
-    else
-    {   // We are about finishing processing
-        EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
-    }
-}
+
 
     /**
      *
      * Handle heartbeats in 'Relaxing' mode
      */
-void scGenComp_PU_Bio::
+void scGenComp_PU_Bio_Izkievits::
     Heartbeat_Relaxing_Do()
 {
     if (scLocalTime_Get() < sc_time(8*HEARTBEAT_TIME_DEFAULT_BIO))
@@ -142,10 +86,10 @@ void scGenComp_PU_Bio::
 /*
  * Initialize the GenComp unit.
  */
-void scGenComp_PU_Bio::
+void scGenComp_PU_Bio_Izkievits::
     Initialize_Do(void)
 {
-    scGenComp_PU_Abstract::Initialize_Do();
+    scGenComp_PU_Bio::Initialize_Do();
                 DEBUG_SC_EVENT_LOCAL("Initialized for BIO mode");
  }
 
@@ -158,7 +102,7 @@ void scGenComp_PU_Bio::
  * If it was the first spike, issue 'ComputingBegin' and re-issue
 
  */
-void scGenComp_PU_Bio::
+void scGenComp_PU_Bio_Izkievits::
    InputReceived_Do(void)
 {
     if(!((gcsm_Ready == mStateFlag) || (gcsm_Processing == mStateFlag))) return;
@@ -174,41 +118,20 @@ void scGenComp_PU_Bio::
     }
     else
     {
-        scGenComp_PU_Abstract::InputReceived_Do();
+        scGenComp_PU_Bio::InputReceived_Do();
     }
  }
 
-/*
- * This virtual method makes ProcessingBegin activity
- * */
-void scGenComp_PU_Bio::
-    ProcessingBegin_Do()
-{
-    scGenComp_PU_Abstract::ProcessingBegin_Do();  // Make default processing
-    // Technically, just make sure that Heartbeat comes last:
-    // 1st: ProcessingBegin
-    // 2nd: Input
-    // 3rd: Heartbeat
-    EVENT_GenComp.Heartbeat.notify(2,SC_PS);
-                DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with zero");
-}
 
 
-void scGenComp_PU_Bio::
-    ProcessingEnd_Do()
-{
-    DEBUG_SC_EVENT_LOCAL("Processing finished");
-    MachineState->Deliver(this);    // Pass to "Delivering
-}
-
-bool scGenComp_PU_Bio::
+bool scGenComp_PU_Bio_Izkievits::
     Processing_Finished(void)
 {
     return scLocalTime_Get() >= sc_core::sc_time(500,SC_US);
 
 }
 
-void scGenComp_PU_Bio::
+void scGenComp_PU_Bio_Izkievits::
     SolvePDE()
 {
     int i=1;
@@ -281,22 +204,6 @@ void scGenComp_PU_Bio::
     B_.logger_.record_data( origin.get_steps() + lag );
   }
 */
-/*
-void scGenComp_PU_Bio::
-    Relax()
-{   // The state machine ensures that we are in phases either 'Delivering' or 'Relaxing'
-     if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the beginning of the 'Delivering' phase
-        StateFlag_Set(gcsm_Relaxing);
-    }
-    else
-    {   // We are at the end of the 'Delivering' phase
-        EVENT_GenComp.DeliveringEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Delivering");
-        MachineState->Initialize(this);
-        StateFlag_Set(gcsm_Ready);
-    }
-}
-*/
+
 
 

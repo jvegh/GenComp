@@ -1,8 +1,8 @@
-/** @file scGenComp_PU_Bio.h
+/** @file scGenComp_PU_Bio_Izkievits.h
  *  @ingroup GENCOMP_MODULE_BIOLOGY
 
  *  @brief Function prototypes for the computing module
- *  It is just event handling, no modules
+ *  Implements Izkievits's model
  */
 /*
  *  @author János Végh (jvegh)
@@ -10,63 +10,59 @@
 */
 
 
-#ifndef SCBIOGENCOMP_H
-#define SCBIOGENCOMP_H
+#ifndef SCBIOGENCOMPIZKIEVITCH_H
+#define SCBIOGENCOMPIZKIEVITCH_H
 /** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
 
 #include "GenCompStates_Bio.h"
-#include "scGenComp_PU_Abstract.h"
+#include "scGenComp_PU_Bio.h"
 
-#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(10,SC_US)
 
 /*
- * \class scGenComp_PU_Bio
+ * \class scGenComp_PU_Bio_Izkievits
  * \brief  A simple abstract class to implement the operation of a general bio computing unit
  *
- * Operating principle of event processing:
+ * Operating principle @see scGenComp_PU_Bio
  *
- * The non-virtual "XXX_method"s are "sensitive" to specific events. After receiving such an an event,
- * the corresponding virtual routine of "XXX_Do" is called.
- * If the unit's state and the call are not compatible (programming mistake), that routine asserts.
- * (wrong event)
-  * the time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
- * Optionally, also the next state is invoked by issuing a EVENT_GenComp.XXX.notify() notification.
- * The description is valid for methods
- * - Deliver
- * - Process
- * - Relax
- * - Synchronize
+ * Some virtual methods overwrite the general "BO-Computing" behavior, according to the Izkievitch model
  *
-
  * @see AbstractGenCompState
  *
  * The rest of methods are of technical nature.
- * - HeartBeat: technical signal to update PU's state (e.g. integrate a signal)
- * - Fail: something went wrong, retry
- * - Sleep: if the unit is unused, sends it logically to sleep
- * - Wakeup: awake it if it was sleeping
- */
+ * - HeartBeat: integrate Izkievits's PDE
+  */
 
 /*!
- * \class scGenComp_PU_Bio
- * \brief  Implements a general biological-type computing PU
+ * \class scGenComp_PU_Bio_Izkievits
+ * \brief  Implements the Izkievits-type biological computing PU
  *
  */
-class scGenComp_PU_Bio : public scGenComp_PU_Abstract
+class scGenComp_PU_Bio_Izkievits : public scGenComp_PU_Bio
 {
   public:
     /*!
-     * \brief Creates a biological general computing unit
+     * \brief Creates an Izkievits-type biological general computing unit
      * @param nm the SystemC name of the module
      * @param[in] Heartbeat the state refresh time
-      *
-     * Creates an abstract biological computing unit
+     *
+     * Creates  an Izkievits-type biological computing unit
+     *
+     *  Izkievitch model:
+     *  \f[ \frac{dv}{dt} = 0.04*v^2 + 5*v + 140 - u + I \f]
+     *  \f[ \frac{du}{dt} = a( b*v - u) \f]
+     *   - \f$ v \f$ the membrane potential (in mV)
+     *   - \f$ u \f$ the membrane recovery potential (in mV)
+     *   - \f$ t \f$ time (in msec, the local time)
+     *   - \f$ a \f$ the time scale of the recovery variable \f$ u \f$. (0.02) Smaller values result in slower recovery.
+     *   - \f$ b \f$ the sensitivity of the recovery variable \f$ u \f$ to the subthreshold fluctuations of the membrane potential \f$ v \f$
+     *   - \f$ c \f$ after-spike reset value of the membrane potential v. (c = 065 mV)
+     *   - \f$ d \f$ after-spike reset of the recovery variable of\f$ u \f$ (d=2)
      */
-    scGenComp_PU_Bio(sc_core::sc_module_name nm   // Module name
+    scGenComp_PU_Bio_Izkievits(sc_core::sc_module_name nm   // Module name
                    ,sc_core::sc_time Heartbeat);  // Heartbeat time
-    virtual ~scGenComp_PU_Bio(void); // Must be overridden
+    virtual ~scGenComp_PU_Bio_Izkievits(void); // Must be overridden
 
     /**
      * @brief A new spike received; only in 'Ready' and 'Processing' states
@@ -80,21 +76,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      */
     virtual void InputReceived_Do();
 
-    /**
-     * @brief Called when the state 'processing' begins
-     *
-     * The unit passes to phase 'Processing'
-     */
-    virtual void ProcessingBegin_Do();
-
-    /**
-     * @brief Called when the state 'processing' ends
-     *
-     * The unit passes to phase 'Delivering'
-     */
-    virtual void ProcessingEnd_Do();
-
-    /**
+     /**
      * @brief Called when the state 'Relaxing' begins
      *
       */
@@ -118,9 +100,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * - In 'Ready' mode, re-calculates membrane's decay potential
      * - In 'Delivering' mode, re-calculates membrane's decay potential
       */
-/*     virtual void Synchronize(){assert(0);}
-    virtual void Fail(){assert(0);}
-*/
+
     /**
      * @brief IdleTime_Get
      * @return
@@ -170,12 +150,23 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      */
      void Heartbeat_Relaxing_Do();
     /**
-     * @brief SolvePDE
+     * @brief SolvePDE : solve the differential equations for the actual time increment
+     *
+     *  Izkievitch model:
+     *  \f[ \frac{dv}{dt} = 0.04*v^2 + 5*v + 140 - u + I \f]
+     *  \f[ \frac{du}{dt} = a( b*v - u) \f]
+     *   - \f$ v \f$ the membrane potential (in mV)
+     *   - \f$ u \f$ the membrane recovery potential (in mV)
+     *   - \f$ t \f$ time (in msec, the local time)
+     *   - \f$ a \f$ the time scale of the recovery variable \f$ u \f$. (0.02) Smaller values result in slower recovery.
+     *   - \f$ b \f$ the sensitivity of the recovery variable \f$ u \f$ to the subthreshold fluctuations of the membrane potential \f$ v \f$
+     *   - \f$ c \f$ after-spike reset value of the membrane potential v. (c = 065 mV)
+     *   - \f$ d \f$ after-spike reset of the recovery variable of\f$ u \f$ (d=2)
+
      *
      *  The state of the biological computing is re-calculated (as the simulation time passes)
      *  (solve the differential equation at this time; reset takes place in RelaxingBegin_Do )
      *  @see scGenComp_PU_Bio#RelaxingBegin_Do
-     *
      */
     virtual void SolvePDE();
     /**
@@ -187,7 +178,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * (return 'true' @500 us
      */
     virtual bool Processing_Finished(void);
-  };// of class scGenComp_PU_Bio
+  };// of class scGenComp_PU_Bio_Izkievitch
 /** @}*/
 
-#endif // SCBIOGENCOMP_H
+#endif // SCBIOGENCOMPIZKIRVITCH_H
