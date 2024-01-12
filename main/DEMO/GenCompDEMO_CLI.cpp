@@ -37,12 +37,15 @@
 //??string ListOfIniFiles;
 
 #include "scGenComp_PU_BioDEMO.h"
+#include "scGenComp_PU_Bio_IzhikevichDEMO.h"
+#include "scGenComp_PU_BioDEMO.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStatesString[];   // Just for debugging
 
 scGenComp_PU_BioDEMO* MyBioDEMO;
+scGenComp_PU_Bio_IzhikevichDEMO* MyIzhikevichDEMO;
 scGenComp_Simulator* MySimulator;
 
 // Prepare sxXXX modules and instantiate them
@@ -100,8 +103,10 @@ int sc_main(int argc, char* argv[])
         MySimulator = new scGenComp_Simulator("MySim");
         // Create all units you need
         MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich");
         // All units must be created before registering
         MySimulator->RegisterPU(MyBioDEMO);
+        MySimulator->RegisterPU(MyIzhikevichDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);

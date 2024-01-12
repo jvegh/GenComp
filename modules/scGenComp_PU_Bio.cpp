@@ -215,72 +215,8 @@ void scGenComp_PU_Bio::
 }
 
 
-/* Izkievitch parameters
- *
- *  a_( 0.02 )                                      // a
-  , b_( 0.2 )                                       // b
-  , c_( -65.0 )                                     // c without unit
-  , d_( 8.0 )                                       // d
-  , I_e_( 0.0 )                                     // pA
-  , V_th_( 30.0 )                                   // mV
-  , V_min_( -std::numeric_limits< double >::max() ) // mV
 
-  : v_( -65.0 ) // membrane potential
-  , u_( 0.0 )   // membrane recovery variable
-  , I_( 0.0 )   // input current
 
-*/
-
-/* Nest method for calculating
- *     if ( P_.consistent_integration_ )
-    {
-      v_old = S_.v_;
-      u_old = S_.u_;
-      S_.v_ += h * ( 0.04 * v_old * v_old + 5.0 * v_old + 140.0 - u_old + S_.I_
-                     + P_.I_e_ )
-        + B_.spikes_.get_value( lag );
-      S_.u_ += h * P_.a_ * ( P_.b_ * v_old - u_old );
-    }
-
-    {
-        double OldPotential = mMembranePotential;
-        double OldRecovery = mRecoveryPotential;
-
-        mMembranePotential += mTimeStep*  ( 0.04 * OldPotential * OldPotential + 5.0 *OldPotential + 140.0 - OldRecovery + OldCurrent +
-                     + mParam_I )
-      S_.v_ += h * ( 0.04 * v_old * v_old + 5.0 * v_old + 140.0 - u_old + S_.I_
-                     + P_.I_e_ )
-        + B_.spikes_.get_value( lag );
-      S_.u_ += h * P_.a_ * ( P_.b_ * v_old - u_old );
-        mRecoveryPotential += mTimeStep * mParam_A * (mParamB * OldPotential - OldRecovery);
-    }
-
-    // lower bound of membrane potential
-    S_.v_ = ( S_.v_ < P_.V_min_ ? P_.V_min_ : S_.v_ );
-
-*/
-
-/*
- *     // threshold crossing
-    if ( S_.v_ >= P_.V_th_ )
-    {
-      S_.v_ = P_.c_;
-      S_.u_ = S_.u_ + P_.d_;
-
-      // compute spike time
-      set_spiketime( Time::step( origin.get_steps() + lag + 1 ) );
-
-      SpikeEvent se;
-      kernel().event_delivery_manager.send( *this, se, lag );
-    }
-
-    // set new input current
-    S_.I_ = B_.currents_.get_value( lag );
-
-    // voltage logging
-    B_.logger_.record_data( origin.get_steps() + lag );
-  }
-*/
 /*
 void scGenComp_PU_Bio::
     Relax()
