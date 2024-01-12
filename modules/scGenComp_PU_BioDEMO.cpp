@@ -47,14 +47,16 @@ void scGenComp_PU_BioDEMO::
     ObservingBit_Set(gcob_ObserveProcessingBegin, true);
     ObservingBit_Set(gcob_ObserveProcessingBegin, true);
     ObservingBit_Set(gcob_ObserveHeartbeat, true);
+//??    wait(100,SC_MS);
+
     //    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     Heartbeat_Set(BIO_DEMO_HEARTBEAT_TIME); // Just to speed up demo
     DEBUG_SC_PRINT_LOCAL("Heartbeat is set to: "  << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
+//??    EVENT_GenComp.InputReceived.notify(20,SC_MS);
     // Not really needed: done in constructor
-    // The unit is 'Ready', expected to 'live' at 120 us
-            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 10 ms");
-    wait(10,SC_MS);
-    EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
+//??            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 10 ms");
+//??    wait(10,SC_MS);
+    EVENT_GenComp.InputReceived.notify();
             DEBUG_SC_EVENT("DEMO_DRIVER SENT #0 EVENT_GenComp.InputReceived  @10,000 (000) us");
             DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.BeginProcessing");
     // Receiving an input, also starts 'Processing'

@@ -126,7 +126,7 @@ PositionOfFirstZero_Get(SC_GRIDPOINT_MASK_TYPE Mask, const int Length)
         oss << hex << setw((BitWidth+3)/4) << setfill('0') << dec << ID;
         return oss.str();
    }
-/** Convert the simulated time to string
+/* Convert the simulated time to string
  *  @param[in] U The unit of the returned number; by default SC_TIME_US
  *  @param[in] T the sc_time; by sefault sc_time_stamp()
  *  @param[in] d decimals; by default 2

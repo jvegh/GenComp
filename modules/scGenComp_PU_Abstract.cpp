@@ -171,7 +171,7 @@ void scGenComp_PU_Abstract::
     Heartbeat_method()
 {
     ObserverNotify(gcob_ObserveHeartbeat);
-    DEBUG_SC_EVENT_LOCAL("In state '" << GenCompStatesString[mStateFlag]);
+    DEBUG_SC_EVENT_LOCAL("In state '" << GenCompStatesString[mStateFlag] << "'");
 
     switch(StateFlag_Get())
     {
@@ -336,7 +336,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     ObserverNotify(GenCompPUObservingBits_t  ObservedBit)
 {
-    assert(MySimulator); // Module not registered
+    if(!MySimulator) return; // Module not registered
     if(ObservingBit_Get(ObservedBit))
         MySimulator->Observe(this,ObservedBit);
 }

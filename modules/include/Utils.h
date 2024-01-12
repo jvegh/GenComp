@@ -67,7 +67,7 @@ YFromPosition_Get(int x, int y);
      * @param T the SystemC time to convert
      * @param U the requested unit, see SC_TIME_UNIT_xx
      * @param d decimals (after period)
-     * @param w width (filed total width
+     * @param w width (field total width
      * @return the requested string
      */
     string

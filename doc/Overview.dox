@@ -100,6 +100,14 @@ before going into details. The approach we take seems to be overly complicated,
 but it is needed to build a more effective and capable computing. It majorly simplifies
 modern many-thread computing, but its real advantage manifest in large-scale computing.
 
+@defgroup GENCOMP_MODULE_SOURCES SOURCES: The simulation source files
+The source files are built on top of each other.
+Many of the are used in unchanged form, many have overloaded member functions
+    @defgroup GGENCOMP_MODULE_PROCESS SOURCES: package GenComp
+    Implementation details of the general computing-related processor-related functionality
+        @ingroup GENCOMP_MODULE_SOURCES
+
+
 
 The \b main \b documentation is organized into \em chapters covering different domains of features.
 They are themselves composed of \em user \em manual pages describing the different features
@@ -128,6 +136,19 @@ src="https://c.statcounter.com/12506963/0/4d279618/0/" alt="Visitor counter"></a
 */
 
 /*
+
+!!
+@defgroup GENCOMP_MODULE_BASIC SOURCES: package BASIC
+Implementation details of the bottom (mainly communication) layer
+    @ingroup GENCOMP_MODULE_SOURCES
+
+@defgroup GENCOMP_MODULE_NEURER SOURCES: package NEURER
+Implementation details of the time-aware neuron modeling facilities
+    @ingroup GENCOMP_MODULE_SOURCES
+@defgroup GENCOMP_MODULE_MEMBRANE SOURCES: package MEMBRANE
+Implementation details of the neuron membrane (a finite element patchwork model)
+    @ingroup GENCOMP_MODULE_SOURCES
+
 The major chapters are:
  - @link GENCOMP_BASIC BASIC: Basic-level components, such as elementary modules and communication @endlink
  - @link TAC_GENERAL_MAIN_PAGE GENERAL: non-software-related docs @endlink
@@ -192,21 +213,21 @@ Tell common handling for the TAC simulator family. The subclassed modules extend
 **              @link GENCOMP_GEN_THEORY_PARADIGM_PAGE The idea of time-aware computing @endlink
 
 
-@defgroup GENCOMP_MODULE_SOURCES SOURCES: The simulation source files
-The source files are built on top of each other.
-Many of the are used in unchanged form, many have overloaded member functions
-    @defgroup GENCOMP_MODULE_BASIC SOURCES: package BASIC
-    Implementation details of the bottom (mainly communication) layer
-        @ingroup GENCOMP_MODULE_SOURCES
-    @defgroup GENCOMP_MODULE_PROC SOURCES: package PROC
-    Implementation details of the processor-related functionality
-        @ingroup GENCOMP_MODULE_SOURCES
-    @defgroup GENCOMP_MODULE_NEURER SOURCES: package NEURER
-    Implementation details of the time-aware neuron modeling facilities
-        @ingroup GENCOMP_MODULE_SOURCES
-    @defgroup GENCOMP_MODULE_MEMBRANE SOURCES: package MEMBRANE
-    Implementation details of the neuron membrane (a finite element patchwork model)
-        @ingroup GENCOMP_MODULE_SOURCES
+**@defgroup GENCOMP_MODULE_SOURCES SOURCES: The simulation source files
+**The source files are built on top of each other.
+**Many of the are used in unchanged form, many have overloaded member functions
+**    @defgroup GENCOMP_MODULE_BASIC SOURCES: package BASIC
+**    Implementation details of the bottom (mainly communication) layer
+**        @ingroup GENCOMP_MODULE_SOURCES
+**    @defgroup GENCOMP_MODULE_PROC SOURCES: package PROC
+**    Implementation details of the processor-related functionality
+**        @ingroup GENCOMP_MODULE_SOURCES
+**    @defgroup GENCOMP_MODULE_NEURER SOURCES: package NEURER
+**    Implementation details of the time-aware neuron modeling facilities
+**        @ingroup GENCOMP_MODULE_SOURCES
+**    @defgroup GENCOMP_MODULE_MEMBRANE SOURCES: package MEMBRANE
+**    Implementation details of the neuron membrane (a finite element patchwork model)
+**        @ingroup GENCOMP_MODULE_SOURCES
 
 ** @defgroup GENCOMP_OTHER_SOURCES The other source files (GUI, main, test)
 ** Rarely needed source files; except if you want to branch a new development tree.

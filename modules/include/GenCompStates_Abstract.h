@@ -128,7 +128,7 @@ class GenCompStates_Abstract
         virtual void Fail(scGenComp_PU_Abstract* PU);
 
         /**
-         * @brief Initialize: Sets the state machineto its well-defined initial state
+         * @brief Initialize: Sets the state machine to its well-defined initial state
          *
          * @param PU The HW to set
          * A simple subroutine, sets state to gcsm_Ready, trigger to
