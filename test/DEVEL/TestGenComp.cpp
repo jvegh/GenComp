@@ -78,7 +78,8 @@ TEST_F(GenCompTest, BioPU)
     BPU.EVENT_GenComp.Initialize.notify(SC_ZERO_TIME); // Be sure we are reset
     wait(SC_ZERO_TIME);
     //
-    BPU.Heartbeat_Set(sc_core::sc_time(100,SC_US));
+    BPU.HeartbeatTime_Set(sc_core::sc_time(128,SC_US));
+    BPU.HeartbeatDivisions_Set(8);
     EXPECT_EQ( gcsm_Ready, BPU.StateFlag_Get());  // The unit is initialized to 'Ready' state
     // Now the 1st spike arrives
     BPU.EVENT_GenComp.InputReceived.notify();
