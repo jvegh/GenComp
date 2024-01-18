@@ -89,7 +89,7 @@ class scGenComp_PU_Bio_IzhikevichDEMO : public scGenComp_PU_Bio_Izhikevich
      * @brief Processing_Finished
      * @return true if processing finished and 'Delivering' follows
      *
-     * (return 'true' @900 us
+     *
      */
     virtual bool Processing_Finished(void);
 #endif

@@ -63,7 +63,7 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *  - V_m        double - Membrane potential in mV
      *  - U_m        double - Membrane potential recovery variable
      *  - V_th       double - Spike threshold in mV.
-     *  - I_e        double - Constant input current in pA. (R=1)
+     *  - I_In        double - Constant input current in pA. (R=1)
      *  - V_min      double - Absolute lower value for the membrane potential.
      *  - a          double - describes time scale of recovery variable
      *  - b          double - sensitivity of recovery variable
@@ -178,7 +178,6 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *   - \f$ b \f$ the sensitivity of the recovery variable \f$ u \f$ to the subthreshold fluctuations of the membrane potential \f$ v \f$
      *   - \f$ c \f$ after-spike reset value of the membrane potential v. (c = 065 mV)
      *   - \f$ d \f$ after-spike reset of the recovery variable of\f$ u \f$ (d=2)
-
      *
      *  The state of the biological computing is re-calculated (as the simulation time passes)
      *  (solve the differential equation at this time; reset takes place in RelaxingBegin_Do )
@@ -193,18 +192,33 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *
      */
     virtual bool Processing_Finished(void);
+    /**
+     * @brief InputCurrent_Set
+     * @param[in] I The current, in pA
+     */
+    void InputCurrent_Set(int I) {mI_In = I;}
+    int InputCurrent_Get(void) {return mI_In;}
+    /**
+     * @brief UseAsPublished_Set
+     * @param[in] B if to use the method as published
+     *
+     * As published, the method uses non-standard integration,
+     * has no delivery and refractory periods
+     */
+    void UseAsPublished_Set(bool B) { mAsPublished = B;}
+    bool UseAsPublished_Set(void){return mAsPublished;}
 protected:
-    double mTimeStep
-        ,mV_Membrane    // Actual
-        ,mV_Min         // (-75) mV
-        ,mV_Recovery    // (0.) mV
-        ,mV_Threshold   // (30.) mV
-        ,mParam_A       //(0.02)
-        ,mParam_B       //(0.2)
-        ,mParam_C       //(-65.)
-        ,mParam_D       //(8.)
-        ,mI_e           // (0)
-        ,mI_Input;      // (0.)
+    double mTimeStep    //As documented in Nest
+        ,mV_M    // V_m        double - Membrane potential in mV
+        ,mU_R    // U_m        double - Membrane potential recovery variable (0.) mV
+        ,mV_Th   // V_th       double - Spike threshold in mV (30.) mV
+        ,mI_In   // I_e        double - Constant input current in pA. (R=1)(0.)
+        ,mV_Min  // V_min      double - Absolute lower value for the membrane potential (-75) mV
+        ,m_A     // a          double - describes time scale of recovery variable (0.02)
+        ,m_B     // b          double - sensitivity of recovery variable(0.2)
+        ,m_C     // c          double - after-spike reset value of V_m (-65.)
+        ,m_D;    // d          double - after-spike reset value of U_m(8.)
+        bool mAsPublished;
   };// of class scGenComp_PU_Bio_Izhikevich
 /** @}*/
 

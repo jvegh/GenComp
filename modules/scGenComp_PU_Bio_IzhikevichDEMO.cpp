@@ -27,9 +27,11 @@ scGenComp_PU_Bio_IzhikevichDEMO::
 
 {   // Needed to avoid using SystemC specific syntax
     typedef scGenComp_PU_Bio_IzhikevichDEMO SC_CURRENT_USER_MODULE;
-    // This routine is called after initalizations but before starting simulation
+    // This routine will be called after initalizations but before starting simulation
     SC_THREAD(InitializeForDemo_method);
     sensitive << Demo_Event;
+    //dont_initialize(); // A simple method for starting the demo
+
     // ** Do not reimplement any of the xxx_method functions
     // until you know what you are doing
 };
@@ -40,6 +42,7 @@ scGenComp_PU_Bio_IzhikevichDEMO::
 void scGenComp_PU_Bio_IzhikevichDEMO::
     InitializeForDemo_method()
 {
+    InputCurrent_Set(5000); // Use 5 nA constant input current
 
     // Set up which events are to be monitored
     // group and module observing are enabled by default
@@ -51,23 +54,25 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
     wait(313,SC_US);
 
     //    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
-    Heartbeat_Set(BIO_DEMO_HEARTBEAT_TIME); // Just to speed up demo
-    DEBUG_SC_PRINT_LOCAL("Heartbeat is set to: "  << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
+//    Heartbeat_Set(BIO_DEMO_HEARTBEAT_TIME); // Just to speed up demo
+    HeartbeatTime_Set(sc_core::sc_time(256,SC_US));
+    DEBUG_SC_PRINT_LOCAL("Heartbeat is set to: "  << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+                                                 << ", in " << HeartbeatDivisions_Get() << " divisions");
 //??    EVENT_GenComp.InputReceived.notify(20,SC_MS);
     // Not really needed: done in constructor
 //??            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 10 ms");
 //??    wait(10,SC_MS);
     EVENT_GenComp.InputReceived.notify();
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT #0 EVENT_GenComp.InputReceived  @10,000 (000) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #0 EVENT_GenComp.InputReceived  @0,313 (+000) us");
             DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.BeginProcessing");
     // Receiving an input, also starts 'Processing'
     // The BPU starts to receive spikes
     wait(200,SC_US);
      EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT #1 EVENT_GenComp.InputReceived  @10,200 (200) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #1 EVENT_GenComp.InputReceived  @0,313 (+200) us");
     wait(500,SC_US);
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-            DEBUG_SC_EVENT("DEMO_DRIVER SENT #2 InputReceived  @10,700 (500) us");
+            DEBUG_SC_EVENT("DEMO_DRIVER SENT #2 InputReceived  @0,313 (+700) us");
      // Now we sent 3 spikes
     // At local time 900, the membrane threshold potential exceeded
     wait(200,SC_US);

@@ -39,19 +39,19 @@ scGenComp_PU_Bio_Izhikevich(sc_core::sc_module_name nm
   , u_( 0.0 )   // membrane recovery variable
   , I_( 0.0 )   // input current
 */
-    ,mV_Membrane (-65) // mV
-    ,mV_Min (-70)   //mV
-    ,mV_Recovery (0.) //mV
-    ,mV_Threshold (30.) //mV
-    ,mParam_A(0.02)
-    ,mParam_B(0.2)
-    ,mParam_C(-65.)
-    ,mParam_D(8.)
-    ,mI_e(0.)
-    ,mI_Input(100.)
+    ,mV_M (-65) // mV
+    ,mU_R (0.)   //mV
+    ,mV_Th (30.) //mV
+    ,mI_In(100.) //mV
+    ,mV_Min (-70)
+    ,m_A(0.02)
+    ,m_B(0.2)
+    ,m_C(-65.)
+    ,m_D(8.)
+    ,mAsPublished(false)
 {
     typedef scGenComp_PU_Bio_Izhikevich SC_CURRENT_USER_MODULE;
-    mTimeStep = Heartbeat_Get().to_seconds();
+    mTimeStep = HeartbeatTime_Get().to_seconds();
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
 }
@@ -68,14 +68,20 @@ scGenComp_PU_Bio_Izhikevich(sc_core::sc_module_name nm
 void scGenComp_PU_Bio_Izhikevich::
     Heartbeat_Processing_Do()
 {
-    SolvePDE();
+    double LocalTime = scLocalTime_Get().to_seconds()*1000*1000; // Have the time in us
+    double RefinedTime = HeartbeatTime_Get().to_seconds()*1000*1000; // Have the time step refinement in us
+    double N = HeartbeatDivisions_Get();
+    double mTimeStep = RefinedTime/N/1000.;
+    for(int32_t i = 0; (i< N) and !Processing_Finished(); i++)
+    {
+        SolvePDE();
+        DEBUG_SC_EVENT_LOCAL("V(memb)=" << mV_M << ", U(rec)=" << mU_R << ", N=" << i);
+    }
     if (Processing_Finished())
     {   // We are about finishing processing
         EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
                     DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
-        //            EVENT_GenComp.Heartbeat.cancel();
-        //                    DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
-    }
+     }
     else
     {   // We are still processing; re-issue the heartbeat
            // if the limit is not yet reached
@@ -109,8 +115,8 @@ void scGenComp_PU_Bio_Izhikevich::
 void scGenComp_PU_Bio_Izhikevich::
     RelaxingBegin_Do()
 {
-    mV_Membrane = mParam_C; // Restore membrane potential
-    mV_Recovery = mParam_D; // Restore recovery potential
+    mV_M = m_C; // Restore membrane potential
+    mU_R = m_D; // Restore recovery potential
 }
     /*  S_.v_ = P_.c_;
         S_.u_ = S_.u_ + P_.d_;*/
@@ -139,17 +145,17 @@ void scGenComp_PU_Bio_Izhikevich::
 {
     if(!((gcsm_Ready == mStateFlag) || (gcsm_Processing == mStateFlag))) return;
     // inputs are processed only in 'Ready' and 'Processing' states
-                DEBUG_SC_EVENT_LOCAL("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
     if(gcsm_Ready == mStateFlag)
     {   // we are still in 'Ready' state
         mStateFlag = gcsm_Processing;   // Be sure we do not repeat
         EVENT_GenComp.ProcessingBegin.notify(SC_ZERO_TIME); // Put events in order
                 DEBUG_SC_EVENT_LOCAL("SEND EVENT_GenComp.ProcessingBegin");
         EVENT_GenComp.InputReceived.notify(1,SC_PS); // Re-issue InputReceived
-                DEBUG_SC_EVENT_LOCAL("re-SEND EVENT_GenComp.InputReceived");
+                DEBUG_SC_EVENT_LOCAL("re-SEND EVENT_GenComp.InputReceived with 1 ps delay");
     }
     else
     {
+        DEBUG_SC_EVENT_LOCAL("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
         scGenComp_PU_Bio::InputReceived_Do();
     }
  }
@@ -159,32 +165,28 @@ void scGenComp_PU_Bio_Izhikevich::
 bool scGenComp_PU_Bio_Izhikevich::
     Processing_Finished(void)
 {
-    return mV_Membrane>mV_Threshold;
+    return mV_M>=mV_Th;
     // threshold crossing
- /*   if ( S_.v_ >= P_.V_th_ )
-    {
-
-    return scLocalTime_Get() >= sc_core::sc_time(500,SC_US);
-*/
+ /*   if ( S_.v_ >= P_.V_th_ )*/
 }
 
 void scGenComp_PU_Bio_Izhikevich::
     SolvePDE()
 {    
-        double OldPotential = mV_Membrane;
-        double OldRecovery = mV_Recovery;
+        double OldV = mV_M;
+        double OldU = mU_R;
 
-        mV_Membrane += mTimeStep*  ( 0.04 * OldPotential * OldPotential + 5.0 *OldPotential + 140.0 - OldRecovery + mI_e +
-                                    + mI_Input );
-        //S_.v_ += h * ( 0.04 * v_old * v_old + 5.0 * v_old + 140.0 - u_old + S_.I_ + P_.I_e_ )
-        //       + B_.spikes_.get_value( lag );
-//        S_.u_ += h * P_.a_ * ( P_.b_ * v_old - u_old );
-        mV_Recovery += mTimeStep * mParam_A * (mParam_B * OldPotential - OldRecovery);
-        if(mV_Membrane<mV_Min)
-            mV_Membrane = mV_Min; // Restore membrane potenti
-    // lower bound of membrane potential
-//    S_.v_ = ( S_.v_ < P_.V_min_ ? P_.V_min_ : S_.v_ );
+        mV_M += mTimeStep*  ( 0.04 * OldV * OldV + 5.0 *OldV + 140.0 - OldU //??+ mI_e +
+                                    + mI_In );
+        mU_R += mTimeStep * m_A * (m_B * OldV - OldU);
+        // lower bound of membrane potential
+        if(mV_M<mV_Min)
+            mV_M = mV_Min; // Restore membrane potential
 }
+//S_.v_ += h * ( 0.04 * v_old * v_old + 5.0 * v_old + 140.0 - u_old + S_.I_ + P_.I_e_ )
+//       + B_.spikes_.get_value( lag );
+//        S_.u_ += h * P_.a_ * ( P_.b_ * v_old - u_old );
+//    S_.v_ = ( S_.v_ < P_.V_min_ ? P_.V_min_ : S_.v_ );
 
 /* Izhikevich parameters
  *
