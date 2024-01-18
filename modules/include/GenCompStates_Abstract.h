@@ -117,7 +117,7 @@ class GenCompStates_Abstract
          *
          * the system must be in state gcsm_Processing, passes to gcsm_Delivering
           */
-        virtual void Deliver(scGenComp_PU_Abstract* PU);
+//        virtual void Deliver(scGenComp_PU_Abstract* PU);
 
 
         /**
@@ -125,7 +125,7 @@ class GenCompStates_Abstract
          *
          * @param PU The HW that failed
          */
-        virtual void Fail(scGenComp_PU_Abstract* PU);
+//        virtual void Fail(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief Initialize: Sets the state machine to its well-defined initial state
@@ -133,7 +133,7 @@ class GenCompStates_Abstract
          * @param PU The HW to set
          * A simple subroutine, sets state to gcsm_Ready, trigger to
          */
-        virtual void Initialize(scGenComp_PU_Abstract* PU);
+//        virtual void Initialize(scGenComp_PU_Abstract* PU);
 
         /**
          * @brief The machine received new input, administer it
@@ -141,22 +141,22 @@ class GenCompStates_Abstract
          * @param PU The HW to set
          * A simple subroutine, sets state to 'ready', trigger to
          */
-        virtual void InputReceive(scGenComp_PU_Abstract* PU);
+ //       virtual void InputReceive(scGenComp_PU_Abstract* PU);
 
-        /**
+        /* *
          * @brief Process: Signal 'begin computing' received; arguments are in the 'input section'; start computing
          *
          * @param PU The HW to set
          */
-        virtual void Process(scGenComp_PU_Abstract* PU);
+//        virtual void Process(scGenComp_PU_Abstract* PU);
 
-        /**
+        /* *
          * @brief Relax: After finishing processing, resets the HW. Uses @see Reinitialize
          *
          * @param PU The HW to set
          */
 
-        virtual void Relax(scGenComp_PU_Abstract* PU);
+//        virtual void Relax(scGenComp_PU_Abstract* PU);
         /**
          * @brief Synchronize: Independently from its actual state, forces the HW to @see Deliver
          *
@@ -171,7 +171,7 @@ class GenCompStates_Abstract
          * @param PU The HW to set
          * @param State The selected state type flag
          */
-        void State_Set(scGenComp_PU_Abstract* PU, GenCompStateMachineType_t& State);
+//        void State_Set(scGenComp_PU_Abstract* PU, GenCompStateMachineType_t& State);
 
 #ifdef USE_PU_HWSLEEPING
          /**
@@ -179,14 +179,14 @@ class GenCompStates_Abstract
          *
          * @param PU The HW to set
          */
-        virtual void Sleep(scGenComp_PU_Abstract *PU);
+//        virtual void Sleep(scGenComp_PU_Abstract *PU);
 
-        /**
+        /* *
          * @brief WakeUp: Wake up machine if was sent to sleep;  economize power
          *
          * @param PU The HW to set
          */
-        virtual void Wakeup(scGenComp_PU_Abstract *PU);
+ //       virtual void Wakeup(scGenComp_PU_Abstract *PU);
  #endif // USE_PU_HWSLEEPING
  /*   protected:
         void UpdatePU(scGenComp_PU_Abstract& PU);*/

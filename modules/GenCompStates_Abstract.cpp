@@ -35,54 +35,54 @@ GenCompStates_Abstract::
 /*
  *  The systems must be in state 'Processing'
  */
-    void GenCompStates_Abstract::
+/*    void GenCompStates_Abstract::
 Deliver(scGenComp_PU_Abstract* PU)
 {
     assert(gcsm_Processing == PU->StateFlag_Get()); // Make sure if it was in state 'Processing'
     PU->StateFlag_Set(gcsm_Delivering);
     PU->EVENT_GenComp.DeliveringBegin.notify(SC_ZERO_TIME);
-  }
+  }*/
 
 // Put the PU electronics to low-power mode
 // Must come from 'Ready' state; otherwise fail
-    void GenCompStates_Abstract::
+/*    void GenCompStates_Abstract::
 Sleep(scGenComp_PU_Abstract* PU)
 {
     assert(gcsm_Ready == PU->StateFlag_Get());
     PU->StateFlag_Set(gcsm_Sleeping);
     PU->EVENT_GenComp.SleepingBegin.notify(SC_ZERO_TIME);
-}
+}*/
 
 // Must be in "Ready" state to pass to
-    void GenCompStates_Abstract::
+/*   void GenCompStates_Abstract::
 Process(scGenComp_PU_Abstract* PU)
 {
     assert(gcsm_Ready == PU->StateFlag_Get()); // No other case allowed
     // Legally received a 'Begin processing' signal
-}
+}*/
 
 // For relaxing, it must be in statio "Delivering"
-    void GenCompStates_Abstract::
+/*    void GenCompStates_Abstract::
 Relax(scGenComp_PU_Abstract* PU)
 {
     assert(gcsm_Delivering == PU->StateFlag_Get()); // No other case allowed
     // Legally received a 'RelaxingBegin' signal
     PU->StateFlag_Set(gcsm_Relaxing);
         PU->EVENT_GenComp.RelaxingBegin.notify(SC_ZERO_TIME);
-}
+}*/
 
-    void GenCompStates_Abstract::
+/*    void GenCompStates_Abstract::
 Initialize(scGenComp_PU_Abstract* PU)
 {
     PU->StateFlag_Set(gcsm_Ready);
     PU->Initialize_Do();
-}
+}*/
 
 /*
  *  The machine PU received new input, administer it
  *  Input can be received only in 'Ready' and 'Processing' states
  */
-void GenCompStates_Abstract::
+/*void GenCompStates_Abstract::
     InputReceive(scGenComp_PU_Abstract* PU)
 {
     if(gcsm_Processing != PU->StateFlag_Get())
@@ -91,7 +91,7 @@ void GenCompStates_Abstract::
         return; // Neglect it
     }
     PU->InputReceived_Do();
-}
+}*/
 
 
 void GenCompStates_Abstract::
@@ -102,19 +102,19 @@ void GenCompStates_Abstract::
 }
 
 //Can happen only in Processing state; passes to Relaxing state
-    void GenCompStates_Abstract::
+/*    void GenCompStates_Abstract::
 Fail(scGenComp_PU_Abstract* PU)
 {
     if(gcsm_Processing== PU->StateFlag_Get())
         PU->Failed_Do();
     // Otherwise neglect it
 
-}
+}*/
 // Overload if want to use "dormant" state
-void GenCompStates_Abstract::
+/*void GenCompStates_Abstract::
     Wakeup(scGenComp_PU_Abstract *PU)
 {
     //   State_Set(machine, new ReadyGenCompState(name()));
     //   machine.WakeUp();
 }
-
+*/
