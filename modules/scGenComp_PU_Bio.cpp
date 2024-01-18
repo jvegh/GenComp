@@ -26,10 +26,11 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm
                 ,sc_core::sc_time HeartBeat ):  // Heartbeat time
     scGenComp_PU_Abstract(nm)
 {
-    mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
     typedef scGenComp_PU_Bio SC_CURRENT_USER_MODULE;
     if(!TheGenCompStates_Bio)
         TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
+    mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
+    mHeartbeatDivisions = HEARTBEAT_TIME_DIVISIONS_BIO;
     MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
@@ -39,7 +40,6 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm
 ~scGenComp_PU_Bio(void)
 {
 }
-
 
 /*
 void scGenComp_PU_Bio::
@@ -175,6 +175,9 @@ void scGenComp_PU_Bio::
     else
     {
         scGenComp_PU_Abstract::InputReceived_Do();
+ //       if(StateFlag_Get() == gcsm_Processing)
+            ObserverNotify(gcob_ObserveInput);
+        DEBUG_SC_EVENT_LOCAL("Received input#" << NoOfInputsReceived_Get());
     }
  }
 
@@ -190,20 +193,19 @@ void scGenComp_PU_Bio::
     // 2nd: Input
     // 3rd: Heartbeat
     EVENT_GenComp.Heartbeat.notify(2,SC_PS);
-                DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with zero");
+                DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat' with 2 ps delay");
 }
 
-
+/*
 void scGenComp_PU_Bio::
     ProcessingEnd_Do()
 {
-    DEBUG_SC_EVENT_LOCAL("Processing finished");
-    MachineState->Deliver(this);    // Pass to "Delivering
-}
+    scGenComp_PU_Abstract::ProcessingEnd_Do();
+}*/
 
 bool scGenComp_PU_Bio::
     Processing_Finished(void)
-{
+{   // Just to provide a sample
     return scLocalTime_Get() >= sc_core::sc_time(500,SC_US);
 
 }

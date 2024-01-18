@@ -415,15 +415,21 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     }
 
     /**
-     * @brief Heartbeat_Get
+     * @brief HeartbeatTime_Get
      * @return The actual heartbeat time
      */
-    sc_core::sc_time Heartbeat_Get(){return mHeartbeat;}
+    sc_core::sc_time HeartbeatTime_Get(){return mHeartbeat;}
     /**
-     * @brief Heartbeat_Set
+     * @brief HeartbeatTime_Set
      * @param T the requested heartbeat time
      */
-    void Heartbeat_Set(sc_core::sc_time T){mHeartbeat = T;}
+    void HeartbeatTime_Set(sc_core::sc_time T){mHeartbeat = T;}
+    /**
+     * @brief The heartbeat time is divided into mHeartbeatDivisions intervalls for calculation
+     * @return the number of heartbeat divisions
+     */
+    int32_t HeartbeatDivisions_Get(void){return mHeartbeatDivisions;}
+    void HeartbeatDivisions_Set(int32_t N){mHeartbeatDivisions = N;}
     /**
      * Save the address of the observer simulator in the PU
      */
@@ -471,9 +477,10 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     virtual void Heartbeat_Relaxing_Do(){};
 
     GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
-    GenCompStateMachineType_t mStateFlag;    ///< preserves last state
+    GenCompStateMachineType_t mStateFlag;    ///< Preserves last state
 
     int32_t mNoOfInputsNeeded;          ///< Remember how many inputs needed
+    int32_t mHeartbeatDivisions;           ///< How many subdivisions the 'heartbeat' time divides to
     vector<int32_t> Inputs; // Stores reference to input source
     /**
      * @brief mLocalTimeBase: the PUs have a local time: the time spent since starting processing

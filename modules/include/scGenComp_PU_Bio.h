@@ -19,7 +19,8 @@
 #include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
-#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(10,SC_US)
+#define HEARTBEAT_TIME_DIVISIONS_BIO 16
+#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(HEARTBEAT_TIME_DIVISIONS_BIO*10,SC_US)
 
 /*
  * \class scGenComp_PU_Bio
@@ -86,12 +87,12 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      */
     virtual void ProcessingBegin_Do();
 
-    /**
+    /* *
      * @brief Called when the state 'processing' ends
      *
      * The unit passes to phase 'Delivering'
      */
-    virtual void ProcessingEnd_Do();
+    //virtual void ProcessingEnd_Do();
 
     /**
      * @brief Called when the state 'Relaxing' begins

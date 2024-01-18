@@ -39,6 +39,7 @@ GenCompStates_Abstract* TheGenCompStates_Abstract;
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
     ,mStateFlag(gcsm_Ready)
     ,mHeartbeat(HEARTBEAT_TIME_DEFAULT)
+    ,mHeartbeatDivisions(16)
     ,mLastProcessingTime(SC_ZERO_TIME) ///< Remember last time duration  (the result)
     ,mLastIdleTime(SC_ZERO_TIME) ///< Remember the beginning of the 'Idle' period
     ,mLastRelaxingEndTime(sc_core::sc_time_stamp())  ///< Remember the beginning of the 'Idle' period
@@ -188,7 +189,6 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
-    ObserverNotify(gcob_ObserveInput);
     InputReceived_Do();
 }
 
@@ -196,8 +196,7 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_Do(void)
 {
-    DEBUG_SC_EVENT_LOCAL("Received input#" << NoOfInputsReceived_Get());
-    Inputs.push_back(NoOfInputsReceived_Get());
+     Inputs.push_back(NoOfInputsReceived_Get());
 }
 
 
@@ -225,9 +224,12 @@ void scGenComp_PU_Abstract::
     ProcessingEnd_method()
 {
     ProcessingEnd_Do();
+    StateFlag_Set(gcsm_Delivering);   // Pass to "Delivering"
     mLastProcessingTime = sc_core::sc_time_stamp()-scLocalTime_Get();    // Remember when we were ready
-    ObserverNotify(gcob_ObserveProcessingBegin);
-    DEBUG_SC_EVENT_LOCAL("Processing finished");
+    ObserverNotify(gcob_ObserveProcessingEnd);
+                DEBUG_SC_EVENT_LOCAL("Processing finished");
+    EVENT_GenComp.DeliveringBegin.notify(SC_ZERO_TIME);
+                DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.Ready");
 }
 
 void scGenComp_PU_Abstract::
