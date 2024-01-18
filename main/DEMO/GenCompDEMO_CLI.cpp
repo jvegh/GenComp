@@ -103,7 +103,7 @@ int sc_main(int argc, char* argv[])
         MySimulator = new scGenComp_Simulator("MySim");
         // Create all units you need
 //        MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
-        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich");
+        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(200,SC_US));
         // All units must be created before registering
 //        MySimulator->RegisterPU(MyBioDEMO);
         MySimulator->RegisterPU(MyIzhikevichDEMO);
