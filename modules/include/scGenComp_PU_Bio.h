@@ -31,7 +31,7 @@
  * the corresponding virtual routine of "XXX_Do" is called.
  * If the unit's state and the call are not compatible (programming mistake), that routine asserts.
  * (wrong event)
-  * the time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
+ * The time delay of the operation is simulated by issuing a wait() call to SystemC kernel.
  * Optionally, also the next state is invoked by issuing a EVENT_GenComp.XXX.notify() notification.
  * The description is valid for methods
  * - Deliver
@@ -39,7 +39,6 @@
  * - Relax
  * - Synchronize
  *
-
  * @see AbstractGenCompState
  *
  * The rest of methods are of technical nature.

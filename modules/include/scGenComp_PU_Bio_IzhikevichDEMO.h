@@ -59,7 +59,7 @@ class scGenComp_PU_Bio_IzhikevichDEMO : public scGenComp_PU_Bio_Izhikevich
      *     then issues EVENT_GenComp.RelaxingBegin
      * -  Heartbeat frequency is set to BIO_HEARTBEAT_TIME (10 us)
      */
-      virtual void Heartbeat_Processing_Do();
+ //     virtual void Heartbeat_Processing_Do();
 
     /**
       * Prepare events for the demo unit; run before the other 'method's

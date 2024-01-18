@@ -85,6 +85,8 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
 /*
     * Handle heartbeats in 'Processing' mode
     */
+#if 0
+
 void scGenComp_PU_Bio_IzhikevichDEMO::
     Heartbeat_Processing_Do()
 {
@@ -103,6 +105,7 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with " << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
     }
 }
+#endif //0
 
 
 #if 0

@@ -1,8 +1,7 @@
 /** @file scGenComp_PU_Bio_Izhikevich.h
  *  @ingroup GENCOMP_MODULE_BIOLOGY
 
- *  @brief Function prototypes for the computing module
- *  Implements Izkievits's model
+ *  @brief Implements Izhikevich's model of neuronal operation
  */
 /*
  *  @author János Végh (jvegh)
@@ -26,7 +25,7 @@
  *
  * Operating principle @see scGenComp_PU_Bio
  *
- * Some virtual methods overwrite the general "BO-Computing" behavior, according to the Izkievitch model
+ * Some virtual methods overwrite the general "BO-Computing" behavior, according to Izkievitch's model
  *
  * @see AbstractGenCompState
  *
@@ -59,6 +58,23 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *   - \f$ b \f$ the sensitivity of the recovery variable \f$ u \f$ to the subthreshold fluctuations of the membrane potential \f$ v \f$
      *   - \f$ c \f$ after-spike reset value of the membrane potential v. (c = 065 mV)
      *   - \f$ d \f$ after-spike reset of the recovery variable of\f$ u \f$ (d=2)
+     *
+     *   Parameters:
+     *  - V_m        double - Membrane potential in mV
+     *  - U_m        double - Membrane potential recovery variable
+     *  - V_th       double - Spike threshold in mV.
+     *  - I_e        double - Constant input current in pA. (R=1)
+     *  - V_min      double - Absolute lower value for the membrane potential.
+     *  - a          double - describes time scale of recovery variable
+     *  - b          double - sensitivity of recovery variable
+     *  - c          double - after-spike reset value of V_m
+     *  - d          double - after-spike reset value of U_m
+     *  - consistent_integration  bool - use standard integration technique
+     *   References:
+     *[1] Izhikevich, Simple Model of Spiking Neurons,
+     * IEEE Transactions on Neural Networks (2003) 14:1569-1572
+     *
+     * Code uses a nEST fragment
      */
     scGenComp_PU_Bio_Izhikevich(sc_core::sc_module_name nm   // Module name
                    ,sc_core::sc_time Heartbeat);  // Heartbeat time
@@ -80,7 +96,7 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      * @brief Called when the state 'Relaxing' begins
      *
       */
-    virtual void RelaxingBegin_Do(){}
+    virtual void RelaxingBegin_Do();
 
     /**
      * @brief Called when the state 'Relaxing' ends
@@ -175,10 +191,20 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *
      * true if membrane potential reached its threshold value
      *
-     * (return 'true' @500 us
      */
     virtual bool Processing_Finished(void);
-
+protected:
+    double mTimeStep
+        ,mV_Membrane    // Actual
+        ,mV_Min         // (-75) mV
+        ,mV_Recovery    // (0.) mV
+        ,mV_Threshold   // (30.) mV
+        ,mParam_A       //(0.02)
+        ,mParam_B       //(0.2)
+        ,mParam_C       //(-65.)
+        ,mParam_D       //(8.)
+        ,mI_e           // (0)
+        ,mI_Input;      // (0.)
   };// of class scGenComp_PU_Bio_Izhikevich
 /** @}*/
 
