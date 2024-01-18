@@ -55,7 +55,7 @@ bool scGenComp_Simulator::Run(GenCompSimulatorModes_t SimulatorMode, int32_t Sim
     {   // We are in the process of simulating
         sc_start( sc_time_to_pending_activity());   // Run up to the next activity
         mMoreEvents = sc_pending_activity();    // Check if we have anything to do
-        Update();
+        Update();   // Do updating if anything is to be updated
         if((MoreCycles))
         {   // We have still more events, see which mode requested
             switch(SimulatorMode)
@@ -92,8 +92,11 @@ void scGenComp_Simulator::RegisterPU(scGenComp_PU_Bio* Module)
 
 void  scGenComp_Simulator::Update(void)
 {
-    if(!mUpdateUnit) return;    // The event is not observed
-    switch(mUpdateObservingBit)
+    if(!mUpdateUnit)
+    {   DEBUG_SC_EVENT("Nothing to update");
+        return;    // We  have no new update request
+    }
+    switch(mUpdateObservingBit) // Seem if the activity itself is not observed
         {
         default: assert(0); break;
         case gcob_ObserveProcessingBegin: //Watch 'Begin Computing'
