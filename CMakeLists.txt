@@ -28,8 +28,8 @@ cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0007 NEW)
 include(Colorize)   # Just to make some beauty
     set(CPACK_PACKAGE_NAME "GenComp")
-    set(MyVersion "0.0.1")
-    set(MyDate "2023.12.25")
+    set(MyVersion "0.0.2")
+    set(MyDate "2024.01.19")
     project(GenComp VERSION ${MyVersion} LANGUAGES C CXX)
 
 include(BuildType)
