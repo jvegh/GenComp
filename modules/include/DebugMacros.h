@@ -12,13 +12,13 @@
 extern    string SC_TIME_UNIT[];
 // define prompts for SC debugging
 #define DEBUG_EVENT_STRING "EVT->"
-#define DEBUG_LOG_STRING "LOG: "
+#define DEBUG_LOG_STRING "LOG#>"
 #define DEBUG_PRINT_STRING "DBG->"
-#define DEBUG_WARNING_STRING "WNG->"
-#define DEBUG_EVENT_STRING_LOCAL "EVT*>"
+#define DEBUG_WARNING_STRING "**WNG"
+#define DEBUG_EVENT_STRING_LOCAL "EVT->"
 #define DEBUG_LOG_STRING_LOCAL "LOG:."
 #define DEBUG_PRINT_STRING_LOCAL "DBG*>"
-#define DEBUG_WARNING_STRING_LOCAL "WNG*>"
+#define DEBUG_WARNING_STRING_LOCAL "**WNG"
 //
 // Utility functions for degugging
 //
@@ -67,7 +67,7 @@ extern    string SC_TIME_UNIT[];
 #define DEBUG_SC_EVENT(X)       if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << DEBUG_LOCATION_SHORT  << std::endl
 #define DEBUG_SC_EVENT_LOCAL(X)  if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << DEBUG_LOCATION_SHORT  << std::endl
 #define DEBUG_SC_LOG(X) if(!UNIT_TESTING) std::cerr  << DEBUG_LOG_STRING << DEBUG_SC_TIME << ":"   << name() << "- " <<  X << std::endl
-#define DEBUG_SC_LOG_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_LOG_STRING_LOCAL <<  DEBUG_SC_TIME_LOCAL << name() << "- "   << X << std::endl
+#define DEBUG_SC_LOG_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_LOG_STRING_LOCAL <<  DEBUG_SC_TIME_LOCAL<< ":"  << name() << "- "   << X << std::endl
 #else
 #define DEBUG_SC_EVENT(X)
 #define DEBUG_SC_EVENT_LOCAL(X)
