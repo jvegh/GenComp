@@ -7,7 +7,7 @@
 /*
  *  @author János Végh (jvegh)
  *  @bug No known bugs.
-*/
+ */
 
 
 #ifndef SCABSTRACTGENCOMP_H
@@ -15,13 +15,11 @@
 /** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
-//#include "GenCompStates_Abstract.h"
 
 #include <systemc>
 #include <bitset>
 using namespace sc_core; using namespace sc_dt;
 using namespace std;
-//static vector<GenCompStates_Abstract*> AbsPU_StateVector;
 class scGenComp_Simulator;
 
 #define HEARTBEAT_TIME_DEFAULT sc_core::sc_time(1,SC_NS)
@@ -56,8 +54,10 @@ class scGenComp_Simulator;
  *  External event forces PU to synchronize
  *  @var EVENT_GenComp_type::Failed
  *  Computing failed, start over
- *  @var EVENT_GenComp_type::Initialize,             // Put the unit to its ground state
- *  @var EVENT_GenComp_type::InputReceived,          // New input received
+ *  @var EVENT_GenComp_type::Initialize
+ *  Put the unit to its ground state
+ *  @var EVENT_GenComp_type::InputReceived
+ *  New input received
  *
  *  Actually, the above main duties govern processing of the abstract computing units
 */
@@ -90,9 +90,7 @@ struct EVENT_GenComp_type {
         Wakeup;                  // The HW is needed again, awake it
 };
 
-/*
-
- *
+/**
  * Operating principle of event processing:
  *
  * "XXX_thread" methods are "sensitive" to specific events. After receiving an event,
@@ -230,7 +228,8 @@ GenCompStateMachineType_t;
 
 extern string GenCompStatesString[];
 /*! \var typedef GenCompPUObservingBits_t
- * \brief the names of the bits in the bitset describing scGenComp_PU_Abstract
+ * \brief the names of the bits in the bitset describing
+ * which signals in scGenComp_PU_Abstract are monitored by the scGenComp_Simulator
  */
 typedef enum
 {
@@ -254,8 +253,7 @@ extern string GenCompObserveStrings[];
 
 class scGenComp_PU_Abstract: public sc_core::sc_module
 {
-    friend class GenCompStates_Abstract;
-  public:
+   public:
     /*!
      * \brief Create an abstract processing unit for the general computing paradigm
      * @param[in] nm the SystemC name of the module
@@ -271,75 +269,84 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     void CancelEvents(void);
 
-    /* *
-      * @brief The physical delivery method
-      *
-      * The delivery method is called twice; at the beginning and at the end of the 'delivery'Delivering' phase
-      * The first phase is executed in state 'Processing', the 2nd one in state 'Delivering'
-      * The routine is actived by EVENT_GenComp.End_Processing
-      *
-    virtual void Deliver();*/
-     /**
+    /**
      * @brief Delivering has started
      *
      * Internal result delivering has started.
-     * Usually activated by         EVENT_GenComp.DeliveringBegin,        // Begin delivering the result (internally)
-
+     * Usually activated by         EVENT_GenComp.DeliveringBegin
      */
     void DeliveringBegin_method();
     virtual void DeliveringBegin_Do(){};
-
 
     /**
      * @brief Delivering has finished
      *
      * Internal result delivering has finished.
-     * Usually activated by         EVENT_GenComp.DeliveringEnd,        // Begin delivering the result (internally)
+     * Usually activated by         EVENT_GenComp.DeliveringEnd
      */
     void DeliveringEnd_method();
     virtual void DeliveringEnd_Do(){};
 
     /**
      * @brief Module failed
-     * Usually activated by         EVENT_GenComp.Failed,        // module failed to compute
+     * Usually activated by         EVENT_GenComp.Failed
      * - In biological computing, it means a failed charging-up; passes to 'Ready state'
-     * - In technical computing, it results a failed operation
+     * - In technical computing, it results in a failed operation
      */
     virtual void Failed_Do();
     void Failed_method();
-
 
     /**
      * @brief Heartbeat_method
      *
      * A periodic signal as a timebase to refresh state; to avoid using clock signals
-     * Usually activated by      EVENT_GenComp.Heartbeat,        // Represeh PUs state
+     * Usually activated by      EVENT_GenComp.Heartbeat
      *
      *   - For technical computing, it is used to display time delays
-     *   - For biological computing, it is used to refresh PU's state
+     *   - For biological computing, it is used to solve PDEs
      *   - The unit receives a signal EVENT_GenComp.HeartBeat
      * and branches according to PU's state
      *
      * A heartbeat can be useful in states
-     * Ready : the potential is leaking
-     * Processing: the potencial is leaking and charging up
-     * Delivering: the membrane voltage builds up
-     * Relaxing: the membrane potential decays
+     * - Ready : the potential is leaking
+     * - Processing: the potencial is leaking and charging up
+     * - Delivering: the membrane voltage builds up
+     * - Relaxing: the membrane potential decays
      *
      * Calls
-     *      virtual void Heartbeat_Ready_Do();
-     *      virtual void Heartbeat_Processing_Do();
-     *      virtual void Heartbeat_Delivering_Do();
-     *      virtual void Heartbeat_Relaxing_Do();
+     *    -  virtual void Heartbeat_Ready_Do();
+     *    -  virtual void Heartbeat_Processing_Do();
+     *    -  virtual void Heartbeat_Delivering_Do();
+     *    -  virtual void Heartbeat_Relaxing_Do();
       */
     void Heartbeat_method();
 
     /**
+     * @brief HeartbeatTime_Get
+     * @return The actual heartbeat time
+     */
+    inline sc_core::sc_time HeartbeatTime_Get(){return mHeartbeat;}
+
+    /**
+     * @brief HeartbeatTime_Set
+     * @param T the requested heartbeat time
+     */
+    inline void HeartbeatTime_Set(sc_core::sc_time T){mHeartbeat = T;}
+
+    /**
+     * @brief The heartbeat time is divided into mHeartbeatDivisions intervalls for calculation
+     * @return the number of heartbeat divisions
+     */
+    inline int32_t HeartbeatDivisions_Get(void){return mHeartbeatDivisions;}
+    inline void HeartbeatDivisions_Set(int32_t N){mHeartbeatDivisions = N;}
+
+    /**
      * @brief Initialize_method
      *
-     * Usually activated by      EVENT_GenComp.Initialize,       // Put the unit to its ground state
+     * Usually activated by      EVENT_GenComp.Initialize
      */
     void Initialize_method();
+
     /**
      * @brief The HW initialization
     */
@@ -349,26 +356,27 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * @brief InputReceived_method
      *
      * An external input received to the terminal.
-     * Usually activated by      EVENT_GenComp.InputReceived,       // Put the unit to its ground state
+     * Usually activated by      EVENT_GenComp.InputReceived
      */
      void InputReceived_method();
+
     /**
      * @brief Prepare external input for processing
-     * Usually activated by      EVENT_GenComp.InputReceived,          // New input received
+     * Usually activated by      EVENT_GenComp.InputReceived
      */
     virtual void InputReceived_Do(void);
 
     /**
      * @brief Processing has started
      *
-     * Usually activated by      EVENT_GenComp.ProcessingBegin,        // Begin data processing
+     * Usually activated by      EVENT_GenComp.ProcessingBegin
      */
     void ProcessingBegin_method();
     virtual void ProcessingBegin_Do();
 
     /**
      * @brief Processing has finished
-     * Usually activated by         EVENT_GenComp.ProcessingEnd,          // End data processing
+     * Usually activated by         EVENT_GenComp.ProcessingEnd
      *
      */
     void ProcessingEnd_method();
@@ -376,25 +384,22 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
 
     /**
      * @brief the PU is ready again
+     * Usually activated by         EVENT_GenComp.Ready
      */
     void  Ready_method();
     virtual void Ready_Do(){};
 
-
-    /**
+    /* *
      * @brief Resetting the unit to its operating state
-     *
-     * No input received; basically just spends time
-     * (plus resets unit to "Ready" state)
      *
      * The routine is actived by EVENT_GenComp.End_Delivering
      */
-    void Reset(void);
+ //   void Reset(void);
 
      /**
      * @brief Relaxing has started
      *
-     * Usually activated by RelaxingBegin,          // Begin restoring the 'Ready' state
+     * Usually activated by RelaxingBegin
      * After delivered the result internally to the 'output section', resetting begins
      */
     void RelaxingBegin_method();
@@ -403,8 +408,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /**
      * @brief Relaxing has finished
      *
-     * Usually activated by    EVENT_GenComp.RelaxingEnd,            // End restoring the 'Ready' state
-     * After delivered the result internally to the 'output section', resetting begins
+     * Usually activated by    EVENT_GenComp.RelaxingEnd
      */
     void RelaxingEnd_method();
     virtual void RelaxingEnd_Do(){};
@@ -431,7 +435,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /**
      * @brief Synchronize the PU to some external condition
      *
-     * Usually activated by     EVENT_GenComp.Synchronize,             // External synhronize signal
+     * Usually activated by     EVENT_GenComp.Synchronize
 
      * - In biological computing, it results in issuing 'End Computing' (immediate spiking; passing to 'Delivering')
      * - In technical computing, it results in issuing 'Begin Computing' (starting computing; passing to 'Processing')
@@ -463,25 +467,14 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     sc_core::sc_time scLocalTime_Get(){return sc_core::sc_time_stamp()-mLocalTimeBase;}
     /**
-     * @brief scLocalTime_Set
+     * @brief scLocalTimeBase_Set
      * @param T The beginning of the simulated time of the recent operation
      */
-    void scLocalTime_Set(sc_core::sc_time T){    mLocalTimeBase = T;}
+    void scLocalTimeBase_Set(sc_core::sc_time T){    mLocalTimeBase = T;}
     sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
     sc_core::sc_time scTimeTransmission_Get(){ return mLastTransmissionTime;}
-     /*!
-     * \brief Set an observing bit for this scGenComp_PU_Abstract
-     * \param B is the bit to set  in mObservedBit
-     * \param V is the requested value of the bit
-     */
-    void ObservingBit_Set(GenCompPUObservingBits_t B, bool V)
-     {
-        assert(B < gcob_Max);  // Check if wrong bit
-        mObservedBits[B] = V;
-    }
-
-     /*!
+    /*!
      * \brief Set an observing bit for this scGenComp_PU_Abstract
      * \param B is the bit to get in mObservedBits
      * \return is the requested value of the bit
@@ -492,22 +485,17 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
          return mObservedBits[B];
     }
 
-    /**
-     * @brief HeartbeatTime_Get
-     * @return The actual heartbeat time
+    /*!
+     * \brief Set an observing bit for this scGenComp_PU_Abstract
+     * \param B is the bit to set  in mObservedBit
+     * \param V is the requested value of the bit
      */
-    sc_core::sc_time HeartbeatTime_Get(){return mHeartbeat;}
-    /**
-     * @brief HeartbeatTime_Set
-     * @param T the requested heartbeat time
-     */
-    void HeartbeatTime_Set(sc_core::sc_time T){mHeartbeat = T;}
-    /**
-     * @brief The heartbeat time is divided into mHeartbeatDivisions intervalls for calculation
-     * @return the number of heartbeat divisions
-     */
-    int32_t HeartbeatDivisions_Get(void){return mHeartbeatDivisions;}
-    void HeartbeatDivisions_Set(int32_t N){mHeartbeatDivisions = N;}
+    void ObservingBit_Set(GenCompPUObservingBits_t B, bool V)
+    {
+        assert(B < gcob_Max);  // Check if wrong bit
+        mObservedBits[B] = V;
+    }
+
     /**
      * Save the address of the observer simulator in the PU
      */
@@ -554,35 +542,33 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     virtual void Heartbeat_Relaxing_Do(){};
 
-    sc_core::sc_time
-    OperatingTime_Get(){return mLastOperatingTime;}
-    sc_core::sc_time
-    ResultTime_Get(){return mLastResultTime;}
-    sc_core::sc_time
-    IdleTime_Get(){return mLastIdleTime;}
-    int32_t
+    inline sc_core::sc_time
+    LastOperatingTime_Get(){return mLastOperatingTime;}
+    inline sc_core::sc_time
+    LastResultTime_Get(){return mLastResultTime;}
+    inline sc_core::sc_time
+    LastIdleTime_Get(){return mLastIdleTime;}
+    inline int32_t
     OperationCounter_Get(){return mOperationCounter;}
 
-
-//    GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     GenCompStateMachineType_t mStateFlag;    ///< Preserves last state
 
     int32_t mNoOfInputsNeeded;          ///< Remember how many inputs needed
     int32_t mHeartbeatDivisions;           ///< How many subdivisions the 'heartbeat' time divides to
     vector<int32_t> Inputs; // Stores reference to input source
     /**
-     * @brief mLocalTimeBase: the PUs have a local time: the time spent since starting processing
+     * @brief mLocalTimeBase: the PUs have a local time: the time spent since starting this processing
      */
     sc_core::sc_time
-         mLocalTimeBase      ///< The beginning of the local computing
-        ,mHeartbeat          ///< The heartbeat length of the unit
-        ,mLastOperatingTime  ///< Remember last total operating time duration
-        ,mLastResultTime     ///< Remember last processing time duration  (the result)
-        ,mLastIdleTime       ///< Time duration from Last mLastRelaxingEndTime to ProcessingBegin
-        ,mLastTransmissionTime ///< The time of last transmission began
+         mLocalTimeBase        ///< The beginning of the local computing
+        ,mHeartbeat            ///< The heartbeat length of the unit
+        ,mLastOperatingTime    ///< Remember last total operating time duration
+        ,mLastResultTime       ///< Remember last processing time duration  (the result)
+        ,mLastRelaxingEndTime  ///< Remember the beginning of the 'Idle' period
+        ,mLastIdleTime         ///< Time duration from Last mLastRelaxingEndTime to ProcessingBegin
+        ,mLastTransmissionTime ///< The time of last transmission began (aka spiking)
         ;
-    sc_core::sc_time mLastRelaxingEndTime;   ///< Remember the beginning of the 'Idle' period
- private:
+private:
     /**
      * @brief mObservedBits: Store here which events the unit wants to be observed
      *

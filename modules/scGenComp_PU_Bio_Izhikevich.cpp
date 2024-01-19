@@ -51,7 +51,8 @@ scGenComp_PU_Bio_Izhikevich(sc_core::sc_module_name nm
     ,mAsPublished(false)
 {
     typedef scGenComp_PU_Bio_Izhikevich SC_CURRENT_USER_MODULE;
-    mTimeStep = HeartbeatTime_Get().to_seconds();
+    double RefinedTime = HeartbeatTime_Get().to_seconds()*1000; // Have the time step refinement in ms
+    mTimeStep = RefinedTime/HeartbeatDivisions_Get();
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
 }
@@ -69,10 +70,7 @@ void scGenComp_PU_Bio_Izhikevich::
     Heartbeat_Processing_Do()
 {
     double LocalTime = scLocalTime_Get().to_seconds()*1000*1000; // Have the time in us
-    double RefinedTime = HeartbeatTime_Get().to_seconds()*1000*1000; // Have the time step refinement in us
-    double N = HeartbeatDivisions_Get();
-    double mTimeStep = RefinedTime/N/1000.;
-    for(int32_t i = 0; (i< N) and !Processing_Finished(); i++)
+    for(int32_t i = 0; (i < mHeartbeatDivisions) and !Processing_Finished(); i++)
     {
         SolvePDE();
         DEBUG_SC_EVENT_LOCAL("V(memb)=" << mV_M << ", U(rec)=" << mU_R << ", N=" << i);

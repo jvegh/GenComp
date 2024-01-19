@@ -28,7 +28,7 @@ scGenComp_PU_AbstractDEMO::
     // This routine will be called after initalizations but before starting simulation
     SC_THREAD(InitializeForDemo_method);
     sensitive << Demo_Event;
-    //dont_initialize(); // A simple method for starting the demo is to comment this line out
+    //dont_initialize(); // A simple method for starting the demo is comment this line out
 
     // ** Do not reimplement any of the xxx_method() functions
     // until you know what you are doing
@@ -52,28 +52,33 @@ void scGenComp_PU_AbstractDEMO::
     ObservingBit_Set(gcob_ObserveReady, true);
     ObservingBit_Set(gcob_ObserveRelaxingBegin, true);
     ObservingBit_Set(gcob_ObserveRelaxingBegin, true);
+
+    // Prepare events for the program
     EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
-    DEBUG_SC_PRINT("Will issue 'ProcessingBegin' @ 0.95 ms SIMULATED time");
-    EVENT_GenComp.ProcessingBegin.notify(sc_core::sc_time(950,SC_US));
+    DEBUG_SC_PRINT("Will issue 'ProcessingBegin' @ 0.123 ms SIMULATED time");
+    EVENT_GenComp.ProcessingBegin.notify(sc_core::sc_time(123,SC_US));
+    DEBUG_SC_PRINT("Will issue 'ProcessingBegin' @ 0.123 ms SIMULATED time");
     EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);   // Input in 'Ready' mode
     wait(EVENT_GenComp.RelaxingEnd);
     // We have finished the first cycle
 
-    EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
-    EVENT_GenComp.ProcessingBegin.notify(sc_core::sc_time(100,SC_US));
+    DEBUG_SC_PRINT("Will issue 'ProcessingBegin' @ +0.45 ms SIMULATED time");
+    EVENT_GenComp.ProcessingBegin.notify(sc_core::sc_time(45,SC_US));
     wait(EVENT_GenComp.RelaxingEnd);
   }
 
-// Here overload default processing: just wait and issue event 'ProcessingEnd'
+// Here overload default processing: just wait and issue the corresponding events
+// that are normally generate by the object
 void scGenComp_PU_AbstractDEMO::
     ProcessingBegin_Do()
 {
+    // You may call superclass method or make your own
     scGenComp_PU_Abstract::ProcessingBegin_Do(); // Reset input processing
     // Replace actual processing activity with a delay
     EVENT_GenComp.ProcessingEnd.notify(sc_core::sc_time(180,SC_US));
 }
 
-// Here overload default processing: just wait and issue event 'ProcessingEnd'
+// Here overload default processing: just wait and issue event 'DeliveringEnd'
 void scGenComp_PU_AbstractDEMO::
     DeliveringBegin_Do()
 {
@@ -82,15 +87,15 @@ void scGenComp_PU_AbstractDEMO::
     EVENT_GenComp.DeliveringEnd.notify(sc_core::sc_time(140,SC_US));
 }
 
+// We have finished a cycle and ready to begin the next one
+// A perfect place to collect statistics, etc.
 void scGenComp_PU_AbstractDEMO::
     Ready_Do()
 {
-    // We have finished a cycle and ready to begin the next one
-    // A perfect place to collect statistics, etc.
             DEBUG_SC_LOG("Run#" << OperationCounter_Get() <<": Last spike at:       " << sc_time_String_Get(scTimeTransmission_Get(),SC_TIME_UNIT_DEFAULT));
-            DEBUG_SC_LOG("Run#" << OperationCounter_Get() << ": Processing time was: " << sc_time_String_Get(OperatingTime_Get(),SC_TIME_UNIT_DEFAULT));
-            DEBUG_SC_LOG("Run#" << OperationCounter_Get() << ": Idle time was:       " << sc_time_String_Get(IdleTime_Get(),SC_TIME_UNIT_DEFAULT));
-            DEBUG_SC_LOG("Run#" << OperationCounter_Get() << ": Result time was:     " << sc_time_String_Get(ResultTime_Get(),SC_TIME_UNIT_DEFAULT));
+            DEBUG_SC_LOG("Run#" << OperationCounter_Get() << ": Processing time was: " << sc_time_String_Get(LastOperatingTime_Get(),SC_TIME_UNIT_DEFAULT));
+            DEBUG_SC_LOG("Run#" << OperationCounter_Get() << ": Idle time was:       " << sc_time_String_Get(LastIdleTime_Get(),SC_TIME_UNIT_DEFAULT));
+            DEBUG_SC_LOG("Run#" << OperationCounter_Get() << ": Result time was:     " << sc_time_String_Get(LastResultTime_Get(),SC_TIME_UNIT_DEFAULT));
             DEBUG_SC_PRINT("Ready to go!");
 }
 
@@ -101,7 +106,4 @@ void scGenComp_PU_AbstractDEMO::
     EVENT_GenComp.RelaxingEnd.notify(sc_core::sc_time(100,SC_US));
 }
 
-void scGenComp_PU_AbstractDEMO::
-    RelaxingEnd_Do()
-{
-}
+

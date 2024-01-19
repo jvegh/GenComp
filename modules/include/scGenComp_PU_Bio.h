@@ -177,7 +177,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *  @see scGenComp_PU_Bio#RelaxingBegin_Do
      *
      */
-    virtual void SolvePDE();
+     virtual void SolvePDE(){};
     /**
      * @brief Processing_Finished
      * @return true if processing finished and 'Delivering' follows

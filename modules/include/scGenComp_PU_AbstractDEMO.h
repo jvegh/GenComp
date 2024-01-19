@@ -15,7 +15,6 @@
  *  @{
  */
 
-//#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
 #define BIO_DEMO_HEARTBEAT_TIME sc_core::sc_time(100,SC_US)
@@ -32,7 +31,6 @@
 /*!
  * \class scGenComp_PU_AbstractDEMO
  * \brief  Implements a demo of general abstract computing PU
- *
  */
 class scGenComp_PU_AbstractDEMO : public scGenComp_PU_Abstract
 {
@@ -41,7 +39,7 @@ class scGenComp_PU_AbstractDEMO : public scGenComp_PU_Abstract
      * \brief Creates a demo abstract general computing unit
      * @param[in] nm the SystemC name of the module
      * @param[in] Heartbeat the integration time lap
-      *
+     *
      * Creates a demo abstract general computing unit.
      * A template for developing and testing your own units
      */
@@ -53,13 +51,11 @@ class scGenComp_PU_AbstractDEMO : public scGenComp_PU_Abstract
       * Prepare events for the demo unit; run before the other 'method's
       */
     void InitializeForDemo_method();
+
+    virtual void DeliveringBegin_Do();
     virtual void ProcessingBegin_Do();
     virtual void Ready_Do();
     virtual void RelaxingBegin_Do();
-    virtual void RelaxingEnd_Do();
-
-    virtual void DeliveringBegin_Do();
-    virtual void DeliveringEnd_Do(){};
 
 protected:
     sc_core::sc_event Demo_Event;

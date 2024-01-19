@@ -210,11 +210,11 @@ bool scGenComp_PU_Bio::
 
 }
 
-void scGenComp_PU_Bio::
+/*void scGenComp_PU_Bio::
     SolvePDE()
 {
     int i=1;
-}
+}*/
 
 
 
