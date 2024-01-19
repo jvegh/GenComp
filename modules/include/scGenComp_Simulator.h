@@ -87,7 +87,7 @@ public:
       * @brief Register
       * @param Module the activity of which must be watched
       */
-    void RegisterPU(scGenComp_PU_Bio* Module);
+    void RegisterPU(scGenComp_PU_Abstract* Module);
 
     /**
      * @brief Reset the simulator
@@ -102,7 +102,9 @@ public:
      */
     bool HasMoreToDo(void){ return mMoreEvents;}
 
-     void Update();
+    void Update();
+    void  UpdateDeliveringBegin(scGenComp_PU_Abstract* PU);
+    void  UpdateDeliveringEnd(scGenComp_PU_Abstract* PU);
     /**
      * @brief Update the input information in the simulator
      * @param PU the HW
@@ -113,6 +115,8 @@ public:
     void UpdateInitialize(scGenComp_PU_Abstract* PU);
     void UpdateProcessingBegin(scGenComp_PU_Abstract* PU);
     void UpdateProcessingEnd(scGenComp_PU_Abstract* PU);
+    void UpdateRelaxingBegin(scGenComp_PU_Abstract* PU);
+    void UpdateRelaxingEnd(scGenComp_PU_Abstract* PU);
     void Observe(scGenComp_PU_Abstract* PU, GenCompPUObservingBits_t B);
 
     std::chrono::duration<int64_t, nano> Time_Get(void)    {return s;}
