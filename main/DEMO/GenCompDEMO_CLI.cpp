@@ -134,7 +134,7 @@ int sc_main(int argc, char* argv[])
                 MySimulator->Update();   // Do updating if anything is to be updated
                 // Update display here
             }
-            DEBUG_SC_LOG("Processing time was: " << sc_time_String_Get(sc_core::sc_timeStamp(),SC_TIME_UNIT_DEFAULT));
+//            DEBUG_SC_LOG("Processing time was: " << sc_time_String_Get(sc_core::sc_timeStamp(),SC_TIME_UNIT_DEFAULT));
 
         };
         BENCHMARK_TIME_END(&t,&x,&s);
