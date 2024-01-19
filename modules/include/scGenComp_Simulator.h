@@ -115,6 +115,7 @@ public:
     void UpdateInitialize(scGenComp_PU_Abstract* PU);
     void UpdateProcessingBegin(scGenComp_PU_Abstract* PU);
     void UpdateProcessingEnd(scGenComp_PU_Abstract* PU);
+    void UpdateReady(scGenComp_PU_Abstract* PU);
     void UpdateRelaxingBegin(scGenComp_PU_Abstract* PU);
     void UpdateRelaxingEnd(scGenComp_PU_Abstract* PU);
     void Observe(scGenComp_PU_Abstract* PU, GenCompPUObservingBits_t B);

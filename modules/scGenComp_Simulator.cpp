@@ -119,6 +119,9 @@ void  scGenComp_Simulator::Update(void)
         case gcob_ObserveInitialize:         // Observe 'Initialize's of the PU
             UpdateInitialize(mUpdateUnit);
             break;
+        case gcob_ObserveReady: //Watch 'Ready'
+            UpdateReady(mUpdateUnit);
+            break;
         case gcob_ObserveRelaxingBegin: //Watch 'Begin Relaxing'
             UpdateRelaxingBegin(mUpdateUnit);
             break;
@@ -144,6 +147,11 @@ void  scGenComp_Simulator::UpdateInitialize(scGenComp_PU_Abstract* PU)
 void  scGenComp_Simulator::UpdateProcessingBegin(scGenComp_PU_Abstract* PU)
 {
     DEBUG_SC_PRINT(PU->name()<< " ProcessingBegin");
+}
+// Update ''Ready' information in simulator
+void  scGenComp_Simulator::UpdateReady(scGenComp_PU_Abstract* PU)
+{
+    DEBUG_SC_PRINT(PU->name()<< " Ready");
 }
 // Update ''RelaxingBegin' information in simulator
 void  scGenComp_Simulator::UpdateRelaxingBegin(scGenComp_PU_Abstract* PU)
