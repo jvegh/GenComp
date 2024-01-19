@@ -31,27 +31,22 @@ string GenCompObserveStrings[]{"Group","Module","BrocessingBegin","ProcessingEnd
                                "Heartbeat","Input","Initialize"};
 string GenCompStatesString[]{"Sleeping", "Ready", "Processing", "Delivering", "Relaxing"};
 
-// The units of general computing work in the same way, using general events
-// \brief Implement handling the states of computing
-
-//GenCompStates_Abstract* TheGenCompStates_Abstract;
-
     scGenComp_PU_Abstract::
 scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
-    ,mStateFlag(gcsm_Ready)
+//    ,mStateFlag(gcsm_Ready)
     ,mHeartbeatDivisions(8)
     ,mHeartbeat(HEARTBEAT_TIME_DEFAULT)
-    ,mLastProcessingTime(SC_ZERO_TIME) ///< Remember last time duration  (the result)
+    ,mLastOperatingTime(sc_core::sc_time_stamp()) ///< Remember last time duration  (the result)
     ,mLastIdleTime(SC_ZERO_TIME) ///< Remember the beginning of the 'Idle' period
+    ,mLocalTimeBase(sc_core::sc_time_stamp())
+    ,mLastTransmissionTime(sc_core::sc_time_stamp())
     ,mLastRelaxingEndTime(sc_core::sc_time_stamp())  ///< Remember the beginning of the 'Idle' period
 {
-//    if(!TheGenCompStates_Abstract)
-  //      TheGenCompStates_Abstract = new GenCompStates_Abstract();
-    //MachineState = TheGenCompStates_Abstract;
     mObservedBits[gcob_ObserveGroup] = true;   // Enable this module for its group observing by default
     mObservedBits[gcob_ObserveModule] = true;   // Enable module observing by default
-    // The stuff below in the consructor are SystemC specific, do not touch!
+    // The stuff below in the constructor are SystemC specific, do not touch!
     typedef scGenComp_PU_Abstract SC_CURRENT_USER_MODULE;
+    Initialize_method();    // initialize without issuing EVENT_GenComp.Initialize
 
     // Operating
     SC_METHOD(DeliveringBegin_method);
@@ -109,12 +104,15 @@ scGenComp_PU_Abstract::
 
 
 // Puts the PU in its default state
-void scGenComp_PU_Abstract::
+// Usually triggered by EVENT_GenComp.Initialize
+// but called from the contructor, too
+    void scGenComp_PU_Abstract::
     Initialize_method(void)
 {
     ObserverNotify(gcob_ObserveInitialize);
     StateFlag_Set(gcsm_Ready);   // Pass to "Ready"
     mLocalTimeBase = sc_time_stamp();
+    mOperationCounter = 0;    // Count the actions the unit makes
     Initialize_Do();
             DEBUG_SC_EVENT_LOCAL("---Initialized");
 }
@@ -167,6 +165,7 @@ void scGenComp_PU_Abstract::
     DeliveringEnd_method()
 {
     DeliveringEnd_Do();
+    mLastTransmissionTime = sc_core::sc_time_stamp();    // Remember
     StateFlag_Set(gcsm_Relaxing);   // Pass to "Relaxing"
     ObserverNotify(gcob_ObserveDeliveringEnd);
     EVENT_GenComp.RelaxingBegin.notify(SC_ZERO_TIME);
@@ -206,7 +205,14 @@ void scGenComp_PU_Abstract::
 void scGenComp_PU_Abstract::
     InputReceived_Do(void)
 {
-     Inputs.push_back(NoOfInputsReceived_Get());
+    if(StateFlag_Get()==gcsm_Processing)
+    {
+        Inputs.push_back(NoOfInputsReceived_Get());
+    }
+    else
+    {
+        DEBUG_SC_WARNING_LOCAL("Omitted input received in state " << GenCompStatesString[StateFlag_Get()]);
+    }
 }
 
 
@@ -217,7 +223,9 @@ void scGenComp_PU_Abstract::
     DEBUG_SC_EVENT_LOCAL(">>>Processing");
     ObserverNotify(gcob_ObserveProcessingBegin);
     // For statistic, remember the duration of 'Idle' state
+    if(!mOperationCounter++)mLastRelaxingEndTime = sc_core::sc_time_stamp();
     mLastIdleTime = sc_core::sc_time_stamp() - mLastRelaxingEndTime;
+    mLastOperatingTime = sc_core::sc_time_stamp(); // Remember beginning of processing
     StateFlag_Set(gcsm_Processing);         // Passing to statio 'Processing'
     scLocalTime_Set(sc_time_stamp());      // The clock is synchronized to the beginning of processing
     ProcessingBegin_Do();
@@ -235,23 +243,19 @@ void scGenComp_PU_Abstract::
 {
     ProcessingEnd_Do();
     ObserverNotify(gcob_ObserveProcessingEnd);
-    mLastProcessingTime = sc_core::sc_time_stamp()-scLocalTime_Get();    // Remember when we were ready
+    mLastResultTime = scLocalTime_Get();
     StateFlag_Set(gcsm_Delivering);   // Pass to "Delivering"
     EVENT_GenComp.DeliveringBegin.notify(SC_ZERO_TIME);
                 DEBUG_SC_EVENT_LOCAL("SENT EVENT_GenComp.DeliveringBegin");
                 DEBUG_SC_EVENT_LOCAL("<<<Processing");
 }
 
-/*void scGenComp_PU_Abstract::
-    ProcessingEnd_Do()
-{
-}*/
 
-// Called when the state 'Relaxing' begins
+// Called when back to the "Ready" statio
 void scGenComp_PU_Abstract::
     Ready_method()
 {
-     ObserverNotify(gcob_ObserveReady);
+    ObserverNotify(gcob_ObserveReady);
     Ready_Do();
 }
 
@@ -275,6 +279,7 @@ void scGenComp_PU_Abstract::
     RelaxingEnd_method()
 {
     RelaxingEnd_Do();
+    mLastOperatingTime = scLocalTime_Get();    // Remember when we were ready
     mLastRelaxingEndTime = sc_core::sc_time_stamp();    // Remember when we were ready
     StateFlag_Set(gcsm_Ready);   // Pass to "Delivering"
     EVENT_GenComp.Ready.notify(SC_ZERO_TIME);

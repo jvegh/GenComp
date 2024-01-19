@@ -337,7 +337,6 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /**
      * @brief Initialize_method
      *
-     * The method called upon EVENT_GenComp.Initialize
      * Usually activated by      EVENT_GenComp.Initialize,       // Put the unit to its ground state
      */
     void Initialize_method();
@@ -470,6 +469,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     void scLocalTime_Set(sc_core::sc_time T){    mLocalTimeBase = T;}
     sc_core::sc_time scTimeBase_Get(void){return mLocalTimeBase;}
     size_t NoOfInputsReceived_Get(){ return Inputs.size();}
+    sc_core::sc_time scTimeTransmission_Get(){ return mLastTransmissionTime;}
      /*!
      * \brief Set an observing bit for this scGenComp_PU_Abstract
      * \param B is the bit to set  in mObservedBit
@@ -554,6 +554,16 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     virtual void Heartbeat_Relaxing_Do(){};
 
+    sc_core::sc_time
+    OperatingTime_Get(){return mLastOperatingTime;}
+    sc_core::sc_time
+    ResultTime_Get(){return mLastResultTime;}
+    sc_core::sc_time
+    IdleTime_Get(){return mLastIdleTime;}
+    int32_t
+    OperationCounter_Get(){return mOperationCounter;}
+
+
 //    GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     GenCompStateMachineType_t mStateFlag;    ///< Preserves last state
 
@@ -563,10 +573,14 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /**
      * @brief mLocalTimeBase: the PUs have a local time: the time spent since starting processing
      */
-    sc_core::sc_time mLocalTimeBase;    ///< The beginning of the local computing
-    sc_core::sc_time mHeartbeat;        ///< The heartbeat length of the unit
-    sc_core::sc_time mLastProcessingTime; ///< Remember last processing time duration  (the result)
-    sc_core::sc_time mLastIdleTime;     ///< Time duration from Last mLastRelaxingEndTime to ProcessingBegin
+    sc_core::sc_time
+         mLocalTimeBase      ///< The beginning of the local computing
+        ,mHeartbeat          ///< The heartbeat length of the unit
+        ,mLastOperatingTime  ///< Remember last total operating time duration
+        ,mLastResultTime     ///< Remember last processing time duration  (the result)
+        ,mLastIdleTime       ///< Time duration from Last mLastRelaxingEndTime to ProcessingBegin
+        ,mLastTransmissionTime ///< The time of last transmission began
+        ;
     sc_core::sc_time mLastRelaxingEndTime;   ///< Remember the beginning of the 'Idle' period
  private:
     /**
@@ -576,6 +590,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     bitset<gcob_Max> mObservedBits;   ///< The bits of the GenComp_PU state
     scGenComp_Simulator* MySimulator;     ///< The simulator that observes us
+    int32_t mOperationCounter;            ///< Count the operations
 };// of class scGenComp_PU_Abstract
 
 /** @}*/
