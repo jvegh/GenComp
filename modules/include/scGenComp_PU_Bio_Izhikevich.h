@@ -15,7 +15,7 @@
  *  @{
  */
 
-#include "GenCompStates_Bio.h"
+//#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Bio.h"
 
 

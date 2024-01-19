@@ -17,7 +17,7 @@
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
-extern GenCompStates_Bio *TheGenCompStates_Bio;
+//extern GenCompStates_Bio *TheGenCompStates_Bio;
 
 scGenComp_PU_BioDEMO::
     scGenComp_PU_BioDEMO(sc_core::sc_module_name nm   // Module name

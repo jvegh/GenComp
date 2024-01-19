@@ -17,7 +17,7 @@
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
-static GenCompStates_Bio *TheGenCompStates_Bio;
+//static GenCompStates_Bio *TheGenCompStates_Bio;
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
@@ -27,11 +27,11 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm
     scGenComp_PU_Abstract(nm)
 {
     typedef scGenComp_PU_Bio SC_CURRENT_USER_MODULE;
-    if(!TheGenCompStates_Bio)
-        TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
+//    if(!TheGenCompStates_Bio)
+  //      TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
     mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
     mHeartbeatDivisions = HEARTBEAT_TIME_DIVISIONS_BIO;
-    MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
+//    MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
 }

@@ -15,7 +15,7 @@
 /** @addtogroup GENCOMP_MODULE_PROCESS
  *  @{
  */
-#include "GenCompStates_Abstract.h"
+//#include "GenCompStates_Abstract.h"
 
 #include <systemc>
 #include <bitset>
@@ -74,6 +74,7 @@ struct EVENT_GenComp_type {
         InputReceived,          // New input received
         ProcessingBegin,        // Begin data processing
         ProcessingEnd,          // End data processing
+        Ready,                  // The unit is ready again
         RelaxingBegin,          // Begin restoring the 'Ready' state
         RelaxingEnd,            // End restoring the 'Ready' state
         SleepingBegin,
@@ -160,8 +161,72 @@ struct EVENT_GenComp_type {
  * - Sleep: if the unit is unused, sends it logically to sleep
  * - Wakeup: awake it if it was sleeping
  */
+
+/*! \var typedef  GenCompStateMachineType_t
+ * The operation of an elementary computing unit of general computing is modelled as a multiple-state machine,
+ * with internal state variables.
+ * The states are used in scGenComp_PU_Abstract.
+ @verbatim
+  Sleeping   - waiting for activation;
+               Goes to Ready
+  Ready      - everything is prepared, variables available, activated from Seeping state;
+               Normally goes to Processing; After some inactivity goes to Sleeping;
+               The abstract units are generated to this state.
+  Processing - receives inputs (computes), runs timed functions;
+               Normallygoes to Delivering its result; it may also fail and go to Relaxing
+  Delivering - produces output for some time;
+               Normally goes to Relaxing.  An extranal Synchronizing may force immediate Delivering
+  Relaxing   - is on vacation, no input received; everything reset
+               Goes to Readyafter that goes to Working
+
+  The General Computing Unit's abstract state machine
+
+                   Sleeping<-------> Ready   <---Initially
+                                   ^  ^    \   ^
+                                  /  HBeat  \    <-InputReceived
+                                 /         v v v
+                         Relaxing <-Failed- Processing
+                                ^           /
+                                 \         /
+                                  \       v
+                                  Delivering<-----Synchronizing
+ @endverbatim
+ *
+ * The states of the general computing unit's state machine
+ * - Sleeping: just a technical state, unused units can be switched off
+ *   - Can be activated explicitely (after 3 processor clock signals delay)
+ *   - Can be activaed implicitely ((after 3 processor clock signals delay)
+ * - Ready: The unit is ready, waiting for 'Begin Computing';
+ *   - after some inactivity, can pass to Sleeping
+ *   - after receiving 'Begin Computing' passes to Processing
+ * - InputReceived: the unit received new input (a momentary state)
+ *   - in biological mode, starts to add new synaptic input. If first,  issues 'Begin Computing';
+ *   - in technical mode, account arrival of an argument; If all,  issues 'Begin Computing';
+ * - Processing: The unit is computing (takes time $T_P$)
+ *   - in synchronized technical mode: received synchron signal
+ *   - in asynchron mode: received all needed arguments
+ *   - in biological mode: received its first argument
+ *   Passes to Delivering (after issuing 'End Computing') if successful;
+ *   Passes to Relaxing if Failed
+ * - Relaxing: Resets state and passes to 'Computing'
+ * --These states below are momantary states: need action and passes to one of the above states
+ * - Delivering: The unit is delivering its result to its output section
+ *   - After some time, it Sends 'Begin Transmitting' @see scGenComp_PU_Abstract
+ *     (Activates transmission unit to send computed result to its chained unit(s),
+ *      then goes to Relaxing
+ * - Failing :
+ * - Synchronizing: deliver result, anyhow ;  (a momentary state)
+ *   - in biologycal mode, deliver immediate spike
+ *   - in technical mode, deliver immediate result
+ *   Passes to Relaxing (after issuing 'End Computing)
+ */
 #endif //SCTECHGENCOMP_H
 #endif //SCBIOGENCOMP_H
+
+
+typedef enum {gcsm_Sleeping, gcsm_Ready, gcsm_Processing, gcsm_Delivering, gcsm_Relaxing}
+GenCompStateMachineType_t;
+
 
 extern string GenCompStatesString[];
 /*! \var typedef GenCompPUObservingBits_t
@@ -169,16 +234,20 @@ extern string GenCompStatesString[];
  */
 typedef enum
 {
-    gcob_ObserveGroup,             ///< The scGenComp_PU_Abstract is observed (by the simulator)
-    gcob_ObserveModule,             ///< The scGenComp_PU_Abstract is observed (by the simulator)
-    gcob_ObserveProcessingBegin,     ///< Observe 'Begin Computing'
-    gcob_ObserveProcessingEnd,       ///< Observe 'End Computing'
-    gcob_ObserveDeliveringBegin,     ///< Observe 'Begin Delivering'
-    gcob_ObserveDeliveringEnd,       ///< Observe 'End Delivering'
+    gcob_ObserveGroup,              ///< The module's group is observed (by the simulator)
+    gcob_ObserveModule,             ///< The module is observed (by the simulator)
+    gcob_ObserveDeliveringBegin,    ///< Observe 'Begin Delivering'
+    gcob_ObserveDeliveringEnd,      ///< Observe 'End Delivering'
     gcob_ObserveHeartbeat,          ///< Observe 'Heartbeat's of the PU
     gcob_ObserveInput,              ///< Observe 'Input's of the PU
-    gcob_ObserveInitialize,         ///< Observe 'Initialize's of the PU
-    gcob_Max        // just maintains the number of bits used
+    gcob_ObserveInitialize,         ///< Observe 'Initialize' of the PU
+    gcob_ObserveProcessingBegin,    ///< Observe 'Begin Computing'
+    gcob_ObserveProcessingEnd,      ///< Observe 'End Computing'
+    gcob_ObserveReady,              ///< Observe 'Ready' of the PU
+    gcob_ObserveRelaxingBegin,      ///< Observe 'Begin Relaxing'
+    gcob_ObserveRelaxingEnd,        ///< Observe 'End Relaxing'
+    gcob_ValueChanged,              ///< Observe 'Value changed'
+    gcob_Max                    // just maintains the number of bits used
 } GenCompPUObservingBits_t;
 extern string GenCompObserveStrings[];
 
@@ -217,7 +286,8 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * Usually activated by         EVENT_GenComp.DeliveringBegin,        // Begin delivering the result (internally)
 
      */
-    virtual void DeliveringBegin_method();
+    void DeliveringBegin_method();
+    virtual void DeliveringBegin_Do(){};
 
 
     /**
@@ -226,7 +296,8 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * Internal result delivering has finished.
      * Usually activated by         EVENT_GenComp.DeliveringEnd,        // Begin delivering the result (internally)
      */
-    virtual void DeliveringEnd_method();
+    void DeliveringEnd_method();
+    virtual void DeliveringEnd_Do(){};
 
     /**
      * @brief Module failed
@@ -302,7 +373,14 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      *
      */
     void ProcessingEnd_method();
-    virtual void ProcessingEnd_Do();
+    virtual void ProcessingEnd_Do(){};
+
+    /**
+     * @brief the PU is ready again
+     */
+    void  Ready_method();
+    virtual void Ready_Do(){};
+
 
     /**
      * @brief Resetting the unit to its operating state
@@ -330,7 +408,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      * After delivered the result internally to the 'output section', resetting begins
      */
     void RelaxingEnd_method();
-    virtual void RelaxingEnd_Do();
+    virtual void RelaxingEnd_Do(){};
 
  /*
     struct _type {
@@ -476,7 +554,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
      */
     virtual void Heartbeat_Relaxing_Do(){};
 
-    GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
+//    GenCompStates_Abstract* MachineState;     ///< Points to the service object of the state machine
     GenCompStateMachineType_t mStateFlag;    ///< Preserves last state
 
     int32_t mNoOfInputsNeeded;          ///< Remember how many inputs needed
@@ -490,8 +568,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     sc_core::sc_time mLastProcessingTime; ///< Remember last processing time duration  (the result)
     sc_core::sc_time mLastIdleTime;     ///< Time duration from Last mLastRelaxingEndTime to ProcessingBegin
     sc_core::sc_time mLastRelaxingEndTime;   ///< Remember the beginning of the 'Idle' period
-    sc_core::sc_time mLastComputingTime; ///< Remember last computing time duration  (the result)
-private:
+ private:
     /**
      * @brief mObservedBits: Store here which events the unit wants to be observed
      *

@@ -16,8 +16,8 @@
  *  @{
  */
 #include "scGenComp_PU_Abstract.h"
-#include "GenCompStates_Tech.h"
-static vector<GenCompStates_Abstract*> TechPU_StateVector;
+//#include "GenCompStates_Tech.h"
+//static vector<GenCompStates_Abstract*> TechPU_StateVector;
 
 /* !
  * \class scGenComp_PU_Tech

@@ -16,7 +16,7 @@
  *  @{
  */
 
-#include "GenCompStates_Bio.h"
+//#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
 #define HEARTBEAT_TIME_DIVISIONS_BIO 16
