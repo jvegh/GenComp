@@ -115,17 +115,8 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      * - In 'Processing' mode, re-calculates membrane's charge-up potential
      * - In 'Ready' mode, re-calculates membrane's decay potential
      * - In 'Delivering' mode, re-calculates membrane's decay potential
-      */
-
-    /* *
-     * @brief IdleTime_Get
-     * @return
      */
-    /*sc_core::sc_time LastIdleTime_Get(void)
-    { return sc_core::sc_time_stamp() - mLastRelaxingEndTime;}   ///< Remember the beginning of the 'Idle' period
-*/
-/*    sc_core::sc_time mLastResultTime; ///< Remember last time duration  (the result)
- */
+
 
   protected:
     /**
