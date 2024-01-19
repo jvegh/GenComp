@@ -12,9 +12,11 @@
 extern    string SC_TIME_UNIT[];
 // define prompts for SC debugging
 #define DEBUG_EVENT_STRING "EVT->"
+#define DEBUG_LOG_STRING "LOG: "
 #define DEBUG_PRINT_STRING "DBG->"
 #define DEBUG_WARNING_STRING "WNG->"
 #define DEBUG_EVENT_STRING_LOCAL "EVT*>"
+#define DEBUG_LOG_STRING_LOCAL "LOG:."
 #define DEBUG_PRINT_STRING_LOCAL "DBG*>"
 #define DEBUG_WARNING_STRING_LOCAL "WNG*>"
 //
@@ -25,8 +27,8 @@ extern    string SC_TIME_UNIT[];
 #define DEBUG_SC_TIME_LOCAL sc_time_String_Get(sc_time_stamp()-scTimeBase_Get(),SC_TIME_UNIT_DEFAULT)
 //<< ' ' << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
 //#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << << dec << ", line " << __LINE__
-#define DEBUG_LOCATION string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
-#define DEBUG_LOCATION_SHORT string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1)  << dec << ", line " << __LINE__
+#define DEBUG_LOCATION "\" //" << string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1) << "::" << __func__ << dec << ", line " << __LINE__
+#define DEBUG_LOCATION_SHORT "\" //" << string(__FILE__).substr(string(__FILE__).find_last_of("/") + 1)  << dec << ", line " << __LINE__
 //#define DEBUG_SC_RELATIVE_PROLOG(P) P << name() << "@" << DEBUG_SC_TIME_LOCAL << " : \""
 #define DEBUG_SC_PROLOG_LOCAL "." << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \""
 //#define DEBUG_SC_PROLOG(Prompt) "@" << DEBUG_SC_TIME_LOCAL << "," << name() << "::" << __func__ << ": \"" << Prompt
@@ -48,9 +50,24 @@ extern    string SC_TIME_UNIT[];
   @param X the message from the event
 */
 
+/*!
+  \def DEBUG_SC_LOG(X)
+  Prints a  log message X with nameof unit and time
+  @param X the message from the event
+*/
+
+/*!
+  \def DEBUG_SC_LOG_LOCAL(X)
+  Prints a  message type and scGenComp_PU_Abstract's LOCAL time, message \a X, and the location of the event.
+  The same as DEBUG_SC_LOG, but uses local time
+  @param X the message from the event
+*/
+
 #ifdef DEBUG_EVENTS
-#define DEBUG_SC_EVENT(X)       if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_EVENT_LOCAL(X)  if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_EVENT(X)       if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_EVENT_LOCAL(X)  if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_LOG(X) if(!UNIT_TESTING) std::cerr  << DEBUG_LOG_STRING << DEBUG_SC_TIME << ":"   << name() << "- " <<  X << std::endl
+#define DEBUG_SC_LOG_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_LOG_STRING_LOCAL <<  DEBUG_SC_TIME_LOCAL << name() << "- "   << X << std::endl
 #else
 #define DEBUG_SC_EVENT(X)
 #define DEBUG_SC_EVENT_LOCAL(X)
