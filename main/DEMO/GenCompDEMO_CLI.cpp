@@ -36,16 +36,17 @@
 //??scClusterBusSimulator* TheSimulator;
 //??string ListOfIniFiles;
 
-#include "scGenComp_PU_BioDEMO.h"
-#include "scGenComp_PU_Bio_IzhikevichDEMO.h"
-#include "scGenComp_PU_BioDEMO.h"
+#include "scGenComp_PU_AbstractDEMO.h"
+//#include "scGenComp_PU_BioDEMO.h"
+//#include "scGenComp_PU_Bio_IzhikevichDEMO.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStatesString[];   // Just for debugging
 
-scGenComp_PU_BioDEMO* MyBioDEMO;
-scGenComp_PU_Bio_IzhikevichDEMO* MyIzhikevichDEMO;
+scGenComp_PU_AbstractDEMO* MyAbstractDEMO;
+//scGenComp_PU_BioDEMO* MyBioDEMO;
+//scGenComp_PU_Bio_IzhikevichDEMO* MyIzhikevichDEMO;
 scGenComp_Simulator* MySimulator;
 
 // Prepare sxXXX modules and instantiate them
@@ -53,10 +54,12 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
 {
     switch(ObjectSelector)
     {
-        case 0: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
+        case 0: MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO"); break;
+//        case 1: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
         default:
         {
-            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
+            MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO");
+//            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
         }; break;
     }
     return 0;
@@ -102,11 +105,14 @@ int sc_main(int argc, char* argv[])
     {// Create a simulator
         MySimulator = new scGenComp_Simulator("MySim");
         // Create all units you need
+
+        MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstract");
 //        MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
-        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(200,SC_US));
+//        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(200,SC_US));
         // All units must be created before registering
 //        MySimulator->RegisterPU(MyBioDEMO);
-        MySimulator->RegisterPU(MyIzhikevichDEMO);
+        MySimulator->RegisterPU(MyAbstractDEMO);
+//        MySimulator->RegisterPU(MyIzhikevichDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
@@ -125,8 +131,11 @@ int sc_main(int argc, char* argv[])
             // but allows updating any state of the simulated object
             while(MySimulator->Run(gcsm_Eventwise,1))
             {   // This portion is run repeatedly by the simulator
+                MySimulator->Update();   // Do updating if anything is to be updated
                 // Update display here
             }
+            DEBUG_SC_LOG("Processing time was: " << sc_time_String_Get(sc_core::sc_timeStamp(),SC_TIME_UNIT_DEFAULT));
+
         };
         BENCHMARK_TIME_END(&t,&x,&s);
         SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
