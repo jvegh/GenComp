@@ -71,6 +71,8 @@ extern    string SC_TIME_UNIT[];
 #else
 #define DEBUG_SC_EVENT(X)
 #define DEBUG_SC_EVENT_LOCAL(X)
+#define DEBUG_SC_LOG(X)
+#define DEBUG_SC_LOG_LOCAL(X)
 #endif
 //
 //
