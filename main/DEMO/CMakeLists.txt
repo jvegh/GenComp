@@ -34,6 +34,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/modules/include
         ../../..//modules/include
         ${CMAKE_SOURCE_DIR}/3rdParty/QCustomPlot/include
+        ${CMAKE_SOURCE_DIR}/3rdParty/Minuit/include
         ${Qt6Core_INCLUDE_DIRS}
         ${Qt6Gui_INCLUDE_DIRS}
         ${Qt6Widgets_INCLUDE_DIRS}
@@ -42,6 +43,7 @@ include_directories(
 #        ${SCV_INCLUDE_DIRS}
 )
     link_directories(
+        ${CMAKE_SOURCE_DIR}/3rdParty
         ${SystemC_LIBRARY_DIRS}
         ${SCV_LIBRARY_DIRS}
 )
@@ -55,7 +57,7 @@ add_executable(${PROJECT_NAME}DEMO_CLI #../QtGUI/resources/images.qrc
         ${hdr_moc} # The MOC headers, generated
         )
 target_link_libraries(${PROJECT_NAME}DEMO_CLI
-     GenCompModules
+     GenCompModules  Minuit
      ${SystemC_LIBRARIES}
         Qt6::Widgets
         Qt6::PrintSupport

@@ -16,6 +16,7 @@
 #include <systemc>
 #include <chrono>
 #include "Project.h"
+//#include "GaussRandomGen.h"
 
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
 #include "MacroTimeBenchmarking.h"    // Must be after the define to have its effect
@@ -37,15 +38,15 @@
 //??string ListOfIniFiles;
 
 #include "scGenComp_PU_AbstractDEMO.h"
-//#include "scGenComp_PU_BioDEMO.h"
+#include "scGenComp_PU_BioDEMO.h"
 //#include "scGenComp_PU_Bio_IzhikevichDEMO.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStatesString[];   // Just for debugging
 
-scGenComp_PU_AbstractDEMO* MyAbstractDEMO;
-//scGenComp_PU_BioDEMO* MyBioDEMO;
+//scGenComp_PU_AbstractDEMO* MyAbstractDEMO;
+scGenComp_PU_BioDEMO* MyBioDEMO;
 //scGenComp_PU_Bio_IzhikevichDEMO* MyIzhikevichDEMO;
 scGenComp_Simulator* MySimulator;
 
@@ -54,12 +55,12 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
 {
     switch(ObjectSelector)
     {
-        case 0: MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO"); break;
-//        case 1: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
+//        case 0: MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO"); break;
+        case 1: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
         default:
         {
-            MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO");
-//            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
+//            MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO");
+            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
         }; break;
     }
     return 0;
@@ -72,7 +73,9 @@ bool UNIT_TESTING = false; // Used internally for debugging
 int sc_main(int argc, char* argv[])
 {
     bool UseSimulator = true;   // Can use either scGenComp_Simulator or stand-alone unit operating modes
-    int returnValue=0;
+//    GaussRandomGen Gauss = GaussRandomGen(0,1);
+//    double A = Gauss();
+//    int returnValue=0;
     // We rely on the default clearing of the values of time benchmarking
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
@@ -106,12 +109,12 @@ int sc_main(int argc, char* argv[])
         MySimulator = new scGenComp_Simulator("MySim");
         // Create all units you need
 
-        MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstract");
-//        MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
-//        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(200,SC_US));
-        // All units must be created before registering
-//        MySimulator->RegisterPU(MyBioDEMO);
-        MySimulator->RegisterPU(MyAbstractDEMO);
+//        MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstract");
+        MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+//        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(500,SC_US));
+        // All modules must be created before registering
+        //        MySimulator->RegisterPU(MyAbstractDEMO);
+        MySimulator->RegisterPU(MyBioDEMO);
 //        MySimulator->RegisterPU(MyIzhikevichDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
