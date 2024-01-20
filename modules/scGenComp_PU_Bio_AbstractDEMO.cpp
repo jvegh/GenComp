@@ -113,21 +113,3 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
 #endif //0
 
 
-#if 0
-
- // NO PDE solving, just exceeded some characteristic tims
-bool scGenComp_PU_Bio_IzhikevichDEMO::
-    Processing_Finished(void)
-{
-    return scLocalTime_Get() >= sc_core::sc_time(900,SC_US);
-}
-
-
-// Recalculate the membrane potential for the last BIO_HEARTBEAT_TIME period
-void scGenComp_PU_Bio_IzhikevichDEMO::
-    HeartbeatRecalculateMembranePotential()
-{
-                DEBUG_SC_PRINT_LOCAL("Calculate membrane potential");
-}
-
-#endif

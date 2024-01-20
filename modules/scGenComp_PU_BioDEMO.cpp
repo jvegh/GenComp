@@ -17,7 +17,6 @@
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
-//extern GenCompStates_Bio *TheGenCompStates_Bio;
 
 scGenComp_PU_BioDEMO::
     scGenComp_PU_BioDEMO(sc_core::sc_module_name nm   // Module name
@@ -92,8 +91,6 @@ void scGenComp_PU_BioDEMO::
         {   // We are about finishing processing
             EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
                 DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
-        /*    EVENT_GenComp.Heartbeat.cancel();
-                DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");  obsolete*/
         }
     else
         {   // We are still processing; re-issue the heartbeat
