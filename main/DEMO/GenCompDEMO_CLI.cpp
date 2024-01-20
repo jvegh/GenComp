@@ -39,15 +39,15 @@
 
 #include "scGenComp_PU_AbstractDEMO.h"
 #include "scGenComp_PU_BioDEMO.h"
-//#include "scGenComp_PU_Bio_IzhikevichDEMO.h"
+#include "scGenComp_PU_Bio_IzhikevichDEMO.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
 extern string GenCompStatesString[];   // Just for debugging
 
-//scGenComp_PU_AbstractDEMO* MyAbstractDEMO;
+scGenComp_PU_AbstractDEMO* MyAbstractDEMO;
 scGenComp_PU_BioDEMO* MyBioDEMO;
-//scGenComp_PU_Bio_IzhikevichDEMO* MyIzhikevichDEMO;
+scGenComp_PU_Bio_IzhikevichDEMO* MyBioIzhikevichDEMO;
 scGenComp_Simulator* MySimulator;
 
 // Prepare sxXXX modules and instantiate them
@@ -56,11 +56,13 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
     switch(ObjectSelector)
     {
 //        case 0: MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO"); break;
-        case 1: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
-        default:
+//        case 1: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
+        case 2: MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhiievitchBioDEMO"); break;
+    default:
         {
 //            MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO");
-            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
+//            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
+        MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyBioDEMO",sc_core::sc_time(1,SC_MS));
         }; break;
     }
     return 0;
@@ -75,7 +77,7 @@ int sc_main(int argc, char* argv[])
     bool UseSimulator = true;   // Can use either scGenComp_Simulator or stand-alone unit operating modes
 //    GaussRandomGen Gauss = GaussRandomGen(0,1);
 //    double A = Gauss();
-//    int returnValue=0;
+    int returnValue=0;
     // We rely on the default clearing of the values of time benchmarking
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
@@ -110,12 +112,12 @@ int sc_main(int argc, char* argv[])
         // Create all units you need
 
 //        MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstract");
-        MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
-//        MyIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(500,SC_US));
+ //       MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+        MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",sc_core::sc_time(1000,SC_US));
         // All modules must be created before registering
         //        MySimulator->RegisterPU(MyAbstractDEMO);
-        MySimulator->RegisterPU(MyBioDEMO);
-//        MySimulator->RegisterPU(MyIzhikevichDEMO);
+//        MySimulator->RegisterPU(MyBioDEMO);
+        MySimulator->RegisterPU(MyBioIzhikevichDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
