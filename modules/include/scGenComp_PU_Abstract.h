@@ -18,6 +18,8 @@
 
 #include <systemc>
 #include <bitset>
+#include "../../3rdParty/Minuit/include/GaussRandomGen.h"
+//#include "GaussRandomGen.h"
 using namespace sc_core; using namespace sc_dt;
 using namespace std;
 class scGenComp_Simulator;

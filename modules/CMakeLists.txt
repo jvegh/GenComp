@@ -16,13 +16,16 @@ set(MY_SRCS ${MY_SRCS})
 
 file(GLOB_RECURSE MY_HEADERS
     include/*.h
+##    ${CMAKE_SOURCE_DIR}/3rdParty/Minuit/include/*.h
 )
 
 include_directories(
        include
+       ${CMAKE_SOURCE_DIR}/3rdParty/Minuit/include
+
        ${Qt6Widgets_INCLUDE_DIRS}
        ${SystemC_INCLUDE_DIRS}
-       ../3rdParty/QSystemC/include
+##       ../3rdParty/QSystemC/include
 )
 
 link_directories(${SystemC_LIBRARY_DIRS})

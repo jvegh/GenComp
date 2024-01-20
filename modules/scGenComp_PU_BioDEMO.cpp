@@ -39,6 +39,8 @@ void scGenComp_PU_BioDEMO::
     InitializeForDemo_method()
 {
 
+ //   GaussRandomGen Gauss = GaussRandomGen(0,1);
+ //   double A = Gauss();
     // Set up which events are to be monitored
     // group and module observing are enabled by default
     ObservingBit_Set(gcob_ObserveInput, true);
@@ -49,7 +51,7 @@ void scGenComp_PU_BioDEMO::
 //??    wait(100,SC_MS);
 
     //    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
-    HeartbeatTime_Set(BIO_DEMO_HEARTBEAT_TIME); // Just to speed up demo
+    HeartbeatTime_Set(sc_core::sc_time(1,SC_MS)); // Just to speed up demo
     DEBUG_SC_PRINT_LOCAL("Heartbeat is set to: "  << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
 //??    EVENT_GenComp.InputReceived.notify(20,SC_MS);
     // Not really needed: done in constructor

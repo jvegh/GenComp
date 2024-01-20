@@ -20,7 +20,8 @@ file(GLOB_RECURSE TEST_INCLUDES
 
 file(GLOB_RECURSE TEST_SOURCES
     Test*.cpp
-    ../../modules/scAbstractGenComp_PU.cpp #//??
+    ${CMAKE_SOURCE_DIR}/3rdParty/Minuit/include
+    ${CMAKE_SOURCE_DIR}/modules/scAbstractGenComp_PU.cpp
 )
 #TestUtils.cpp           # Utility funtions
 #TestStuff.cpp           # Other processing stuff
