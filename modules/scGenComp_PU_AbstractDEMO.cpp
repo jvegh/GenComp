@@ -40,6 +40,7 @@ scGenComp_PU_AbstractDEMO::
 void scGenComp_PU_AbstractDEMO::
     InitializeForDemo_method()
 {
+
     // Set up which events are to be monitored
     // group and module observing are enabled by default
     ObservingBit_Set(gcob_ObserveHeartbeat, true);

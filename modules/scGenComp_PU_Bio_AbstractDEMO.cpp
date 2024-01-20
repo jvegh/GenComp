@@ -42,7 +42,7 @@ scGenComp_PU_Bio_IzhikevichDEMO::
 void scGenComp_PU_Bio_IzhikevichDEMO::
     InitializeForDemo_method()
 {
-    InputCurrent_Set(5000); // Use 5 nA constant input current
+    InputCurrent_Set(5); // Use 5 nA constant input current
 
     // Set up which events are to be monitored
     // group and module observing are enabled by default

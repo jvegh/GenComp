@@ -16,7 +16,6 @@
  *  @{
  */
 
-//#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Bio.h"
 
 #define BIO_DEMO_HEARTBEAT_TIME sc_core::sc_time(100,SC_US)
