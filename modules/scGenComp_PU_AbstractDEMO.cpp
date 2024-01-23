@@ -40,7 +40,6 @@ scGenComp_PU_AbstractDEMO::
 void scGenComp_PU_AbstractDEMO::
     InitializeForDemo_method()
 {
-
     // Set up which events are to be monitored
     // group and module observing are enabled by default
     ObservingBit_Set(gcob_ObserveHeartbeat, true);
@@ -53,7 +52,6 @@ void scGenComp_PU_AbstractDEMO::
     ObservingBit_Set(gcob_ObserveReady, true);
     ObservingBit_Set(gcob_ObserveRelaxingBegin, true);
     ObservingBit_Set(gcob_ObserveRelaxingBegin, true);
-
     // Prepare events for the program
     EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
     DEBUG_SC_PRINT("Will issue 'ProcessingBegin' @ 0.123 ms SIMULATED time");

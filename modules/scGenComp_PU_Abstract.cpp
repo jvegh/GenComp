@@ -9,7 +9,7 @@
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in unit testing
 /*
- *  If this macro is not defined, no code is generated;
+ *  If theses macros are not defined, no code is generated;
         the variables, however, must be defined (although they will be
         optimized out as unused ones).
         Alternatively, the macros may be protected with "\#ifdef MAKE_TIME_BENCHMARKING".
@@ -32,14 +32,14 @@ string GenCompObserveStrings[]{"Group","Module","BrocessingBegin","ProcessingEnd
 string GenCompStatesString[]{"Sleeping", "Ready", "Processing", "Delivering", "Relaxing"};
 
     scGenComp_PU_Abstract::
-scGenComp_PU_Abstract(sc_core::sc_module_name nm): sc_core::sc_module( nm)
-    ,mHeartbeatDivisions(8)                         ///< Reduce update frequency
-    ,mLocalTimeBase(sc_core::sc_time_stamp())       ///< Remember the beginning of this computation
-    ,mHeartbeat(HEARTBEAT_TIME_DEFAULT)             ///< Remember heartbeat time
-    ,mLastOperatingTime(sc_core::sc_time_stamp())   ///< Remember last time duration  (the result)
-    ,mLastRelaxingEndTime(sc_core::sc_time_stamp()) ///< Remember the beginning of the 'Idle' period
-    ,mLastIdleTime(SC_ZERO_TIME)                    ///< Remember the beginning of the 'Idle' period
-    ,mLastTransmissionTime(sc_core::sc_time_stamp())///< Remember last spiking time
+scGenComp_PU_Abstract(sc_core::sc_module_name nm
+                     ,sc_core::sc_time HeartBeat): sc_core::sc_module( nm)
+    ,mHeartbeatDivisions(8)                         /// Reduce update frequency
+    ,mLocalTimeBase(sc_core::sc_time_stamp())       /// Remember the beginning of this computation
+    ,mLastOperatingTime(sc_core::sc_time_stamp())   /// Remember last time duration  (the result)
+    ,mLastRelaxingEndTime(sc_core::sc_time_stamp()) /// Remember the beginning of the 'Idle' period
+    ,mLastIdleTime(SC_ZERO_TIME)                    /// Remember the beginning of the 'Idle' period
+    ,mLastTransmissionTime(sc_core::sc_time_stamp())/// Remember last spiking time
 {
     mObservedBits[gcob_ObserveGroup] = true;   // Enable this module for its group observing by default
     mObservedBits[gcob_ObserveModule] = true;   // Enable module observing by default
@@ -137,10 +137,12 @@ void scGenComp_PU_Abstract::
     EVENT_GenComp.ProcessingEnd.cancel();
     EVENT_GenComp.RelaxingBegin.cancel();
     EVENT_GenComp.RelaxingEnd.cancel();
-    EVENT_GenComp.SleepingBegin.cancel();
+/*    EVENT_GenComp.SleepingBegin.cancel();
     EVENT_GenComp.SleepingEnd.cancel();
     EVENT_GenComp.TransmittingBegin.cancel();
     EVENT_GenComp.TransmittingEnd.cancel();
+    Implement later
+*/
     EVENT_GenComp.Failed.cancel();
     EVENT_GenComp.Heartbeat.cancel();
     EVENT_GenComp.InputReceived.cancel();
@@ -155,10 +157,19 @@ void scGenComp_PU_Abstract::
     DeliveringBegin_method()
 {
     assert(StateFlag_Get() == gcsm_Delivering); // Must be set by 'ProcessingEnd'
-    DEBUG_SC_EVENT_LOCAL(">>Delivering");
+                DEBUG_SC_EVENT_LOCAL(">>Delivering");
     ObserverNotify(gcob_ObserveDeliveringBegin);
+    EVENT_GenComp.Heartbeat.notify(sc_core::sc_time(1,SC_PS));
+                DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat'");
     DeliveringBegin_Do();
+
  }
+
+ void scGenComp_PU_Abstract::
+     DeliveringBegin_Do()
+{
+}
+
 
 
 void scGenComp_PU_Abstract::
@@ -173,6 +184,12 @@ void scGenComp_PU_Abstract::
                 DEBUG_SC_EVENT_LOCAL("<<<Delivering");
 }
 
+void  scGenComp_PU_Abstract::
+    DeliveringEnd_Do()
+{
+
+}
+
 
 // Called when the state 'processing' ends
 void scGenComp_PU_Abstract::
@@ -180,7 +197,6 @@ void scGenComp_PU_Abstract::
 {
     ObserverNotify(gcob_ObserveHeartbeat);
                 DEBUG_SC_EVENT_LOCAL("In state '" << GenCompStatesString[mStateFlag] << "'");
-
     switch(StateFlag_Get())
     {
         case gcsm_Ready:      Heartbeat_Ready_Do(); break;
@@ -191,14 +207,12 @@ void scGenComp_PU_Abstract::
     }
 }
 
-
-
 void scGenComp_PU_Abstract::
     InputReceived_method(void)
 {
-                DEBUG_SC_EVENT_LOCAL("Input received");
-    ObserverNotify(gcob_ObserveInput);
+ //               DEBUG_SC_EVENT_LOCAL("Input received");
     InputReceived_Do();
+    ObserverNotify(gcob_ObserveInput);
 }
 
 // This routine makes actual input processing, although most of the job is done in Process and Heartbeat
@@ -215,7 +229,6 @@ void scGenComp_PU_Abstract::
     }
 }
 
-
 // Called when the state 'processing' begins
 void scGenComp_PU_Abstract::
     ProcessingBegin_method()
@@ -228,6 +241,8 @@ void scGenComp_PU_Abstract::
     mLastOperatingTime = sc_core::sc_time_stamp();  // Remember beginning of processing
     mLocalTimeBase = mLastOperatingTime;            // The clock is synchronized to the beginning of processing
     StateFlag_Set(gcsm_Processing);                 // Passing to statio 'Processing'
+    EVENT_GenComp.Heartbeat.notify(sc_core::sc_time(1,SC_PS));
+                DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat'");
     ProcessingBegin_Do();         // Now perform the activity in the derived classes
 }
 
@@ -256,6 +271,7 @@ void scGenComp_PU_Abstract::
     Ready_method()
 {
     ObserverNotify(gcob_ObserveReady);
+    EVENT_GenComp.Heartbeat.notify(sc_core::sc_time(1,SC_PS));
     Ready_Do();
 }
 
@@ -265,8 +281,12 @@ void scGenComp_PU_Abstract::
 {
             DEBUG_SC_EVENT_LOCAL(">>>Relaxing");
     ObserverNotify(gcob_ObserveRelaxingBegin);
+    EVENT_GenComp.Heartbeat.notify(sc_core::sc_time(1,SC_PS));
+    DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat'");
     RelaxingBegin_Do();
 }
+
+
 
 // Relaxing/refractory has finished
 void scGenComp_PU_Abstract::
@@ -277,6 +297,8 @@ void scGenComp_PU_Abstract::
     mLastRelaxingEndTime = sc_core::sc_time_stamp();    // Remember when we were ready
     StateFlag_Set(gcsm_Ready);   // Pass to "Delivering"
     EVENT_GenComp.Ready.notify(SC_ZERO_TIME);
+    EVENT_GenComp.Heartbeat.notify(sc_core::sc_time(1,SC_PS));
+    DEBUG_SC_EVENT_LOCAL("SENT 'EVENT_GenComp.HeartBeat'");
                 DEBUG_SC_EVENT_LOCAL("<<<Relaxing");
 }
 

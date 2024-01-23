@@ -20,18 +20,14 @@
 #define BIO_DEMO_HEARTBEAT_TIME sc_core::sc_time(100,SC_US)
 #define BIO_DEMO_INITIAL_DELAY sc_core::sc_time(10,SC_MS)
 
-/*
+/**
  * \class scGenComp_AbstractDemo
  * \brief  A simple demo class to implement the operation of a general abstract computing unit
  *
  * Operating principle of event processing:
- * The unit cycles through the statios of processing
+ * The unit cycles through the statios of processing, by issuing the corresponding events with some delay
  */
 
-/*!
- * \class scGenComp_PU_AbstractDEMO
- * \brief  Implements a demo of general abstract computing PU
- */
 class scGenComp_PU_AbstractDEMO : public scGenComp_PU_Abstract
 {
   public:
@@ -41,7 +37,7 @@ class scGenComp_PU_AbstractDEMO : public scGenComp_PU_Abstract
      * @param[in] Heartbeat the integration time lap
      *
      * Creates a demo abstract general computing unit.
-     * A template for developing and testing your own units
+     * A template for developing and testing your own first units
      */
       scGenComp_PU_AbstractDEMO(sc_core::sc_module_name nm   // Module name
                            , sc_core::sc_time Heartbeat = BIO_DEMO_HEARTBEAT_TIME);  // Heartbeat time
@@ -49,12 +45,27 @@ class scGenComp_PU_AbstractDEMO : public scGenComp_PU_Abstract
 
     /**
       * Prepare events for the demo unit; run before the other 'method's
+      *
+      * Makes two full cycles, no functionaly, just proves that cycling is correct
+      *
       */
     void InitializeForDemo_method();
 
+     /**
+     * @brief What to do in statio 'Delivering'
+     */
     virtual void DeliveringBegin_Do();
+    /**
+     * @brief What to do in statio 'Processing'
+     */
     virtual void ProcessingBegin_Do();
+    /**
+     * @brief What to do in station 'Ready'
+     */
     virtual void Ready_Do();
+    /**
+     * @brief What to do in statio 'Relaxing
+     */
     virtual void RelaxingBegin_Do();
 
 protected:

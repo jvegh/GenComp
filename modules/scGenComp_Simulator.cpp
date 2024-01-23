@@ -20,7 +20,6 @@ scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
 {   // Initialize CLOCK and SIMULATED time counters
     BENCHMARK_TIME_RESET(&t,&x,&s);
     SC_BENCHMARK_TIME_RESET(&SC_t,&SC_x,&SC_s);
-//    SC_OldT = SC_t;
 }
 
 /* Reset the simulator for a new processing
