@@ -22,8 +22,9 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 scGenComp_PU_Bio_IzhikevichDEMO::
     scGenComp_PU_Bio_IzhikevichDEMO(sc_core::sc_module_name nm   // Module name
+                                    ,bool AsPublished   // If with omissions
                         ,sc_core::sc_time HeartBeat ):  // Heartbeat time
-   scGenComp_PU_Bio_Izhikevich(nm,HeartBeat)
+   scGenComp_PU_Bio_Izhikevich(nm,AsPublished,HeartBeat)
 
 {   // Needed to avoid using SystemC specific syntax
     typedef scGenComp_PU_Bio_IzhikevichDEMO SC_CURRENT_USER_MODULE;
@@ -42,7 +43,7 @@ scGenComp_PU_Bio_IzhikevichDEMO::
 void scGenComp_PU_Bio_IzhikevichDEMO::
     InitializeForDemo_method()
 {
-    InputCurrent_Set(5); // Use 5 nA constant input current
+//    InputCurrent_Set(5); // Use 5 nA constant input current
 
     // Set up which events are to be monitored
     // group and module observing are enabled by default
@@ -64,7 +65,7 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
 //??    wait(10,SC_MS);
     EVENT_GenComp.InputReceived.notify();
             DEBUG_SC_EVENT("DEMO_DRIVER SENT #0 EVENT_GenComp.InputReceived  @0,313 (+000) us");
-            DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.BeginProcessing");
+            DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.ProcessingBegin");
     // Receiving an input, also starts 'Processing'
     // The BPU starts to receive spikes
     wait(200,SC_US);
@@ -86,30 +87,5 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
             DEBUG_SC_EVENT("Now processing must be over");
 }
 
-
-/*
-    * Handle heartbeats in 'Processing' mode
-    */
-#if 0
-
-void scGenComp_PU_Bio_IzhikevichDEMO::
-    Heartbeat_Processing_Do()
-{
- //   HeartbeatRecalculateMembranePotential();
-    if (Processing_Finished())
-    {   // We are about finishing processing
-        EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
-        /*    EVENT_GenComp.Heartbeat.cancel();
-                DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");  obsolete*/
-    }
-    else
-    {   // We are still processing; re-issue the heartbeat
-        // if the limit is not yet reached
-        EVENT_GenComp.Heartbeat.notify( mHeartbeat);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with " << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]);
-    }
-}
-#endif //0
 
 

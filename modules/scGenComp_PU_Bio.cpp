@@ -27,11 +27,8 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm
     scGenComp_PU_Abstract(nm)
 {
     typedef scGenComp_PU_Bio SC_CURRENT_USER_MODULE;
-//    if(!TheGenCompStates_Bio)
-  //      TheGenCompStates_Bio = new GenCompStates_Bio(); // We need one singleton copy of state machine
     mHeartbeat = HEARTBEAT_TIME_DEFAULT_BIO;
     mHeartbeatDivisions = HEARTBEAT_TIME_DIVISIONS_BIO;
-//    MachineState =  TheGenCompStates_Bio;     // However, the state flag is stored per PU object
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
 }
@@ -85,14 +82,11 @@ void scGenComp_PU_Bio::
 void scGenComp_PU_Bio::
     Heartbeat_Processing_Do()
 {
-    SolvePDE();
     if (Processing_Finished())
     {   // We are about finishing processing
         EVENT_GenComp.ProcessingEnd.notify(SC_ZERO_TIME);
                     DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.ProcessingEnd");
-        //            EVENT_GenComp.Heartbeat.cancel();
-        //                    DEBUG_SC_EVENT_LOCAL("CNCL    EVENT_GenComp.Heartbeat");
-    }
+     }
     else
     {   // We are still processing; re-issue the heartbeat
            // if the limit is not yet reached
@@ -163,7 +157,7 @@ void scGenComp_PU_Bio::
 {
     if(!((gcsm_Ready == mStateFlag) || (gcsm_Processing == mStateFlag))) return;
     // inputs are processed only in 'Ready' and 'Processing' states
-                DEBUG_SC_EVENT_LOCAL("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
+//                DEBUG_SC_EVENT_LOCAL("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
     if(gcsm_Ready == mStateFlag)
     {   // we are still in 'Ready' state
         mStateFlag = gcsm_Processing;   // Be sure we do not repeat

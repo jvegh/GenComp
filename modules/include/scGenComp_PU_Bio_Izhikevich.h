@@ -2,6 +2,8 @@
  *  @ingroup GENCOMP_MODULE_BIOLOGY
 
  *  @brief Implements Izhikevich's model of neuronal operation
+ *
+ *  @todo implement 'Fail'
  */
 /*
  *  @author János Végh (jvegh)
@@ -15,7 +17,6 @@
  *  @{
  */
 
-//#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Bio.h"
 
 
@@ -36,17 +37,14 @@
 /*!
  * \class scGenComp_PU_Bio_Izhikevich
  * \brief  Implements the Izhikevich-type biological computing PU
- *
- */
-class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
-{
-  public:
-    /*!
-     * \brief Creates an Izhikevich-type biological general computing unit
-     * @param nm the SystemC name of the module
+     * @param[in] nm the SystemC name of the module
      * @param[in] Heartbeat the state refresh time
      *
-     * Creates  an Izhikevich-type biological computing unit
+     * Creates  an Izhikevich-type biological computing unit:
+     *
+     * [1] Izhikevich, Simple Model of Spiking Neurons,
+     * IEEE Transactions on Neural Networks (2003) 14:1569-1572
+
      *
      *  Izkievitch model:
      *  \f[ \frac{dv}{dt} = 0.04*v^2 + 5*v + 140 - u + I \f]
@@ -69,34 +67,57 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *  - b          double - sensitivity of recovery variable
      *  - c          double - after-spike reset value of V_m
      *  - d          double - after-spike reset value of U_m
-     *  - consistent_integration  bool - use standard integration technique
+     *  - AsPublished  bool - use as published, with omitting statios 'Delivering' and 'Relaxing'
      *   References:
-     *[1] Izhikevich, Simple Model of Spiking Neurons,
-     * IEEE Transactions on Neural Networks (2003) 14:1569-1572
      *
-     * Code uses a nEST fragment
+     *   Statios: In different stages the parameters I and V_th are interpreted differently.
+     *  - In 'Processing' statio, I is the sum of the synaptic input current plus the introduced direct current:
+     *   the PU counts, and sums up the charge received in these two ways, until its threshold voltage V_th reached.
+     *   Then the PU passes to 'Delivering' statio: the result is ready, we must deliver it to the hillock.
+     *   The ion channels get closed. no more synaptic ionic input and the threshold is about the minimum+25 mV
+     *  - In 'Delivering' mode, the I input current is what Na+ and K+ ions from the extracellular space contribute and is much higher than
+     *   in 'processing' mode; however no synaptic and direct input. The state is terminated when potential +130 mV reached.
+     *   At that point, the spike starts and relaxing begins; passes to 'Relaxing' statio
+     *  - In 'Relaxing' statio, some negative ionic current from the extracellular space is present and the
+     *   membrane potential decreases below the resting potential. Now the neuron passes to statio 'Ready'.
+     *  - in 'Ready' statio, the the ioninc channels are open, but the voltage decays towards the resting potential.
+     *   Any input current takes the system to 'Processing, see above.
+     *
+     *   in the original model, statios 'Processing' and 'Relaxing' are contracted and described by the same function,
+     *   'Relaxing' statio is dropped (time skip) and replaced by a drascic and sudden change in v_M
+     *
+     *   The modified model separates 'Processing' and 'Delivery', introduces a 'Relaxing' statio that has no current input
+     *   and relaxes in the same way as the original in 'Ready' statio. The station passes to 'Ready' when the original
+     *   membrane cutback point reached.
+     *
+     * Code uses a Nest fragment
      */
+
+class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
+{
+  public:
     scGenComp_PU_Bio_Izhikevich(sc_core::sc_module_name nm   // Module name
+                   ,bool AsPublished // if with omitting statios 'delivering' and sRelaxing'
                    ,sc_core::sc_time Heartbeat);  // Heartbeat time
     virtual ~scGenComp_PU_Bio_Izhikevich(void); // Must be overridden
 
     /**
-     * @brief A new spike received; only in 'Ready' and 'Processing' states
+     * @brief A new spike received; legal only in 'Ready' and 'Processing' states
      *
-     * A spike arrived, store spike parameters. Receving an input a momentary action, just administer its processing.
-     * Most of the job is done in methods Heartbeat_Ready() and Heartbeat_Processing().
+     * Called by scGenComp_PU_Abstract::InputReceived_method.
+     * A spike arrived, store spike parameters. Receving an input is a momentary action, just administer its processing.
      * If it was the first spike, issue 'Begin_Computing'
      *
-     * Called by scGenComp_PU_Abstract::InputReceived_method
      * Reimplemented given that in biology the first input also starts processing
+     * Receiving input is recently just symbolic, no details elaborated
      */
     virtual void InputReceived_Do();
 
-     /**
+    /* *
      * @brief Called when the state 'Relaxing' begins
      *
       */
-    virtual void RelaxingBegin_Do();
+//    virtual void RelaxingBegin_Do();
 
     /**
      * @brief Called when the state 'Relaxing' ends
@@ -110,8 +131,13 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *
      * A periodic  signal as a timebase for solving differential equations.
      *
-     * - The unit receives a signal EVENT_GenComp.HeartBeat and handles it
-     *   differently in different modes
+     * - The unit receives a signal EVENT_GenComp.HeartBeat and calculates the membran potential.
+     *
+     *   Most of the job is done in methods Heartbeat_Processing_Do() (This was elaborated first),
+     * Heartbeat_Delivering_Do() and  Heartbeat_Relaxing_Do() and Heartbeat_Ready_Do().
+     * These Heartbeat_XXX_Do() methods work on the same principle, only their function and terminating condition are different
+     * (furthermore, the station to which they pass). They issue the corresponding event to pas to the next statio.
+
      * - In 'Processing' mode, re-calculates membrane's charge-up potential
      * - In 'Ready' mode, re-calculates membrane's decay potential
      * - In 'Delivering' mode, re-calculates membrane's decay potential
@@ -119,14 +145,13 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
 
 
   protected:
-    /**
+    /* *
      * @brief Puts the PU to its default state (just the HW).
      * Usually called by Initialize_method, but also  by other methods
     */
-    virtual void Initialize_Do();
+ //   virtual void Initialize_Do();
 
-    /* *
-     *
+    /*
      * Handle heartbeats in 'Ready' mode
      */
  //   void Heartbeat_Ready_Do();
@@ -135,20 +160,29 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *
      * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential reaches its threshold value
      * -  Starts to receive heartbeats after EVENT_GenComp.ProcessingBegin arrives
-     * -  Stops generating heartbeats after EVENT_GenComp.ProcessingEnd  arrivies (when reaching the threshold potential
-     *    then issues EVENT_GenComp.DeliveringBegin
+     * -  Stops generating heartbeats and issues EVENT_GenComp.ProcessingEnd
      * -  Issues EVENT_GenComp.Fail whey the membrane potential decaya near to its threshold
      */
     virtual void Heartbeat_Processing_Do();
-    /* *
+
+    /**
      * @brief Handle heartbeats in 'Delivering' mode
      *
-     * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential at hillock reaches its threshold value
+     * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential at hillock reaches its peak value
      * -  Starts to receive heartbeats after EVENT_GenComp.DeliveringBegin arrives
-     * -  Stops generating heartbeats after EVENT_GenComp.DeliveringEnd arrives
-     *     then issues EVENT_GenComp.RelaxingBegin
+     * -  Stops generating heartbeats and issues EVENT_GenComp.DeliveringEnd
      */
- //   void Heartbeat_Delivering_Do();
+    void Heartbeat_Delivering_Do();
+
+    /**
+     * @brief Handle heartbeats in 'Ready' mode
+     *
+     * -  Re-issues EVENT_GenComp.Heartbeat until membrane potential reaches its recovery value
+     * -  Starts to receive heartbeats after EVENT_GenComp.ReadyBegin arrives
+     * -  Stops generating heartbeats and issues EVENT_GenComp.ReadyEnd
+     */
+    void Heartbeat_Ready_Do();
+
     /**
      * @brief Handle heartbeats in 'Relaxing' mode
      *
@@ -158,6 +192,7 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *     then issues EVENT_GenComp.Initializing
      */
      void Heartbeat_Relaxing_Do();
+
     /**
      * @brief SolvePDE : solve the differential equations for the actual time increment
      *
@@ -176,16 +211,31 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      *  (solve the differential equation at this time; reset takes place in RelaxingBegin_Do )
      *  @see scGenComp_PU_Bio#RelaxingBegin_Do
      */
-    virtual void SolvePDE();
-    /**
-     * @brief Processing_Finished
-     * @return true if processing finished and 'Delivering' follows
-     *
-     * true if membrane potential reached its threshold value
-     *
+     /**
+     * @brief Threshold_Exceeded
+     * @return true if spike generation threshold exceeded and 'Delivering'  follows
      */
-    virtual bool Processing_Finished(void);
+    bool ThresholdExceeded(void);
+
     /**
+     * @brief Peak_Exceeded
+     * @return true if spike generation threshold exceeded and 'Relaxing' follows
+     */
+    bool PeakExceeded(void);
+
+    /**
+     * @brief Resting potential approached
+     * @return true if potential approached mV_M to < m_C + m_D
+     */
+    bool RestingApproached(void);
+
+    /**
+     * @brief Resting potential reached
+     */
+    bool RestingReached(void);
+
+    /**
+     *
      * @brief InputCurrent_Set
      * @param[in] I The current, in pA
      */
@@ -195,11 +245,10 @@ class scGenComp_PU_Bio_Izhikevich : public scGenComp_PU_Bio
      * @brief UseAsPublished_Set
      * @param[in] B if to use the method as published
      *
-     * As published, the method uses non-standard integration,
-     * has no delivery and refractory periods
+     * As published, the method uses no delivery and refractory periods
      */
     void UseAsPublished_Set(bool B) { mAsPublished = B;}
-    bool UseAsPublished_Set(void){return mAsPublished;}
+    bool UseAsPublished_Get(void){return mAsPublished;}
 protected:
     double mTimeStep    //As documented in Nest
         ,mV_M    // V_m        double - Membrane potential in mV

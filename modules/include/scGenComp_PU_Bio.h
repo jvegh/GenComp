@@ -19,8 +19,8 @@
 //#include "GenCompStates_Bio.h"
 #include "scGenComp_PU_Abstract.h"
 
-#define HEARTBEAT_TIME_DIVISIONS_BIO 16
-#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(HEARTBEAT_TIME_DIVISIONS_BIO*10,SC_US)
+#define HEARTBEAT_TIME_DIVISIONS_BIO 8
+#define HEARTBEAT_TIME_DEFAULT_BIO sc_core::sc_time(HEARTBEAT_TIME_DIVISIONS_BIO*16,SC_US)
 
 /*
  * \class scGenComp_PU_Bio
@@ -65,7 +65,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      * Creates an abstract biological computing unit
      */
     scGenComp_PU_Bio(sc_core::sc_module_name nm   // Module name
-                   ,sc_core::sc_time Heartbeat);  // Heartbeat time
+                   ,sc_core::sc_time Heartbeat = HEARTBEAT_TIME_DEFAULT_BIO);  // Heartbeat time
     virtual ~scGenComp_PU_Bio(void); // Must be overridden
 
     /**
@@ -169,7 +169,7 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *     then issues EVENT_GenComp.Initializing
      */
      void Heartbeat_Relaxing_Do();
-    /**
+    /* *
      * @brief SolvePDE
      *
      *  The state of the biological computing is re-calculated (as the simulation time passes)
@@ -177,14 +177,14 @@ class scGenComp_PU_Bio : public scGenComp_PU_Abstract
      *  @see scGenComp_PU_Bio#RelaxingBegin_Do
      *
      */
-     virtual void SolvePDE(){};
+ //    virtual void SolvePDE(){};
     /**
      * @brief Processing_Finished
      * @return true if processing finished and 'Delivering' follows
      *
      * true if membrane potential reached its threshold value
      *
-     * (return 'true' @500 us
+     * (return 'true' @500 us)
      */
     virtual bool Processing_Finished(void);
   };// of class scGenComp_PU_Bio

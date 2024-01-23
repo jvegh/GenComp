@@ -47,6 +47,7 @@ class scGenComp_PU_Bio_IzhikevichDEMO : public scGenComp_PU_Bio_Izhikevich
      * A template for developing and testing your own units
      */
       scGenComp_PU_Bio_IzhikevichDEMO(sc_core::sc_module_name nm   // Module name
+                                      ,bool AsPublished // if without statios 'Delivering and 'Relaxing'
                            , sc_core::sc_time Heartbeat = BIO_DEMO_HEARTBEAT_TIME);  // Heartbeat time
      ~scGenComp_PU_Bio_IzhikevichDEMO(void){}
 
