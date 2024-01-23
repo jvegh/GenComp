@@ -1,8 +1,8 @@
 /*! @file MacroTimeBenchmarking.h
- *  @brief Macros for (clock) execution time (simulated) handling in benchmarks
+ *  @brief Macros for processor (CLOCK) time span passing between using the expanded codes
  *  @ingroup GENCOMP_MODULE_STUFF
  *
-    These defined macros are the benchmarking macros for making computing (clock) time measurements.
+    These defined macros are benchmarking macros for measuring computing (clock) time of executing certain instruction sequences between them.
     The "MacroTimeBenchmarking.h" file shall be included in the header of the module in question.
     The results of the time measurements will be returned in user-defined variables.
     As the arguments are user-provided, with consistent use several independent
@@ -10,6 +10,8 @@
     All variables must be passed by reference.
 
     Notice: this is CLOCK time, returned by the processor; not SIMULATED time.
+    When using in cooperation (and in an analog way with the corresponding without-'sc' macros, you may find out
+    the CLOCK to SIMULATED time of the benchmarked activity
 
     The operating time offset due to benchmarking is approx 55-85 nanosecs, per macro pairs.
 
@@ -18,13 +20,16 @@
     @code{.cpp}
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
     @endcode
-   If this name is not defined, no code is generated for the module.
+   If this name is not defined, no code is generated  as code expansion for the module.
     The variables, however, must be defined (although they will be
     optimized out as unused ones).
-    Alternatively, generating those variables may be protected with
+    Alternatively, generating those variables may be protected with bracketing them by pairs
     @code{.cpp}
 #ifdef BENCHMARK_TIME_BEGIN
+#endif
     @endcode
+
+
 
 <b>Example:</b>
     in your module, between the '\#include' files write
@@ -33,6 +38,8 @@
 #define MAKE_TIME_BENCHMARKING  // comment out if you do not want to benchmark
 #include "MacroTimeBenchmarking.h"    // Must be after the define to have its effect
     @endcode
+It is a good idea to use these macro expansions at the end of heading block:
+the similar macro definitions in included other modules may overload them
 
      In your class (or member function) define
     @code{.cpp}
@@ -46,6 +53,7 @@
     Later put the benchmarked code between macros, used as brackets
     @code{.cpp}
     BENCHMARK_TIME_BEGIN(&t,&x);    // Begin the benchmarking here
+    your code
     BENCHMARK_TIME_END(&t,&x,&s);   // End benchmarking here
     @endcode
     After using these macros, the benchmarked time values are returned:
@@ -59,6 +67,8 @@
 In an object, you can RESET in the constructor,
     in the member functions between BEGIN and END measure the
     one-time utilization, and in the destructor to read out the total benchmarked time.
+Or to benchmark (in multiple variables) execution CLOCK time  about critical sections of your code.
+Take care: control printing takes a along time.
  */
 /*  @author János Végh (jvegh)
  *  @bug No known bugs.
@@ -67,8 +77,9 @@ In an object, you can RESET in the constructor,
 
 
 /*!
-  \def BENCHMARK_TIME_BEGIN(t,x)
-  Changes the user-provided  \a t timepoint.
+  \def BENCHMARK_TIME_BEGIN(t,
+                            x)
+  Changes the user-provided  \a t timepoint to the recent time.
   Sets the user-provided \a x to the last TIME_BEGIN \a t value
   @param t for internal use, the absolute beginning of time  (do not touch)
   @param x deliver clock time of the beginning
@@ -78,7 +89,8 @@ In an object, you can RESET in the constructor,
   \def BENCHMARK_TIME_END(t,x,s)
   Changes the user-provided  \a t timepoint.
   Sets the user-provided \a x to the duration since the last TIME_BEGIN \a t value.
-  Sets the user-provided ime of the beginning\a s to the duration since the last TIME_RESET \a t value.
+  Sets the user-provided time of the beginning \a s to the duration since the last TIME_RESET \a t value.
+  Multiple uses can deliver multiple results since the same ENCHMARK_TIME_BEGIN
   @param t for internal use, the absolute beginning of time  (do not touch)
   @param x deliver clock duration since _BEGIN (only read)
   @param s deliver clock duration since _RESET (only read)
@@ -86,7 +98,7 @@ In an object, you can RESET in the constructor,
 
 /*!
   \def BENCHMARK_TIME_RESET(t,x,s)
-  Clears the user-provided \a x and \a s duration values
+  Clears the user-provided \a x and \a s duration values.
   Sets the user-provided \a x to the duration since the last TIME_BEGIN \a t value.
   Sets the user-provided \a s to the duration since the last TIME_RESET \a t value.
   @param t for internal use, the absolute beginning of time (do not touch)
