@@ -39,28 +39,28 @@ extern    string SC_TIME_UNIT[];
 
 /*!
   \def DEBUG_SC_EVENT(X)
-  Prints a  message type and time, message \a X, and the location of the event
-  @param X the message from the event
+  Prints a  message type and time, message \a X, and the location (file, function and lineno) of the event
+  @param X the message describing the event
 */
 
 /*!
   \def DEBUG_SC_EVENT_LOCAL(X)
   Prints a  message type and scGenComp_PU_Abstract's LOCAL time, message \a X, and the location of the event.
   The same as DEBUG_SC_EVENT, but uses local time
-  @param X the message from the event
+  @param X the message describing the event
 */
 
 /*!
   \def DEBUG_SC_LOG(X)
-  Prints a  log message X with nameof unit and time
-  @param X the message from the event
+  Prints a  log message X with name of unit and time
+  @param X the message describing the event
 */
 
 /*!
   \def DEBUG_SC_LOG_LOCAL(X)
   Prints a  message type and scGenComp_PU_Abstract's LOCAL time, message \a X, and the location of the event.
   The same as DEBUG_SC_LOG, but uses local time
-  @param X the message from the event
+  @param X the message describing the event
 */
 
 #ifdef DEBUG_EVENTS
@@ -78,33 +78,35 @@ extern    string SC_TIME_UNIT[];
 //
 /*!
   \def DEBUG_SC_PRINT(X)
-  Prints a  message type and time, message \a X, and the location
-  @param X the message from the event
+  Prints a  message type and time, message \a X, and the location (file name and lineno)
+  @param X the message describing the event
 */
 
 /*!
   \def DEBUG_SC_PRINT_LOCAL(X)
-  Prints a  message type and time, message \a X, and the location
+  Prints a  message type and time, message \a X, and the location  (file name and lineno)
   The same as DEBUG_SC_PRINT, but uses local time
-  @param X the message from the event
+  @param X the message describing the event
 */
 
 /*!
   \def DEBUG_SC_WARNING(X)
-  Prints a  warning message type and time, message \a X, and the location
+  Prints a  warning message type and time, message \a X, and the location (file name and lineno)
+  The same as DEBUG_SC_PRINT, but uses different prolog
+  @param X the message describing the warning
 */
 
 /*!
-  \def DEBUG_SC_PRINT_LOCAL(X)
-  Prints a  message type and time, message \a X, and the location
+  \def DEBUG_SC_WARNING_LOCAL(X)
+  Prints a  message type and time, message \a X, and the location (file name and lineno)
   The same as DEBUG_SC_WARNING, but uses local time
 */
 
 #ifdef DEBUG_PRINTS
-#define DEBUG_SC_PRINT(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_PRINT_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_WARNING(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_WARNING_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "\" //" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_PRINT(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_PRINT_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "" << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_WARNING(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+#define DEBUG_SC_WARNING_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << " " << DEBUG_LOCATION_SHORT  << std::endl
 #else
 #define DEBUG_SC_PRINT(X)
 #define DEBUG_SC_PRINT_LOCAL(X)
@@ -119,8 +121,11 @@ extern    string SC_TIME_UNIT[];
 //  #define LOG_FATAL(x)
   #define LOG_CRITICAL(x)
   #define LOG_WARNING(x)
+  #define LOG_SC_WARNING(x)
   #define LOG_INFO(x)
-  #define LOG_INFO_SC(x)
+  #define LOG_INFO_OBJECT(x)
+  #define LOG_SC_INFO(x)
+  #define LOG_SC_INFO_LOCAL(x)
   #define LOG_ONLY(x)
 
 #else // Logging is not suppressed
@@ -131,9 +136,11 @@ using namespace std;
 //  #define LOG_FATAL(x) IF_TO_LOG qFatal().noquote().nospace() << x
   #define LOG_CRITICAL(x) IF_TO_LOG qCritical().noquote().nospace() << x
   #define LOG_WARNING(x)  IF_TO_LOG qWarning().noquote().nospace() << x
-  #define LOG_INFO(x)     IF_TO_LOG qInfo().noquote().nospace() << "| " << x
-  #define LOG_INFO_OBJECT(x)     IF_TO_LOG qInfo().noquote().nospace() << PrologString_Get().c_str() << "| " << x
-  #define LOG_INFO_SC(x)  IF_TO_LOG qInfo().noquote().nospace() << "@" << sc_time_to_nsec_Get().c_str() << "|" << name() << " " << x
+  #define LOG_SC_WARNING(x)  IF_TO_LOG qWarning().noquote().nospace() << "@" << DEBUG_SC_TIME << "|" << name() << x
+  #define LOG_INFO(x)     IF_TO_LOG qInfo().noquote().nospace() << "@" << DEBUG_SC_TIME << "|" << name() << x
+  #define LOG_SC_INFO(x)  IF_TO_LOG qInfo().noquote().nospace() << "@" << DEBUG_SC_TIME << "|" << name() << ": " << x
+  #define LOG_INFO_OBJECT(x)     IF_TO_LOG qInfo().noquote().nospace() << "@" << DEBUG_SC_TIME << "|" << name() << PrologString_Get().c_str() << "| " << x
+  #define LOG_SC_INFO_LOCAL(x)  IF_TO_LOG qInfo().noquote().nospace() << "@" << DEBUG_SC_TIME_LOCAL << "|" << name() << ": " << x
   #define LOG_ONLY(x) x
 #endif
 
