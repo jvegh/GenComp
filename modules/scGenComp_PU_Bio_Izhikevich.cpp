@@ -214,7 +214,7 @@ void scGenComp_PU_Bio_Izhikevich::
     {   // We are about finishing processing
         mV_M = m_C; // Restore membrane potential, as published
         mU_R += m_D; // Restore recovery potential
-        DEBUG_SC_EVENT_LOCAL("End of processing, in ready again");
+        DEBUG_SC_EVENT_LOCAL("End of processing, in 'Ready' again");
     }
     else
     {   // We are still processing; re-issue the heartbeat
