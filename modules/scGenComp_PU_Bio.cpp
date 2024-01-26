@@ -13,11 +13,8 @@
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
 #define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
-
+//#define DEBUG_DISABLED
 #include "DebugMacros.h"
-
-extern bool UNIT_TESTING;	// Whether in course of unit testing
-//static GenCompStates_Bio *TheGenCompStates_Bio;
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing
@@ -38,23 +35,7 @@ scGenComp_PU_Bio(sc_core::sc_module_name nm
 {
 }
 
-/*
-void scGenComp_PU_Bio::
-    Deliver()
-{   // The state machine ensures that we are in phases either 'Processing' or 'Delivering'
-    DEBUG_SC_EVENT_LOCAL("   ---");
-    if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the beginning of the 'Delivering' phase
-        StateFlag_Set(gcsm_Delivering);
-    }
-    else
-    {   // We are at the end of the 'Delivering' phase
-        EVENT_GenComp.DeliveringEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Delivering");
-        MachineState->Relax(this);
-    }
-}
-*/
+
 
 // Heartbeat distribution happens in scGenComp_PU_Abstract
     /**
@@ -204,31 +185,8 @@ bool scGenComp_PU_Bio::
 
 }
 
-/*void scGenComp_PU_Bio::
-    SolvePDE()
-{
-    int i=1;
-}*/
 
 
 
-
-/*
-void scGenComp_PU_Bio::
-    Relax()
-{   // The state machine ensures that we are in phases either 'Delivering' or 'Relaxing'
-     if(gcsm_Processing == StateFlag_Get())
-    {   // We are at the beginning of the 'Delivering' phase
-        StateFlag_Set(gcsm_Relaxing);
-    }
-    else
-    {   // We are at the end of the 'Delivering' phase
-        EVENT_GenComp.DeliveringEnd.notify(SC_ZERO_TIME);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.End_Delivering");
-        MachineState->Initialize(this);
-        StateFlag_Set(gcsm_Ready);
-    }
-}
-*/
 
 
