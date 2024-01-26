@@ -63,19 +63,18 @@ extern    string SC_TIME_UNIT[];
   @param X the message describing the event
 */
 
-#ifdef DEBUG_EVENTS
-#define DEBUG_SC_EVENT(X)       if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_EVENT_LOCAL(X)  if(!UNIT_TESTING) std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_LOG(X) if(!UNIT_TESTING) std::cerr  << DEBUG_LOG_STRING << DEBUG_SC_TIME << ":"   << name() << "- " <<  X << std::endl
-#define DEBUG_SC_LOG_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_LOG_STRING_LOCAL <<  DEBUG_SC_TIME_LOCAL<< ":"  << name() << "- "   << X << std::endl
+#if defined(DEBUG_EVENTS) && !defined(DEBUG_DISABLED)
+    #define DEBUG_SC_EVENT(X) std::cerr << DEBUG_EVENT_STRING << DEBUG_SC_PROLOG << X << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_EVENT_LOCAL(X)   std::cerr << DEBUG_EVENT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_LOG(X) std::cerr  << DEBUG_LOG_STRING << DEBUG_SC_TIME << ":"   << name() << "- " <<  X << std::endl
+    #define DEBUG_SC_LOG_LOCAL(X) std::cerr << DEBUG_LOG_STRING_LOCAL <<  DEBUG_SC_TIME_LOCAL<< ":"  << name() << "- "   << X << std::endl
 #else
-#define DEBUG_SC_EVENT(X)
-#define DEBUG_SC_EVENT_LOCAL(X)
-#define DEBUG_SC_LOG(X)
-#define DEBUG_SC_LOG_LOCAL(X)
+    #define DEBUG_SC_EVENT(X)
+    #define DEBUG_SC_EVENT_LOCAL(X)
+    #define DEBUG_SC_LOG(X)
+    #define DEBUG_SC_LOG_LOCAL(X)
 #endif
-//
-//
+
 /*!
   \def DEBUG_SC_PRINT(X)
   Prints a  message type and time, message \a X, and the location (file name and lineno)
@@ -102,22 +101,22 @@ extern    string SC_TIME_UNIT[];
   The same as DEBUG_SC_WARNING, but uses local time
 */
 
-#ifdef DEBUG_PRINTS
-#define DEBUG_SC_PRINT(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_PRINT_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "" << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_WARNING(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
-#define DEBUG_SC_WARNING_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+#if defined(DEBUG_PRINTS) && !defined(DEBUG_DISABLED)
+    #define DEBUG_SC_PRINT(X) std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_PRINT_LOCAL(X)std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_WARNING(X) std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_WARNING_LOCAL(X) std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << " " << DEBUG_LOCATION_SHORT  << std::endl
 #else
-#define DEBUG_SC_PRINT(X)
-#define DEBUG_SC_PRINT_LOCAL(X)
-#define DEBUG_SC_WARNING(X)
-#define DEBUG_SC_WARNING_LOCAL(X)
+    #define DEBUG_SC_PRINT(X)
+    #define DEBUG_SC_PRINT_LOCAL(X)
+    #define DEBUG_SC_WARNING(X)
+    #define DEBUG_SC_WARNING_LOCAL(X)
 #endif
 //
 // The macros blow are not yet revived
 //
 // Do not produce log messages during unit testing or if explicitly suppressed
-#ifdef SUPPRESS_LOGGING
+#if defined( SUPPRESS_LOGGING)
 //  #define LOG_FATAL(x)
   #define LOG_CRITICAL(x)
   #define LOG_WARNING(x)
@@ -127,11 +126,9 @@ extern    string SC_TIME_UNIT[];
   #define LOG_SC_INFO(x)
   #define LOG_SC_INFO_LOCAL(x)
   #define LOG_ONLY(x)
-
 #else // Logging is not suppressed
   #include <QDebug>
 using namespace std;
-  #define IF_TO_LOG if(!UNIT_TESTING)
   // Now use id to make logging
 //  #define LOG_FATAL(x) IF_TO_LOG qFatal().noquote().nospace() << x
   #define LOG_CRITICAL(x) IF_TO_LOG qCritical().noquote().nospace() << x
@@ -289,7 +286,7 @@ using namespace std;
     #define DEBUG_PRINT_IF_DIFFERENT(x,A,B)
 #endif // DEBUG_PRINTS
 #undef DEBUG_PRINTS
-
+#undef DEBUG_DISABLED
 
 #ifdef USE_PERFORMANCE_DIAGRAM
     #define PLOT_FETCH_BALL(TIME,LENGTH) \
