@@ -1,6 +1,6 @@
 /** @file scGenComp_PU_Bio_IzhikevichDEMO.cpp
  *  @ingroup GENCOMP_MODULE_DEMO
- *  @brief  The DEMO processing unit for biological generalized computing
+ *  @brief  The DEMO processing unit for Izhikevich-type biological generalized computing
  */
 /*
  *  @author János Végh (jvegh)
@@ -15,9 +15,6 @@
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 
 #include "DebugMacros.h"
-
-extern bool UNIT_TESTING;	// Whether in course of unit testing
-//extern GenCompStates_Bio *TheGenCompStates_Bio;
 
 
 scGenComp_PU_Bio_IzhikevichDEMO::
