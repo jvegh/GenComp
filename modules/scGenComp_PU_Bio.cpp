@@ -13,7 +13,7 @@
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
 #define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
-
+#define DEBUG_DISABLED
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing

@@ -87,8 +87,8 @@ int sc_main(int argc, char* argv[])
     std::cerr  << "\n Demonstrates using GenComp with SystemC" << "\n>>> Entering " << PROJECT_NAME << "_DEMO/CLI V"
               << PROJECT_VERSION;
     if(UseSimulator)
-        std::cout << " with simulator";
-    std::cout << endl;
+        std::cerr << " with simulator";
+    std::cerr << endl;
 
     // Do whatever setup you will need for your program here
     //
@@ -146,7 +146,7 @@ int sc_main(int argc, char* argv[])
     else
         std::cerr  << "  -Error " << returnValue << " during preparing objects" << endl;
 
-     std::cerr  << "<<< Exiting " << PROJECT_NAME << "_DEMO/CLI V" << PROJECT_VERSION;
+    std::cerr  << "<<< Exiting " << PROJECT_NAME << "_DEMO/CLI V" << PROJECT_VERSION;
     if(returnValue)
         std::cerr << ", error code " << returnValue << endl;
     else

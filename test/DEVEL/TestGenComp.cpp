@@ -13,7 +13,7 @@
  * @brief	Tests the operation of the objects for generalized computing
  * 
  */
-extern bool UNIT_TESTING;		// Switched off by default
+#define DEBUG_DISABLED
 
 #include "scGenComp_PU_Abstract.h"
 #include "scGenComp_PU_Bio.h"

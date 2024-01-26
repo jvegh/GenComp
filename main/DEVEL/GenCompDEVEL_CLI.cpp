@@ -36,7 +36,6 @@ extern QTextEdit *Simulator_LogWindow; // By default and for CLI, we have no QTe
 //??scClusterBusSimulator* TheSimulator;
 //??string ListOfIniFiles;
 
-bool UNIT_TESTING = false; // Used internally for debugging
 QTextEdit *Simulator_LogWindow = 0; // By default and for CLI, we have no QTextEdit
 
 int sc_main(int argc, char* argv[])

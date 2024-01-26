@@ -8,7 +8,8 @@
 
 #include "Utils.h"
 
-//extern bool UNIT_TESTING;		// Switched off by default
+
+//#define DEBUG_DISABLED
 
 // A new test class  of these is created for each test
 class UtilsTest : public testing::Test

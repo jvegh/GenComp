@@ -15,7 +15,7 @@ using std::cout;
 using std::endl;
 #include <chrono>
 #include "sctestbench_simple.h"
-//extern bool UNIT_TESTING;		// Switched off by default
+//#define DEBUG_DISABLED
 using namespace std;
 
 void GenCompDEVEL_simpleTB_t::test_thread()

@@ -14,7 +14,8 @@
  * @brief	Tests the operation of the support stuff
  * 
  */
-extern bool UNIT_TESTING;		// Switched off by default
+//#define DEBUG_DISABLED
+
 extern bool OBJECT_FILE_PRINTED;
 // A new test class  of these is created for each test
 class StuffTest : public testing::Test

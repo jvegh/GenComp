@@ -13,7 +13,7 @@
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
 #define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
-
+#define DEBUG_DISABLED
 #include "DebugMacros.h"
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
@@ -122,7 +122,7 @@ void scGenComp_PU_Bio_Izhikevich::
     {   // We are still processing; re-issue the heartbeat
            // if the limit is not yet reached
         EVENT_GenComp.Heartbeat.notify(mHeartbeat);
-        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with + << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
+        DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with +" << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
                              << ", in " << HeartbeatDivisions_Get() << " divisions");
     }
 }
