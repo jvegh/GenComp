@@ -59,8 +59,7 @@
  */
 #include "scGenComp_PU_Bio.h"
 
-
-extern string GenCompStates[];   // Just for debugging
+//extern string GenCompStates[];   // Just for debugging
 
 
 extern string GenCompSimulatorModesStrings[];
@@ -134,7 +133,7 @@ public:
     sc_core::sc_time scTime_Get(){ return sc_core::sc_time_stamp()- mResetTime;}
 protected:
     vector<scGenComp_PU_Abstract*> mWatchedPUs;   /// Store the registered objects here
-#ifdef SC_MAKE_TIME_BENCHMARKING
+#ifdef MAKE_TIME_BENCHMARKING
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
     chrono::steady_clock::time_point D_t;
