@@ -8,13 +8,13 @@
 */
 
 #include "scGenComp_Simulator.h"
-// This section configures debug and log printing; must be located AFTER the other includes
-//#define SUPPRESS_LOGGING // Suppress all log messages
-#define DEBUG_EVENTS    ///< Print event debug messages  for this module
-#define DEBUG_PRINTS    ///< Print general debug messages for this module
-// Those defines must be located before 'DebugMacros.h", and are undefined in that file
-//#define DEBUG_DISABLED
-#include "DebugMacros.h"
+
+// Take care: SC_MAKE_TIME_BENCHMARKING and MAKE_TIME_BENCHMARKING
+// may be either defined or undefined
+//extern bool UNIT_TESTING;	// Whether in course of unit testing
+#define MAKE_TIME_BENCHMARKING
+#define SC_MAKE_TIME_BENCHMARKING
+
 
 string GenCompSimulatorModesStrings[]{};
 scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
@@ -22,8 +22,7 @@ scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
     ,mToReset(true)             //
     ,mMoreEvents(true)
 {   // Initialize CLOCK and SIMULATED time counters
-    BENCHMARK_TIME_RESET(&t,&x,&s);
-    SC_BENCHMARK_TIME_RESET(&SC_t,&SC_x,&SC_s);
+    Reset();
 }
 
 /* Reset the simulator for a new processing
@@ -31,6 +30,9 @@ scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
 void scGenComp_Simulator::
     Reset()
 {
+    BENCHMARK_TIME_RESET(&t,&x,&s); // Total time spent in simulator
+    BENCHMARK_TIME_RESET(&D_t,&D_x,&D_s);   // Total time spent with the display/update state
+    SC_BENCHMARK_TIME_RESET(&SC_t,&SC_x,&SC_s);
     mToReset = false;
     mResetTime = sc_core::sc_time_stamp();
     for(vector<scGenComp_PU_Abstract*>::size_type i = 0; i != mWatchedPUs.size(); i++)
@@ -80,7 +82,6 @@ bool scGenComp_Simulator::Run(GenCompSimulatorModes_t SimulatorMode, int32_t Sim
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
     return mMoreEvents;  // If we shall come back again
 }
-//^^    DEBUG_SC_PRINT(" Running continued in period [" << sc_time_String_Get(SC_OldT) << "," << sc_time_String_Get(SC_s) << "]");
 
 // Register only already created modules !!!
 void scGenComp_Simulator::RegisterPU(scGenComp_PU_Abstract* Module)
@@ -94,6 +95,7 @@ void scGenComp_Simulator::RegisterPU(scGenComp_PU_Abstract* Module)
 
 void  scGenComp_Simulator::Update(void)
 {
+    BENCHMARK_TIME_BEGIN(&D_t,&D_x);
     if(!mUpdateUnit)
     {   //DEBUG_SC_EVENT("Nothing to update");
         return;    // We  have no new update request
@@ -133,6 +135,7 @@ void  scGenComp_Simulator::Update(void)
             break;
         }
         mUpdateUnit = (scGenComp_PU_Abstract*)NULL;
+    BENCHMARK_TIME_END(&D_t,&D_x,&D_s);
  }
 
 // Update input information in simulator
@@ -203,3 +206,5 @@ void scGenComp_Simulator::
         mUpdateUnit = (scGenComp_PU_Abstract*) NULL;
     }
 }
+#undef MAKE_TIME_BENCHMARKING
+#undef SC_MAKE_TIME_BENCHMARKING
