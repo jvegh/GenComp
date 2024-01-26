@@ -8,9 +8,13 @@
 */
 
 #include "scGenComp_Simulator.h"
-
-
-extern bool UNIT_TESTING;	// Whether in course of unit testing
+// This section configures debug and log printing; must be located AFTER the other includes
+//#define SUPPRESS_LOGGING // Suppress all log messages
+#define DEBUG_EVENTS    ///< Print event debug messages  for this module
+#define DEBUG_PRINTS    ///< Print general debug messages for this module
+// Those defines must be located before 'DebugMacros.h", and are undefined in that file
+//#define DEBUG_DISABLED
+#include "DebugMacros.h"
 
 string GenCompSimulatorModesStrings[]{};
 scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
