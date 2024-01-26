@@ -141,7 +141,8 @@ int sc_main(int argc, char* argv[])
         };
         BENCHMARK_TIME_END(&t,&x,&s);
         SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
-        std::cerr  << "  -Elapsed for running the simulation: " << MySimulator->Time_Get().count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
+        std::cerr  << "  -Elapsed for running the simulation: " << MySimulator->TimeToProcess_Get().count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT)
+                  << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     }
     else
         std::cerr  << "  -Error " << returnValue << " during preparing objects" << endl;
@@ -152,7 +153,7 @@ int sc_main(int argc, char* argv[])
     else
         std::cerr << " with no error"  << endl;
     if(UseSimulator)
-        std::cerr  << "GenComp/DEMO by scGenComp_Simulator " << MySimulator->Time_Get().count()/1000/1000. << " msec CLOCK time" << "//"
+        std::cerr  << "GenComp/DEMO by scGenComp_Simulator " << MySimulator->TimeToProcess_Get().count()/1000/1000. << " msec CLOCK time" << "//"
                   <<  sc_time_String_Get(MySimulator->scTime_Get(), SC_TIME_UNIT_DEFAULT) << " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT] << " SIMULATED time" << endl;
     else
         std::cerr  << "GenComp/DEMO simulation " << s.count()/1000/1000. << " msec CLOCK time" << "//" << sc_time_String_Get(SC_s, SC_TIME_UNIT_DEFAULT)

@@ -23,11 +23,17 @@
 #define SC_MAKE_TIME_BENCHMARKING  // uncomment to measure the SIMULATED time with benchmarking macros
 #include "scMacroTimeBenchmarking.h"    // Must be after the define to have its effect
 
+// Given that we use for the #define-s above for reserving space and at the end of the #include-d files
+// they are undefined, we define them again here and #undefine them at the end of the header
+#define MAKE_TIME_BENCHMARKING
+#define SC_MAKE_TIME_BENCHMARKING
+
 // This section configures debug and log printing; must be located AFTER the other includes
 //#define SUPPRESS_LOGGING // Suppress all log messages
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
 #define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
+#define DEBUG_DISABLED
 #include "DebugMacros.h"
 
 /*
@@ -120,23 +126,24 @@ public:
     void UpdateRelaxingEnd(scGenComp_PU_Abstract* PU);
     void Observe(scGenComp_PU_Abstract* PU, GenCompPUObservingBits_t B);
 
-    std::chrono::duration<int64_t, nano> Time_Get(void)    {return s;}
+    std::chrono::duration<int64_t, nano> TimeToProcess_Get(void)    {return s;}
+    std::chrono::duration<int64_t, nano> TimeToDisplay_Get(void)    {return D_s;}
     /** Return the last reset time */
     sc_core::sc_time scResetTime_Get(){ return mResetTime;}
     /** Return the time since the last reset */
     sc_core::sc_time scTime_Get(){ return sc_core::sc_time_stamp()- mResetTime;}
 protected:
     vector<scGenComp_PU_Abstract*> mWatchedPUs;   /// Store the registered objects here
-#ifdef BENCHMARK_TIME_BEGIN
+#ifdef SC_MAKE_TIME_BENCHMARKING
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
+    chrono::steady_clock::time_point D_t;
+    std::chrono::duration<int64_t, nano> D_x,D_s=(std::chrono::duration< int64_t, nano>)0;
 #endif
-#ifdef SC_BENCHMARK_TIME_BEGIN
-    sc_core::sc_time SC_t, SC_x, SC_s;//, SC_OldT;
-#else
-    sc_core::sc_time SC_t;
+    sc_core::sc_time SC_t,
+#ifdef SC_MAKE_TIME_BENCHMARKING
+         SC_x, SC_s,//, SC_OldT;
 #endif
-    sc_core::sc_time
         SC_time,    ///< Needed for the mode 'gcsm_Timed'
         mResetTime; ///< The time of last Reset
     bool mToReset;              ///< If to reset the simulator befor running
@@ -148,4 +155,6 @@ protected:
 
 /** @}*/
 
+#undef SC_MAKE_TIME_BENCHMARKING
+#undef MAKE_TIME_BENCHMARKING
 #endif // SCGENCOMPSIMULATOR_H
