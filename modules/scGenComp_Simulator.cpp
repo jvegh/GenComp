@@ -6,7 +6,6 @@
  *  @author János Végh (jvegh)
  *  @bug No known bugs.
 */
-
 #include "scGenComp_Simulator.h"
 
 // Take care: SC_MAKE_TIME_BENCHMARKING and MAKE_TIME_BENCHMARKING
@@ -15,20 +14,21 @@
 #define MAKE_TIME_BENCHMARKING
 #define SC_MAKE_TIME_BENCHMARKING
 
-
 string GenCompSimulatorModesStrings[]{};
 scGenComp_Simulator::scGenComp_Simulator(sc_core::sc_module_name nm)
     : sc_core::sc_module( nm)
     ,mToReset(true)             //
     ,mMoreEvents(true)
 {   // Initialize CLOCK and SIMULATED time counters
-    Reset();
-}
+    SC_THREAD(Reset_method);
+    sensitive << Enable;
+    dont_initialize(); // The event 'enable' starts simulator
+ }
 
 /* Reset the simulator for a new processing
      */
 void scGenComp_Simulator::
-    Reset()
+    Reset_method()
 {
     BENCHMARK_TIME_RESET(&t,&x,&s); // Total time spent in simulator
     BENCHMARK_TIME_RESET(&D_t,&D_x,&D_s);   // Total time spent with the display/update state
@@ -51,8 +51,9 @@ bool scGenComp_Simulator::Run(GenCompSimulatorModes_t SimulatorMode, int32_t Sim
     SC_time = sc_core::sc_time_stamp();    // Remember the time of calling, for 'gcsm_Timed' mode
     if(mToReset)
     {
-        Reset();
+        DEBUG_SC_PRINT("SC_Start");
         sc_start(SC_ZERO_TIME);  // We are at the beginning, just make a call to set up the SystemC engine
+        Reset_method();
         mMoreEvents = true;
     }
     bool MoreCycles = true; // Anyhow, we make one cycle
@@ -68,6 +69,7 @@ bool scGenComp_Simulator::Run(GenCompSimulatorModes_t SimulatorMode, int32_t Sim
                 case gcsm_Continuous:
                     MoreCycles = false;
                     break;        ///< Runs to the end
+
                 case gcsm_Eventwise:         ///< Stops after a certain number of events
                     MoreCycles = (--SimulationUnit > 0);    // Count events
                     break;
@@ -100,7 +102,7 @@ void  scGenComp_Simulator::Update(void)
     {   //DEBUG_SC_EVENT("Nothing to update");
         return;    // We  have no new update request
     }
-    switch(mUpdateObservingBit) // Seem if the activity itself is not observed
+    switch(mUpdateObservingBit) // See if the activity is observed
         {
         default: assert(0); break;
         case gcob_ObserveProcessingBegin: //Watch 'Begin Computing'
@@ -135,8 +137,8 @@ void  scGenComp_Simulator::Update(void)
             break;
         }
         mUpdateUnit = (scGenComp_PU_Abstract*)NULL;
-    BENCHMARK_TIME_END(&D_t,&D_x,&D_s);
- }
+        BENCHMARK_TIME_END(&D_t,&D_x,&D_s);
+}
 
 // Update input information in simulator
 void  scGenComp_Simulator::UpdateInput(scGenComp_PU_Abstract* PU)
@@ -195,16 +197,19 @@ void  scGenComp_Simulator::UpdateHeartbeat(scGenComp_PU_Abstract* PU)
 void scGenComp_Simulator::
     Observe(scGenComp_PU_Abstract* PU, GenCompPUObservingBits_t B)
 {
+    BENCHMARK_TIME_BEGIN(&D_t,&D_x);
     assert(PU);     // not installed
     assert(B<gcob_Max); // wrong bit
     if(PU->ObservingBit_Get(gcob_ObserveModule))
-    {   // Everything OK, the module observed
+    {   // Everything OK, the module is observed:
+        // Save the unit pointer and bit for later use in another thread
         mUpdateUnit = PU; mUpdateObservingBit = B;
     }
     else
-    {   //No, the in not observed
+    {   //No, the module is not observed
         mUpdateUnit = (scGenComp_PU_Abstract*) NULL;
     }
+    BENCHMARK_TIME_END(&D_t,&D_x,&D_s);
 }
 #undef MAKE_TIME_BENCHMARKING
 #undef SC_MAKE_TIME_BENCHMARKING
