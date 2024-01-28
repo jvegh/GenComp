@@ -7,7 +7,7 @@
  *  @bug No known bugs.
 */
 
-extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in unit testing
+//extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in unit testing
 /*
  *  If theses macros are not defined, no code is generated;
         the variables, however, must be defined (although they will be
