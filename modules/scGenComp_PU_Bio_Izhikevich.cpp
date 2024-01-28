@@ -225,16 +225,6 @@ void scGenComp_PU_Bio_Izhikevich::
     }
 }
 
-/*
- * Initialize the GenComp unit.
- */
-/*void scGenComp_PU_Bio_Izhikevich::
-    Initialize_Do(void)
-{
-    scGenComp_PU_Bio::Initialize_Do();
-                DEBUG_SC_EVENT_LOCAL("Initialized for Izhikevich mode");
- }
-*/
 
 /*
  * This routine makes actual input processing, although most of the job is done in Process() and Heartbeat()

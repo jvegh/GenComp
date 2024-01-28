@@ -102,10 +102,14 @@ extern    string SC_TIME_UNIT[];
 */
 
 #if defined(DEBUG_PRINTS) && !defined(DEBUG_DISABLED)
-    #define DEBUG_SC_PRINT(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_PRINT_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "" << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_WARNING(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
-    #define DEBUG_SC_WARNING_LOCAL(X) if(!UNIT_TESTING) std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_PRINT(X) \
+        std::cerr << DEBUG_PRINT_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_PRINT_LOCAL(X) \
+        std::cerr << DEBUG_PRINT_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << "" << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_WARNING(X) \
+        std::cerr << DEBUG_WARNING_STRING << DEBUG_SC_PROLOG << X << " " << DEBUG_LOCATION_SHORT  << std::endl
+    #define DEBUG_SC_WARNING_LOCAL(X) \
+        std::cerr << DEBUG_WARNING_STRING_LOCAL << DEBUG_SC_PROLOG_LOCAL << X << " " << DEBUG_LOCATION_SHORT  << std::endl
 #else
     #define DEBUG_SC_PRINT(X)
     #define DEBUG_SC_PRINT_LOCAL(X)

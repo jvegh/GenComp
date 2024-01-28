@@ -1,6 +1,6 @@
 /** @file scGenComp_PU_Bio_IzhikevichDEMO.cpp
  *  @ingroup GENCOMP_MODULE_DEMO
- *  @brief  The DEMO processing unit for biological generalized computing
+ *  @brief  The DEMO processing unit for Izhikevich-type biological generalized computing
  */
 /*
  *  @author János Végh (jvegh)
@@ -15,9 +15,6 @@
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 
 #include "DebugMacros.h"
-
-extern bool UNIT_TESTING;	// Whether in course of unit testing
-//extern GenCompStates_Bio *TheGenCompStates_Bio;
 
 
 scGenComp_PU_Bio_IzhikevichDEMO::
@@ -43,9 +40,6 @@ scGenComp_PU_Bio_IzhikevichDEMO::
 void scGenComp_PU_Bio_IzhikevichDEMO::
     InitializeForDemo_method()
 {
-//    InputCurrent_Set(5000); // Use 5 nA constant input current
-//    HeartbeatDivisions_Set(8);
-
     // Set up which events are to be monitored
     // group and module observing are enabled by default
     ObservingBit_Set(gcob_ObserveInput, true);
@@ -55,16 +49,10 @@ void scGenComp_PU_Bio_IzhikevichDEMO::
     ObservingBit_Set(gcob_ObserveHeartbeat, true);
     wait(313,SC_US);
 
-    //    EVENT_GenComp.Initialize.notify(SC_ZERO_TIME);
-//    Heartbeat_Set(BIO_DEMO_HEARTBEAT_TIME); // Just to speed up demo
-    HeartbeatTime_Set(sc_core::sc_time(128,SC_US));
+     HeartbeatTime_Set(sc_core::sc_time(128,SC_US));
     DEBUG_SC_PRINT_LOCAL("Heartbeat is set to: "  << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
                                                  << ", in " << HeartbeatDivisions_Get() << " divisions");
-//??    EVENT_GenComp.InputReceived.notify(20,SC_MS);
-    // Not really needed: done in constructor
-//??            DEBUG_SC_PRINT("Will issue 'InputReceived' @ 10 ms");
-//??    wait(10,SC_MS);
-    EVENT_GenComp.InputReceived.notify();
+    EVENT_GenComp.InputReceived.notify(SC_ZERO_TIME);
             DEBUG_SC_EVENT("DEMO_DRIVER SENT #0 EVENT_GenComp.InputReceived  @0,313 (+000) us");
             DEBUG_SC_EVENT("DEMO_DRIVER XPCT EVENT_GenComp.BeginProcessing");
     // Receiving an input, also starts 'Processing'

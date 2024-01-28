@@ -7,5 +7,5 @@
 message(HIGHLIGHTED "Configuring '3rd party' components")
 
   add_subdirectory(QCustomPlot)	# A plotting library
-  add_subdirectory(Minuit)	# Routines form Minuit/CERN
+  add_subdirectory(Minuit)	# Routines from Minuit/CERN
 

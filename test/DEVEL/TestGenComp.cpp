@@ -14,6 +14,7 @@
  * 
  */
 #define DEBUG_DISABLED
+#define UNIT_TESTING
 
 #include "scGenComp_PU_Abstract.h"
 #include "scGenComp_PU_Bio.h"
@@ -30,7 +31,6 @@ public:
     virtual void SetUp()
     {
         DEBUG_PRINT("GenCompTest started");
-        UNIT_TESTING = false;
      }
 
     virtual void TearDown()

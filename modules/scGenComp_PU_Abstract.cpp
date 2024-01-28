@@ -7,7 +7,6 @@
  *  @bug No known bugs.
 */
 
-extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in unit testing
 /*
  *  If theses macros are not defined, no code is generated;
         the variables, however, must be defined (although they will be
@@ -23,6 +22,7 @@ extern bool UNIT_TESTING;	// Whether in course of unit testing; considered in un
 #define DEBUG_PRINTS    ///< Print general debug messages for this module
 // Those defines must be located before 'DebugMacros.h", and are undefined in that file
 #define DEBUG_DISABLED
+
 #include "DebugMacros.h"
 #include "scGenComp_PU_Abstract.h"
 #include "scGenComp_Simulator.h"

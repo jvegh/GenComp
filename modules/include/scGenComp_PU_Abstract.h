@@ -6,6 +6,7 @@
  *  @todo Implement Fail, Synchronize
  *  @todo Implement Sleep, Awake
  *  @todo Implement PotentialRestored
+ *  @todo Implement TransmittingEnd
  */
 /*
  *  @author János Végh (jvegh)
@@ -45,17 +46,8 @@ class scGenComp_Simulator;
  *  Begin restoring the 'Ready' state
  *  @var EVENT_GenComp_type::RelaxingEnd
  *  End restoring the 'Ready' state
- *  @var EVENT_GenComp_type::TransmittingBegin
- *  Begin transmitting the result (externally); unattended
- *  @var EVENT_GenComp_type::TransmittingEnd
- *  Feedback from transmission unit; unattended
  *
- *  @var EVENT_GenComp_type::SleepingBegin
- *  Begin of HW sleepig
- *  Only in 'Ready' state, the PU can spare power by going to 'Sleeping' state
- *  @var EVENT_GenComp_type::SleepingEnd,
- *  End of HW spleeping
- *  @var EVENT_GenComp_type::Synchronize
+  *  @var EVENT_GenComp_type::Synchronize
  *  External event forces PU to synchronize
  *  @var EVENT_GenComp_type::Failed
  *  Computing failed, start over
@@ -98,6 +90,17 @@ class scGenComp_Simulator;
  * - Synchronize
  *
 */
+/* Implement later
+ *  @var EVENT_GenComp_type::TransmittingBegin
+        *  Begin transmitting the result (externally); unattended
+    *  @var EVENT_GenComp_type::TransmittingEnd
+        *  Feedback from transmission unit; unattended
+ *  @var EVENT_GenComp_type::SleepingBegin
+ *  Begin of HW sleepig
+ *  Only in 'Ready' state, the PU can spare power by going to 'Sleeping' state
+ *  @var EVENT_GenComp_type::SleepingEnd,
+ *  End of HW spleeping
+*/
 struct EVENT_GenComp_type {
     sc_core::sc_event
         // Operation-related
@@ -116,15 +119,15 @@ struct EVENT_GenComp_type {
 
 //        TransmittingBegin,      // Begin transmitting the result (externally); unattended
         // It is the same as 'RelaxingBegin'
- //       TransmittingEnd,        // Feedback from transmission unit; unattended
+//        TransmittingEnd,        // Feedback from transmission unit; unattended
         // Do we need it?
         //PotentialRestored,      //
         // Do we need it
         // HW-related
         //Awaken,                  // Signals that is ready to use
-        // Implemenet later
-        // SleepingBegin,
-        // SleepingEnd,
+        // Implement later
+//        SleepingBegin,          // Begin
+//        SleepingEnd,
         // Sleep,
         // Implement later
         Wakeup;                  // The HW is needed again, awake it
@@ -263,6 +266,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     /*!
      * \brief Create an abstract processing unit for the general computing paradigm
      * @param[in] nm the SystemC name of the module
+     * @param[in] HeartBeat the state refreshing time
      */
     scGenComp_PU_Abstract(sc_core::sc_module_name nm
                              , sc_core::sc_time HeartBeat = HEARTBEAT_TIME_DEFAULT);
@@ -514,7 +518,7 @@ class scGenComp_PU_Abstract: public sc_core::sc_module
     void scLocalTimeBase_Set(sc_core::sc_time T) { mLocalTimeBase = T;}
     /**
      * @brief scLocalTimeBase_Get
-     * @param return The beginning of the simulated time of the recent operation
+     * @return The beginning of the simulated time of the recent operation
      */
     sc_core::sc_time scTimeBase_Get(void)const {return mLocalTimeBase;}
 

@@ -78,5 +78,7 @@ class scGenComp_PU_Tech : public scGenComp_PU_Abstract
  };// of class scGenComp_PU_Tech
 
 /** @}*/
+#undef SC_MAKE_TIME_BENCHMARKING
+#undef MAKE_TIME_BENCHMARKING
 
 #endif // SCTECHGENCOMP_H

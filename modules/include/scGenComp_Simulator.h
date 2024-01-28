@@ -23,6 +23,11 @@
 #define SC_MAKE_TIME_BENCHMARKING  // uncomment to measure the SIMULATED time with benchmarking macros
 #include "scMacroTimeBenchmarking.h"    // Must be after the define to have its effect
 
+// Given that we use for the #define-s above for reserving space and at the end of the #include-d files
+// they are undefined, we define them again here and #undefine them at the end of the header
+#define MAKE_TIME_BENCHMARKING
+#define SC_MAKE_TIME_BENCHMARKING
+
 // This section configures debug and log printing; must be located AFTER the other includes
 //#define SUPPRESS_LOGGING // Suppress all log messages
 #define DEBUG_EVENTS    ///< Print event debug messages  for this module
@@ -54,8 +59,7 @@
  */
 #include "scGenComp_PU_Bio.h"
 
-
-extern string GenCompStates[];   // Just for debugging
+//extern string GenCompStates[];   // Just for debugging
 
 
 extern string GenCompSimulatorModesStrings[];
@@ -96,7 +100,7 @@ public:
      *  - cancels event pending for the !registered! modules
      *  - initializes the !registered! modules
      */
-    void Reset(void);
+    void Reset_method(void);
 
     /**
      * @brief Return true if more events are pending in the simulation system
@@ -121,32 +125,36 @@ public:
     void UpdateRelaxingEnd(scGenComp_PU_Abstract* PU);
     void Observe(scGenComp_PU_Abstract* PU, GenCompPUObservingBits_t B);
 
-    std::chrono::duration<int64_t, nano> Time_Get(void)    {return s;}
+    std::chrono::duration<int64_t, nano> TimeToProcess_Get(void)    {return s;}
+    std::chrono::duration<int64_t, nano> TimeToDisplay_Get(void)    {return D_s;}
     /** Return the last reset time */
     sc_core::sc_time scResetTime_Get(){ return mResetTime;}
     /** Return the time since the last reset */
     sc_core::sc_time scTime_Get(){ return sc_core::sc_time_stamp()- mResetTime;}
+    sc_core::sc_event Enable;   ///< One must enable simulator when everything prepared
 protected:
     vector<scGenComp_PU_Abstract*> mWatchedPUs;   /// Store the registered objects here
-#ifdef BENCHMARK_TIME_BEGIN
+#ifdef MAKE_TIME_BENCHMARKING
     chrono::steady_clock::time_point t;
     std::chrono::duration<int64_t, nano> x,s=(std::chrono::duration< int64_t, nano>)0;
+    chrono::steady_clock::time_point D_t;
+    std::chrono::duration<int64_t, nano> D_x,D_s=(std::chrono::duration< int64_t, nano>)0;
 #endif
-#ifdef SC_BENCHMARK_TIME_BEGIN
-    sc_core::sc_time SC_t, SC_x, SC_s;//, SC_OldT;
-#else
-    sc_core::sc_time SC_t;
+    sc_core::sc_time SC_t,
+#ifdef SC_MAKE_TIME_BENCHMARKING
+         SC_x, SC_s,//, SC_OldT;
 #endif
-    sc_core::sc_time
         SC_time,    ///< Needed for the mode 'gcsm_Timed'
         mResetTime; ///< The time of last Reset
     bool mToReset;              ///< If to reset the simulator befor running
     bool mMoreEvents;           ///< If the simulation is still active
     scGenComp_PU_Abstract* mUpdateUnit; ///< Store the unit where event happened
     GenCompPUObservingBits_t mUpdateObservingBit; ///< Stor event mask bit
- };
+};
 
 
 /** @}*/
 
+#undef SC_MAKE_TIME_BENCHMARKING
+#undef MAKE_TIME_BENCHMARKING
 #endif // SCGENCOMPSIMULATOR_H

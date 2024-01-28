@@ -16,7 +16,7 @@
 
 #include "DebugMacros.h"
 
-extern bool UNIT_TESTING;	// Whether in course of unit testing
+//extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 
 scGenComp_PU_AbstractDEMO::
