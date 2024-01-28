@@ -100,7 +100,7 @@ public:
      *  - cancels event pending for the !registered! modules
      *  - initializes the !registered! modules
      */
-    void Reset(void);
+    void Reset_method(void);
 
     /**
      * @brief Return true if more events are pending in the simulation system
@@ -131,6 +131,7 @@ public:
     sc_core::sc_time scResetTime_Get(){ return mResetTime;}
     /** Return the time since the last reset */
     sc_core::sc_time scTime_Get(){ return sc_core::sc_time_stamp()- mResetTime;}
+    sc_core::sc_event Enable;   ///< One must enable simulator when everything prepared
 protected:
     vector<scGenComp_PU_Abstract*> mWatchedPUs;   /// Store the registered objects here
 #ifdef MAKE_TIME_BENCHMARKING
@@ -149,7 +150,7 @@ protected:
     bool mMoreEvents;           ///< If the simulation is still active
     scGenComp_PU_Abstract* mUpdateUnit; ///< Store the unit where event happened
     GenCompPUObservingBits_t mUpdateObservingBit; ///< Stor event mask bit
- };
+};
 
 
 /** @}*/
