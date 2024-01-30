@@ -50,7 +50,7 @@ scGenComp_PU_Bio_HodgkinHuxley(sc_core::sc_module_name nm
 /*
      * Handle heartbeats in 'Delivering' mode
      */
-void scGenComp_PU_Bio_Izhikevich::
+void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Delivering_Do()
 {
     double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
@@ -95,7 +95,7 @@ void scGenComp_PU_Bio_Izhikevich::
     /*
      * Handle heartbeats in 'Processing' mode
      */
-void scGenComp_PU_Bio_Izhikevich::
+void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Processing_Do()
 {
     double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
@@ -132,7 +132,7 @@ void scGenComp_PU_Bio_Izhikevich::
      * Handle heartbeats in 'Relaxing' mode
      */
 
-void scGenComp_PU_Bio_Izhikevich::
+void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Relaxing_Do()
 {
     if(mAsPublished)
@@ -182,7 +182,7 @@ void scGenComp_PU_Bio_Izhikevich::
      * Handle heartbeats in 'Ready' mode
      */
 
-void scGenComp_PU_Bio_Izhikevich::
+void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Ready_Do()
 {
     if(mAsPublished)
@@ -233,7 +233,7 @@ void scGenComp_PU_Bio_Izhikevich::
  *
  * If it was the first spike, issue 'ComputingBegin' and re-issue
  */
-void scGenComp_PU_Bio_Izhikevich::
+void scGenComp_PU_Bio_HodgkinHuxley::
    InputReceived_Do(void)
 {
     if(!((gcsm_Ready == mStateFlag) || (gcsm_Processing == mStateFlag))) return;
@@ -255,24 +255,24 @@ void scGenComp_PU_Bio_Izhikevich::
 
 
 
-bool scGenComp_PU_Bio_Izhikevich::
+bool scGenComp_PU_Bio_HodgkinHuxley::
     ThresholdExceeded(void)
 {
     return mV_M>=mV_Min+25;   // threshold crossing
 }
 
-bool scGenComp_PU_Bio_Izhikevich::
+bool scGenComp_PU_Bio_HodgkinHuxley::
     PeakExceeded(void)
 {
     return mV_M>=130;   // Peak voltage crossing
 }
 
-bool scGenComp_PU_Bio_Izhikevich::
+bool scGenComp_PU_Bio_HodgkinHuxley::
     RestingApproached(void)
 {
       return mV_M< m_C+m_D;   // Restoration potential approached
 }
-bool scGenComp_PU_Bio_Izhikevich::
+bool scGenComp_PU_Bio_HodgkinHuxley::
     RestingReached(void)
 {
     return mV_M< m_C+m_D/4;   // Restoration potential approached

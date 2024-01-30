@@ -48,6 +48,7 @@
 #include "scGenComp_PU_AbstractDEMO.h"
 #include "scGenComp_PU_BioDEMO.h"
 #include "scGenComp_PU_Bio_IzhikevichDEMO.h"
+#include "scGenComp_PU_Bio_HodgkinHuxleyDEMO.h"
 #include "scGenComp_Simulator.h"
 
 //    sc_set_time_resolution(SCTIME_RESOLUTION);
@@ -56,6 +57,7 @@ extern string GenCompStatesString[];   // Just for debugging
 scGenComp_PU_AbstractDEMO* MyAbstractDEMO;
 scGenComp_PU_BioDEMO* MyBioDEMO;
 scGenComp_PU_Bio_IzhikevichDEMO* MyBioIzhikevichDEMO;
+scGenComp_PU_Bio_HodgkinHuxleyDEMO* MyBioHodgkinHuxleyDEMO;
 scGenComp_Simulator* MySimulator;
 
 // Prepare sxXXX modules and instantiate them
@@ -66,12 +68,14 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
     {
 //        case 0: MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO"); break;
 //        case 1: MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO"); break;
-        case 2: MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhiievitchBioDEMO",false); break;
+//        case 2: MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhiievitchBioDEMO",false); break;
+        case 3: MyBioHodgkinHuxleyDEMO = new scGenComp_PU_Bio_HodgkinHuxleyDEMO("MyHodgkinHuxleyBioDEMO",false); break;
     default:
         {
 //            MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstractDEMO");
 //            MyBioDEMO = new scGenComp_PU_BioDEMO("MyBioDEMO");
-        MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhiievitchBioDEMO",false,sc_core::sc_time(1,SC_MS));
+//        MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhiievitchBioDEMO",false,sc_core::sc_time(1,SC_MS));
+        MyBioHodgkinHuxleyDEMO = new scGenComp_PU_Bio_HodgkinHuxleyDEMO("MyHodgkinHuxleyBioDEMO",false,sc_core::sc_time(1,SC_MS));
         }; break;
     }
     return 0;
@@ -118,12 +122,14 @@ int sc_main(int argc, char* argv[])
         // Create all units you need
 
 //        MyAbstractDEMO = new scGenComp_PU_AbstractDEMO("MyAbstract");
- //       MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
-        MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",false,sc_core::sc_time(1000,SC_US));
+//       MyBioDEMO = new scGenComp_PU_BioDEMO("MyBio");
+//        MyBioIzhikevichDEMO = new scGenComp_PU_Bio_IzhikevichDEMO("MyIzhikevich",false,sc_core::sc_time(1000,SC_US));
+        MyBioHodgkinHuxleyDEMO = new scGenComp_PU_Bio_HodgkinHuxleyDEMO("MyHodgkinHuxley",false,sc_core::sc_time(1000,SC_US));
         // All modules must be created before registering
         //        MySimulator->RegisterPU(MyAbstractDEMO);
 //        MySimulator->RegisterPU(MyBioDEMO);
-        MySimulator->RegisterPU(MyBioIzhikevichDEMO);
+//        MySimulator->RegisterPU(MyBioIzhikevichDEMO);
+        MySimulator->RegisterPU(MyBioHodgkinHuxleyDEMO);
     }
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
