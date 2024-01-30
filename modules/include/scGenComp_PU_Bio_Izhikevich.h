@@ -2,8 +2,6 @@
  *  @ingroup GENCOMP_MODULE_BIOLOGY
 
  *  @brief Implements Izhikevich's model of neuronal operation
- *
- *  @todo implement 'Fail'
  */
 /*
  *  @author János Végh (jvegh)
