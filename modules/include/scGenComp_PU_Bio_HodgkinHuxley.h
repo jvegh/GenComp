@@ -37,6 +37,8 @@
      *
      * Creates  an HodgkinHuxley-type biological computing unit:
      *
+     * @cite HodgkinHuxley:1952
+     *
      * [1] A. L. Hodgkin and A. F. Huxley, A quantitative description of membrane current
      * and its application to conduction and excitation in nerve
      * J. Physiol. (1952) 117:500-544
@@ -53,18 +55,23 @@
      *   - \f$ c \f$ after-spike reset value of the membrane potential v. (c = 065 mV)
      *   - \f$ d \f$ after-spike reset of the recovery variable of\f$ u \f$ (d=2)
      *
-     *   Parameters:
-     *  - V_m        double - Membrane potential in mV
-     *  - U_m        double - Membrane potential recovery variable
-     *  - V_th       double - Spike threshold in mV.
-     *  - I_In        double - Constant input current in pA. (R=1)
-     *  - V_min      double - Absolute lower value for the membrane potential.
-     *  - a          double - describes time scale of recovery variable
-     *  - b          double - sensitivity of recovery variable
-     *  - c          double - after-spike reset value of V_m
-     *  - d          double - after-spike reset value of U_m
-     *  - AsPublished  bool - use as published, with omitting statios 'Delivering' and 'Relaxing'
-     *   References:
+     * This is really HH
+     *  V_m        double - Membrane potential in mV
+     *  E_L        double - Resting membrane potential in mV.
+     *  g_L        double - Leak conductance in nS.
+     *  C_m        double - Capacity of the membrane in pF.
+     *  tau_ex     double - Rise time of the excitatory synaptic alpha function in ms.
+     *  tau_in     double - Rise time of the inhibitory synaptic alpha function in ms.
+     *  E_Na       double - Sodium reversal potential in mV.
+     *  g_Na       double - Sodium peak conductance in nS.
+     *  E_K        double - Potassium reversal potential in mV.
+     *  g_K        double - Potassium peak conductance in nS.
+     *  Act_m      double - Activation variable m
+     *  Act_h      double - Activation variable h
+     *  Inact_n    double - Inactivation variable n
+     *  I_e        double - Constant external input current in pA.
+     *  End of HH
+     *
      *
      *   Statios: In different stages the parameters I and V_th are interpreted differently.
      *  - In 'Processing' statio, I is the sum of the synaptic input current plus the introduced direct current:
@@ -228,28 +235,45 @@ class scGenComp_PU_Bio_HodgkinHuxley : public scGenComp_PU_Bio
      * @brief InputCurrent_Set
      * @param[in] I The current, in pA
      */
-    void InputCurrent_Set(int I) {mI_In = I;}
-    int InputCurrent_Get(void) {return mI_In;}
+    void InputCurrent_Set(int I) {I_e = I;}
+    int InputCurrent_Get(void) {return I_e;}
     /**
      * @brief UseAsPublished_Set
      * @param[in] B if to use the method as published
      *
      * As published, the method uses no delivery and refractory periods
      */
-    void UseAsPublished_Set(bool B) { mAsPublished = B;}
-    bool UseAsPublished_Get(void){return mAsPublished;}
+//    void UseAsPublished_Set(bool B) { mAsPublished = B;}
+//    bool UseAsPublished_Get(void){return mAsPublished;}
 protected:
+    //        : t_ref_( 2.0 )   // ms
     double mTimeStep    //As documented in Nest
-        ,mV_M    // V_m        double - Membrane potential in mV
-        ,mU_R    // U_m        double - Membrane potential recovery variable (0.) mV
-        ,mV_Th   // V_th       double - Spike threshold in mV (30.) mV
-        ,mI_In   // I_e        double - Constant input current in pA. (R=1)(0.)
-        ,mV_Min  // V_min      double - Absolute lower value for the membrane potential (-75) mV
-        ,m_A     // a          double - describes time scale of recovery variable (0.02)
-        ,m_B     // b          double - sensitivity of recovery variable(0.2)
-        ,m_C     // c          double - after-spike reset value of V_m (-65.)
-        ,m_D;    // d          double - after-spike reset value of U_m(8.)
-        bool mAsPublished;
+        , V_M      // mV, membrane potential
+        , g_Na     // nS, Sodium peak conductance
+        , g_K      // nS, Potassium peak conductance
+        , g_L      // nS, Leak conductance
+        , C_M      // pF, Capacity of the membrane
+        , E_Na     // mV, Sodium reversal potential
+        , E_K      // mV, Potassium reversal potential
+        , E_L      // mV, Resting membrane potential
+        , tau_synE // ms
+        , tau_synI // ms
+        , I_e      // pA Constant external input current
+
+        ,m
+        ,n
+        ;
+/*
+
+                tau_ex     double - Rise time of the excitatory synaptic alpha function in ms.
+                tau_in     double - Rise time of the inhibitory synaptic alpha function in ms.
+
+                .
+                Act_m      double - Activation variable m
+              Act_h      double - Activation variable h
+              Inact_n    double - Inactivation variable n
+         bool mAsPublished;
+*/
   };// of class scGenComp_PU_Bio_HodgkinHuxley
 /** @}*/
 

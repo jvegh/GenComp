@@ -18,28 +18,68 @@
 
 extern bool UNIT_TESTING;	// Whether in course of unit testing
 
+
 // Implement Hodgkin-Huxley model
     scGenComp_PU_Bio_HodgkinHuxley::
 scGenComp_PU_Bio_HodgkinHuxley(sc_core::sc_module_name nm
                                 ,bool AsPublished
                 ,sc_core::sc_time Heartbeat ):  // Heartbeat time
     scGenComp_PU_Bio(nm, Heartbeat)
-    ,mV_M (-65)  //mV, membrane potential -65*random[0,1]
-    ,mU_R (0.)   //mV membrane recovery variable, m_B * mV_M
-    ,mV_Th (30.) //mV; fixed 30
-    ,mI_In(40.) //mV*/R [5*random[0,1]-2*random[0,1]
-    ,mV_Min (-70.)  // Minimum membrane voltage
-    ,m_A(0.02)      // [0.02,0.1] * random[0,1]
-    ,m_B(0.2)       // [0.2,0.27] * random[0,1]
-    ,m_C(-65.)      // [-65,-50] + 15*random[0,1]^2
-    ,m_D(8.)        // [0.05,8] - 6*random[0,1]^2
-    ,mAsPublished(AsPublished)    // If to use without 'Relaxing' and 'Delvering'
+    , g_Na( 12000.0 ) // nS, Sodium peak conductance
+    , g_K( 3600.0 )   // nS, Potassium peak conductance
+    , g_L( 30.0 )     // nS, Leak conductance
+    , C_M (100.0 )    // pF, Capacity of the membrane
+    , E_Na( 50.0 )    // mV, Sodium reversal potential
+    , E_K( -77.0 )    // mV, Potassium reversal potential
+    , E_L( -54.402 )  // mV,
+    , V_M(-65.)       // Resting membrane potential
+    , tau_synE( 0.2 ) // ms
+    , tau_synI( 2.0 ) // ms
+    , I_e( 0.0 )      // pA Constant external input current
+    , m(1.)
+    , n(1.)
 {
     typedef scGenComp_PU_Bio_HodgkinHuxley SC_CURRENT_USER_MODULE;
-    double RefinedTime = HeartbeatTime_Get().to_seconds()*1000; // Have the time step refinement in ms
-    mTimeStep = RefinedTime/HeartbeatDivisions_Get();
+//    double RefinedTime = HeartbeatTime_Get().to_seconds()*1000; // Have the time step refinement in ms
+  //  mTimeStep = RefinedTime/HeartbeatDivisions_Get();
     // *** Do not reimplement any of the xxx_method functions
     // *** until you know what you are doing. Do what you want in methods xxx_Do
+
+     double V_M = -65.; // mV
+    double v = 1.; // mm/ms
+    double C_k = 1;
+    double I_i = 1;
+    double dt = 0.2;
+    bool cont = true;
+    double V_ext = -25;
+    double e = .5;
+    double I_Ca = 10.;
+    double I_K = 5.;
+    double I_l = -2;
+    double C_M = 1000;
+    double t = 0;
+    double I_M = 0;
+    double velo;
+    double t_limit = 5;
+    while(t<6.5)
+    {//
+        if(t<t_limit)
+        {
+        velo = e*(V_ext-V_M);
+        I_M += velo*(I_Ca + I_K);
+        V_M += dt/C_M*velo*(I_M + I_l);
+        cerr << "(" << t <<  "," << 0.0028*I_M << ")" << endl;
+        }
+         else
+             {
+ //           if((t>2.7) && (t<3.3)) I_M -= 150;
+            I_M -= I_M*2*dt;
+            cerr << "(" << t << "," <<  0.0028*I_M << ")" << endl;
+//                 cerr << "(" << t << "," << 6.6*exp(-2*t) << ")" << endl;;
+         }
+        t += dt;
+    }
+    // Concentration
 }
     scGenComp_PU_Bio_HodgkinHuxley::
 ~scGenComp_PU_Bio_HodgkinHuxley(void)
@@ -53,20 +93,30 @@ scGenComp_PU_Bio_HodgkinHuxley(sc_core::sc_module_name nm
 void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Delivering_Do()
 {
-    double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
-    double MyCurrent;
-    if(mAsPublished)
+    //double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
+//    double MyCurrent;
+ /*   if(mAsPublished)
     {   // Use with the input current
         MyCurrent = mI_In;
     }
     else
     {   // Use charge from the extracellular space. temporary
         MyCurrent = 5*mI_In;
-    }
+    }*/
     for(int32_t i = 0; (i < mHeartbeatDivisions) and !PeakExceeded(); i++)
     {
         // ** This part solves the PDE
-        double OldV = mV_M;
+        double h = 1;
+
+    const double I_Na = g_Na * m * m * m * h * ( V_M - E_Na );
+    const double I_K = g_K * n * n * n * n * ( V_M - E_K );
+    const double I_L = g_L * ( V_M - E_L );
+    V_M = ( -( I_Na + I_K + I_L ) //+I_stim_ + I_e + I_ex + + I_in
+       ) / C_M;
+
+
+
+/*        double OldV = mV_M;
         double OldU = mU_R;
 
         mV_M += mTimeStep * ( 0.04 * OldV * OldV + 5.0 *OldV + 140.0 - OldU + MyCurrent ); //??+ spike contrib
@@ -75,6 +125,7 @@ void scGenComp_PU_Bio_HodgkinHuxley::
         if(mV_M<mV_Min)
             mV_M = mV_Min; // Restore membrane potential
         // ** end of pDE solving
+*/
         DEBUG_SC_EVENT_LOCAL("@" << LocalTime+ i*mTimeStep <<  "; V(memb)=" << mV_M << ", U(rec)=" << mU_R << ", N=" << i);
     }
     if (PeakExceeded())
@@ -98,11 +149,11 @@ void scGenComp_PU_Bio_HodgkinHuxley::
 void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Processing_Do()
 {
-    double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
-    for(int32_t i = 0; (i < mHeartbeatDivisions) and !ThresholdExceeded(); i++)
+    //double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
+ //   for(int32_t i = 0; (i < mHeartbeatDivisions) and !ThresholdExceeded(); i++)
     {
         // ** This part solves the PDE
-            double OldV = mV_M;
+ /*           double OldV = mV_M;
             double OldU = mU_R;
 
             mV_M += mTimeStep * ( 0.04 * OldV * OldV + 5.0 *OldV + 140.0 - OldU + mI_In ); //??+ spike contrib
@@ -111,6 +162,7 @@ void scGenComp_PU_Bio_HodgkinHuxley::
             if(mV_M<mV_Min)
                 mV_M = mV_Min; // Restore membrane potential
         // ** end of pDE solving
+ */
         DEBUG_SC_EVENT_LOCAL("@" << LocalTime+ i*mTimeStep <<  "; V(memb)=" << mV_M << ", U(rec)=" << mU_R << ", N=" << i);
     }
     if (ThresholdExceeded())
@@ -135,16 +187,17 @@ void scGenComp_PU_Bio_HodgkinHuxley::
 void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Relaxing_Do()
 {
-    if(mAsPublished)
+    //if(mAsPublished)
     {   // Just restore potentials
-        mV_M = m_C; // Restore membrane potential
+/*        mV_M = m_C; // Restore membrane potential
         mU_R += m_D; // Restore recovery potential
            // We are about finishing processing
             EVENT_GenComp.RelaxingEnd.notify(SC_ZERO_TIME);
             DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.RelaxingEnd");
-            return;
+*/
+        return;
     }
-
+/*
     double  MyCurrent = 10*mI_In;
     // This is the updated processing method
     double LocalTime = scLocalTime_Get().to_seconds()*1000; // Have the time in ms
@@ -164,6 +217,7 @@ void scGenComp_PU_Bio_HodgkinHuxley::
          // ** end of pDE solving
          DEBUG_SC_EVENT_LOCAL("@" << LocalTime+ i*mTimeStep <<  "; V(memb)=" << mV_M << ", U(rec)=" << mU_R << ", N=" << i);
     }
+*/
      if (RestingApproached())
      {   // We are about finishing processing
          EVENT_GenComp.RelaxingEnd.notify(SC_ZERO_TIME);
@@ -185,7 +239,7 @@ void scGenComp_PU_Bio_HodgkinHuxley::
 void scGenComp_PU_Bio_HodgkinHuxley::
     Heartbeat_Ready_Do()
 {
-    if(mAsPublished)
+ /*   if(mAsPublished)
     {   // Nothing to do
         mV_M = m_C; // Restore membrane potential
         mU_R += m_D; // Restore recovery potential
@@ -223,8 +277,8 @@ void scGenComp_PU_Bio_HodgkinHuxley::
         DEBUG_SC_EVENT_LOCAL("SENT    EVENT_GenComp.HeartBeat with  " << sc_time_String_Get(mHeartbeat, SC_TIME_UNIT_DEFAULT)<< " " << SC_TIME_UNIT[SC_TIME_UNIT_DEFAULT]
                                                                                                                                    << ", in " << HeartbeatDivisions_Get() << " divisions");
     }
+*/
 }
-
 
 /*
  * This routine makes actual input processing, although most of the job is done in Process() and Heartbeat()
@@ -249,7 +303,7 @@ void scGenComp_PU_Bio_HodgkinHuxley::
     else
     {
 //        DEBUG_SC_EVENT_LOCAL("RCVD EVENT_GenComp.InputReceived in mode '" << GenCompStatesString[mStateFlag] << "'");
-        scGenComp_PU_Bio::InputReceived_Do();
+        //scGenComp_PU_Bio::InputReceived_Do();
     }
  }
 
@@ -258,24 +312,28 @@ void scGenComp_PU_Bio_HodgkinHuxley::
 bool scGenComp_PU_Bio_HodgkinHuxley::
     ThresholdExceeded(void)
 {
-    return mV_M>=mV_Min+25;   // threshold crossing
+    //return mV_M>=mV_Min+25;   // threshold crossing
+    return false;
 }
 
 bool scGenComp_PU_Bio_HodgkinHuxley::
     PeakExceeded(void)
 {
-    return mV_M>=130;   // Peak voltage crossing
+ //   return mV_M>=130;   // Peak voltage crossing
+    return false;
 }
 
 bool scGenComp_PU_Bio_HodgkinHuxley::
     RestingApproached(void)
 {
-      return mV_M< m_C+m_D;   // Restoration potential approached
+      //return mV_M < m_C+m_D;   // Restoration potential approached
+    return false;
 }
 bool scGenComp_PU_Bio_HodgkinHuxley::
     RestingReached(void)
 {
-    return mV_M< m_C+m_D/4;   // Restoration potential approached
+  //  return mV_M < m_C+m_D/4;   // Restoration potential approached
+    return false;
 }
 
 /*
