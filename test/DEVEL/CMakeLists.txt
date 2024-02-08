@@ -96,7 +96,7 @@ if ( "something" STREQUAL "Nothing" )
 
     target_link_libraries(
         ${PROJECT_NAME}Basic_GTEST
-        BasicModules
+        GenCompModules
            ${SystemC_LIBRARIES}
            ${GTEST_LIBRARIES}
            pthread
