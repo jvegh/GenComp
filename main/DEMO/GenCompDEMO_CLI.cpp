@@ -12,6 +12,7 @@
 //#include <QApplication>
 //#include <QTextEdit>
 //extern QTextEdit *Simulator_LogWindow; // By default and for CLI, we have no QTextEdit
+#include <QResource>
 
 #include <systemc>
 #include <chrono>
@@ -32,6 +33,13 @@
 // These are 'per unit' settings, so set up them in the used modules individually
 
 //#include "scClusterBusSimulator.h"
+
+#include <QApplication>
+#include <QCommandLineParser>
+#include "clioptions.h"
+#include "clirunner.h"
+#include "mainwindow.h"
+
 
 //??scClusterBusSimulator* TheSimulator;
 //??string ListOfIniFiles;
@@ -81,11 +89,116 @@ int32_t scPrepareGenCompObjects(int32_t ObjectSelector)
     return 0;
 }
 
+
+void initParser(QCommandLineParser &parser, GenComp::CLIModeOptions &options) {
+  QString helpText =
+      "The command line interface allows for assembling/compiling/executing a "
+      "\n"
+      "program on an arbitrary neuron model and subsequent reporting of \n"
+      "execution telemetry.\nCommand line mode is enabled when the '--mode "
+      "sh' argument is provided.";
+
+  helpText.prepend("GenComp command line interface.\n");
+  parser.setApplicationDescription(helpText);
+  QCommandLineOption modeOption("mode", "GenComp mode [gui, cli]", "mode", "gui");
+  parser.addOption(modeOption);
+  GenComp::addCLIOptions(parser, options);
+}
+
+enum CommandLineParseResult {
+  CommandLineError,
+  CommandLineHelpRequested,
+  CommandLineGUI,
+  CommandLineCLI
+};
+
+CommandLineParseResult parseCommandLine(QCommandLineParser &parser,
+                                        QString &errorMessage) {
+  const QCommandLineOption helpOption = parser.addHelpOption();
+  if (!parser.parse(QCoreApplication::arguments())) {
+    errorMessage = parser.errorText();
+    return CommandLineError;
+  }
+
+  if (parser.isSet(helpOption))
+    return CommandLineHelpRequested;
+
+  if (parser.value("mode") == "gui")
+    return CommandLineGUI;
+  else if (parser.value("mode") == "cli")
+    return CommandLineCLI;
+  else {
+    errorMessage = "Invalid mode: " + parser.value("mode");
+    return CommandLineError;
+  }
+}
+
+int guiMode(QApplication &app) {
+  GenComp::MainWindow m;
+
+#ifdef Q_OS_WASM
+  // In the WASM build, we'll just want a full-screen application that can't be
+  // dragged or resized by the user.
+  m.setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+#endif
+
+  // The following sequence of events manages to successfully start the
+  // application as maximized, with the processor at a reasonable size. This has
+  // been found to be specially a problem on windows.
+  m.resize(800, 600);
+  m.showMaximized();
+  m.setWindowState(Qt::WindowMaximized);
+//  QTimer::singleShot(100, &m, [&m] { m.fitToView(); });
+
+  return app.exec();
+}
+
+int CLIMode(QCommandLineParser &parser, GenComp::CLIModeOptions &options) {
+  QString err;
+  if (!GenComp::parseCLIOptions(parser, err, options)) {
+    std::cerr << "ERROR: " << err.toStdString() << std::endl;
+    parser.showHelp();
+    return 0;
+  }
+  return true;
+  return GenComp::CLIRunner(options).run();
+}
+
+
+
+
 //QTextEdit *Simulator_LogWindow = 0; // By default and for CLI, we have no QTextEdit
 
 // Using sc_main() is mandatory for using SystemC; equivalent with main()
 int sc_main(int argc, char* argv[])
 {
+
+    Q_INIT_RESOURCE(icons);
+ //   Q_INIT_RESOURCE(examples);
+ //   Q_INIT_RESOURCE(layouts);
+ //   Q_INIT_RESOURCE(fonts);
+
+    QApplication app(argc, argv);
+    QCoreApplication::setApplicationName("GenComp");
+
+    QCommandLineParser parser;
+    GenComp::CLIModeOptions options;
+    initParser(parser, options);
+    QString err;
+    switch (parseCommandLine(parser, err)) {
+    case CommandLineError:
+        std::cerr << "ERROR: " << err.toStdString() << std::endl;
+        parser.showHelp();
+        return 0;
+    case CommandLineHelpRequested:
+        parser.showHelp();
+        return 0;
+    case CommandLineGUI:
+        return guiMode(app);
+    case CommandLineCLI:
+        return CLIMode(parser, options);
+    }
+
     bool UseSimulator = true;   // Can use either scGenComp_Simulator or stand-alone unit operating modes
     int returnValue=0;
     // We rely on the default clearing of the values of time benchmarking

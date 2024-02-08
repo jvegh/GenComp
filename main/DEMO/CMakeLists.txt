@@ -15,6 +15,7 @@ set(MY_SRCS
 
 file(GLOB_RECURSE MY_HEADERS
     include/*.h
+    forms/*.ui
     ${CMAKE_SOURCE_DIR}/modules/include/*.h
 )
 
@@ -28,11 +29,15 @@ file(GLOB_RECURSE MY_HEADERS
 
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+qt6_add_resources(ICONS_SRC ${CMAKE_SOURCE_DIR}/resources/icons/icons.qrc)
 include_directories(
         include
-        forms
         ${CMAKE_SOURCE_DIR}/modules/include
-        ../../..//modules/include
+        ${CMAKE_SOURCE_DIR}/cli/include
+        ${CMAKE_SOURCE_DIR}/QtGUI/include
         ${CMAKE_SOURCE_DIR}/3rdParty/QCustomPlot/include
         ${CMAKE_SOURCE_DIR}/3rdParty/Minuit/include
         ${Qt6Core_INCLUDE_DIRS}
@@ -43,7 +48,7 @@ include_directories(
 #        ${SCV_INCLUDE_DIRS}
 )
     link_directories(
-        ${CMAKE_SOURCE_DIR}/3rdParty
+        ${CMAKE_SOURCE_DIR}/3rdParty/cli
         ${SystemC_LIBRARY_DIRS}
         ${SCV_LIBRARY_DIRS}
 )
@@ -51,13 +56,16 @@ include_directories(
 
 message(HIGHLIGHTED "                    DEMO CLI exutable")
 
-add_executable(${PROJECT_NAME}DEMO_CLI #../QtGUI/resources/images.qrc
+add_executable(${PROJECT_NAME}DEMO_CLI    ${ICONS_SRC}
+#../QtGUI/resources/images.qrc
+#        ${CMAKE_SOURCE_DIR}/QtGUI/forms/mainwindow.ui
         ${PROJECT_NAME}DEMO_CLI.cpp
         ${MY_SRCS}
         ${hdr_moc} # The MOC headers, generated
         )
 target_link_libraries(${PROJECT_NAME}DEMO_CLI
-     GenCompModules  Minuit
+     fancytabbar_lib  GenCompCli  Minuit
+     GenCompQtGUI QCustomPlot GenCompModules
      ${SystemC_LIBRARIES}
         Qt6::Widgets
         Qt6::PrintSupport
@@ -73,7 +81,7 @@ if ( "something" STREQUAL "Nothing" )
 
 message(HIGHLIGHTED "                   BASIC GUI exutable")
 
-set(RESOURCE_FILE ${CMAKE_SOURCE_DIR}/main/BASIC/resources/images.qrc)
+#set(RESOURCE_FILE ${CMAKE_SOURCE_DIR}/main/BASIC/resources/images.qrc)
 if(EXISTS ${RESOURCE_FILE})
     qt_add_resources(RC_SRC ${RESOURCE_FILE})
 else()
@@ -86,10 +94,9 @@ add_executable(${PROJECT_NAME}Basic_GUI ${RC_SRC}
  	${hdr_moc} # The MOC headers, generated
         )
 target_link_libraries(${PROJECT_NAME}Basic_GUI
-     BasicModules
                       ${SystemC_LIBRARIES}
-     libBasicQtGUI
-     libQCustomPlot
+     GenCompQtGUI
+     QCustomPlot
         Qt6::Widgets
         Qt6::PrintSupport
 #         Qt6::Concurrent
@@ -106,7 +113,6 @@ add_executable(${PROJECT_NAME}BasicGates_CLI #../QtGUI/resources/images.qrc
         ${hdr_moc} # The MOC headers, generated
         )
 target_link_libraries(${PROJECT_NAME}BasicGates_CLI
-     BasicModules
                       ${SystemC_LIBRARIES}
         Qt6::Widgets
         Qt6::PrintSupport

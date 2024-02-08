@@ -7,6 +7,9 @@
 message(HIGHLIGHTED "Configuring GenComp 'modules' library")
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 file(GLOB_RECURSE MY_SRCS
     *.cpp
