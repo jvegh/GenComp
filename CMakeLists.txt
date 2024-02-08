@@ -1,7 +1,7 @@
 ##############################################################
 #
 #  This is the major CMake configuration file for the SystemC
-#  TimeAwareSimulation of the Generalized Computingproject.
+#  TimeAwareSimulation of the Generalized Computing project.
 #  To use it you need CMake which can be
 #  downloaded from here:
 #    http://www.cmake.org/cmake/resources/software.html
@@ -26,13 +26,7 @@ endif()
 #[ --- Set the name and version of your project here
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0007 NEW)
-include(Colorize)   # Just to make some beauty
-    set(CPACK_PACKAGE_NAME "GenComp")
-    set(MyVersion "0.0.2")
-    set(MyDate "2024.01.19")
-    project(GenComp VERSION ${MyVersion} LANGUAGES C CXX)
 
-include(BuildType)
 
 # ---[ Set up CMake options for the simulator
 # Choose if clocked physical bus is to be used; slows down simulation
@@ -45,7 +39,21 @@ include(BuildType)
   option (BUILD_DOCS "Prepare also HTML/CHM/PDF documentation" ON)
 # Choose whether you need internal information to docs
   option (DOXY_INTERNAL "Include internal info in the docs"  YES)
-#  include(BuildType)
+    project(GenComp
+            VERSION ${GENCOMP_GIT_VERSION}
+            LANGUAGES C CXX)
+project(GenComp
+        LANGUAGES CXX
+        DESCRIPTION "A visual simulator for time-aware biological and technical computing"
+        HOMEPAGE_URL "https://github.com/jvegh/GenComp"
+        )
+    set(CPACK_PACKAGE_NAME "GenComp")
+    set(MyVersion ${GENCOMP_GIT_VERSION})
+    set(MyDate "2024.01.19")
+
+
+include(Colorize)   # Just to make some beauty
+include(BuildType)
 # ---[ End up CMake options for the user
 
 
@@ -144,7 +152,9 @@ else()
 endif()
 
 set(CMAKE_AUTOMOC ON)
-#set(CMAKE_PREFIX_PATH "~/Qt/6.4.2/gcc_64")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 set(CMAKE_PREFIX_PATH "~/Qt6/6.6.1/gcc_64")
 set(CMAKE_MODULE_PATH "${CMAKE_PREFIX_PATH}/lib/cmake/")
 #find_package should find everything fine so long as the ENV Variable is set or, for linux systems,
@@ -163,8 +173,9 @@ find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Widgets PrintSupport REQUIRED PATH
 ##############################################################
   add_subdirectory(3rdParty)    # Add QSysC, QCustomPlot
   add_subdirectory(modules)	# Hardware module library
-  add_subdirectory(main)	# The executables for SystemC&Qt based simulators
-  add_subdirectory(QtGUI)	# The Qt-based graphics routines
+  add_subdirectory(main)	# Executables for SystemC&Qt based simulators
+  add_subdirectory(cli)	        # Helpers for SystemC&Qt based simulators
+  add_subdirectory(QtGUI)	# Qt-based graphics routines
 ##  add_subdirectory(examples)	# Examples for simulations
 
 ##############################################################
