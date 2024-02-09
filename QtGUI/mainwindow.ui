@@ -110,7 +110,7 @@
   <customwidget>
    <class>FancyTabBar</class>
    <extends>QWidget</extends>
-   <header>fancytabbar.h</header>
+   <header>../3rdParty/fancytabbar/fancytabbar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

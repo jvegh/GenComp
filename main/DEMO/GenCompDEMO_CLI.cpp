@@ -16,7 +16,7 @@
 
 #include <systemc>
 #include <chrono>
-#include "Project.h"
+//#include "Project.h"
 
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
 #include "MacroTimeBenchmarking.h"    // Must be after the define to have its effect
@@ -36,6 +36,8 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+//#include "version.h"
+#include "Stuff.h"
 #include "clioptions.h"
 #include "clirunner.h"
 #include "mainwindow.h"
@@ -210,8 +212,8 @@ int sc_main(int argc, char* argv[])
     sc_core::sc_report_handler::set_actions( "/IEEE_Std_1666/deprecated",
                                             sc_core::SC_DO_NOTHING );
     // About to start
-    std::cerr  << "\n Demonstrates using GenComp with SystemC" << "\n>>> Entering " << PROJECT_NAME << "_DEMO/CLI V"
-              << PROJECT_VERSION;
+    std::cerr  << "\n Demonstrates using GenComp with SystemC" << "\n>>> Entering " << getProjectName().toStdString() << "_DEMO/CLI V"
+              << getGitVersion().toStdString();
     if(UseSimulator)
         std::cerr << " with simulator";
     std::cerr << endl;
@@ -276,7 +278,7 @@ int sc_main(int argc, char* argv[])
     else
         std::cerr  << "  -Error " << returnValue << " during preparing objects" << endl;
 
-    std::cerr  << "<<< Exiting " << PROJECT_NAME << "_DEMO/CLI V" << PROJECT_VERSION;
+    std::cerr  << "<<< Exiting " << getProjectName().toStdString() << "_DEMO/CLI V" << getGitVersion().toStdString();
     if(returnValue)
         std::cerr << ", error code " << returnValue << endl;
     else
