@@ -11,6 +11,9 @@
 #ifndef GENCOMP_UTILS_H
 #define GENCOMP_UTILS_H
 #include "HWConfig.h"
+
+#include <QString>
+
 using namespace std;
 /** @addtogroup GENCOMP_MODULE_STUFF
  *  @{

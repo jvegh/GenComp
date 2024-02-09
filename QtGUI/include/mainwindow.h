@@ -2,8 +2,10 @@
 
 #include <QMainWindow>
 
+
 //#include "assembler/program.h"
 //#include "statusmanager.h"
+//#include "utils.h"
 
 QT_FORWARD_DECLARE_CLASS(QToolBar)
 QT_FORWARD_DECLARE_CLASS(QStackedWidget)
@@ -13,6 +15,7 @@ namespace GenComp {
 namespace Ui {
 class MainWindow;
 }
+
 
 class EditTab;
 class MemoryTab;

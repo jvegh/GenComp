@@ -10,7 +10,12 @@
 #ifndef GENCOMP_STUFF_H
 #define GENCOMP_STUFF_H
 //#include "Config.h"
+#include <QString>
 #include <string>
+
+QString getProjectName();
+QString getGitVersion();
+
 extern bool GUI_MODE;	// This tells whether routine run in GUI mode
 using namespace std;
 /** @addtogroup GENCOMP_MODULE_STUFF

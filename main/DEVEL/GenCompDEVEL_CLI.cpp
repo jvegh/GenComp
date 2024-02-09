@@ -20,7 +20,7 @@ sc_time DelayUnit; // Set globally in the main program
 extern QTextEdit *Simulator_LogWindow; // By default and for CLI, we have no QTextEdit
 
 
-#include "Project.h"
+//#include "Project.h"
 #include <chrono>
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
 #include "MacroTimeBenchmarking.h"    // Must be after the define to have its effect

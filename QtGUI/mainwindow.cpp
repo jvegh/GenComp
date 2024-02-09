@@ -15,11 +15,13 @@
 #include "syscall/syscallviewer.h"
 #include "syscall/systemio.h"
 */
-//#include "version/version.h"
+//#include "version.h"
+
 //#include "wasmSupport.h"
+//#include "/home/jvegh/REPO/SystemC/GenComp/3rdParty/fancytabbar/utils.h"
+//#include "/home/jvegh/REPO/SystemC/GenComp/3rdParty/fancytabbar/fancytabbar.h"
 
-#include "fancytabbar.h"
-
+#include <QToolBar>
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -32,6 +34,7 @@
 #include <QStatusBar>
 #include <QTemporaryFile>
 #include <QTextStream>
+#include "Stuff.h"
 
 namespace GenComp {
 
@@ -46,9 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
   setWindowTitle("GenComp");
   setWindowIcon(QIcon(":/icons/logo.svg"));
   m_ui->actionOpen_wiki->setIcon(QIcon(":/icons/info.svg"));
-/*
+
   // Initialize processor handler
-  ProcessorHandler::get();
+ // ProcessorHandler::get();
 
   // Initialize fonts
   QFontDatabase::addApplicationFont(
@@ -64,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 
   auto *editToolbar = addToolBar("Edit");
   editToolbar->setVisible(false);
-  auto *editTab = new EditTab(editToolbar, this);
+/*  auto *editTab = new EditTab(editToolbar, this);
   m_stackedTabs->insertWidget(EditTabID, editTab);
   m_tabWidgets[EditTabID] = {editTab, editToolbar};
 
@@ -120,11 +123,12 @@ MainWindow::MainWindow(QWidget *parent)
     SyscallViewer v;
     v.exec();
   });
+*/
   connect(m_ui->actionOpen_wiki, &QAction::triggered, this, &MainWindow::wiki);
   connect(m_ui->actionVersion, &QAction::triggered, this, &MainWindow::version);
   connect(m_ui->actionSettings, &QAction::triggered, this,
           &MainWindow::settingsTriggered);
-
+/*
   connect(cacheTab, &CacheTab::focusAddressChanged, memoryTab,
           &MemoryTab::setCentralAddress);
 
@@ -375,9 +379,9 @@ void MainWindow::wiki() {
 }
 
 void MainWindow::version() {
-/*  QMessageBox aboutDialog(this);
-  aboutDialog.setText("GenComp version: " + getGenCompVersion());
-  aboutDialog.exec(); */
+  QMessageBox aboutDialog(this);
+  aboutDialog.setText(getProjectName() + " V" + getGitVersion());
+  aboutDialog.exec();
 }
 
 static bool writeTextFile(QFile &file, const QString &data) {
@@ -462,8 +466,8 @@ void MainWindow::saveFilesAsTriggered() {
 }
 
 void MainWindow::settingsTriggered() {
- /* SettingsDialog diag;
-  diag.exec();  */
+//  SettingsDialog diag;
+//  diag.exec();
 }
 
 void MainWindow::newProgramTriggered() {

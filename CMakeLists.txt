@@ -21,11 +21,10 @@ if ( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
     Please make a new directory (called a build directory) and run CMake from there.\
     You may need to remove CMakeCache.txt." )
 endif()
-#[ --- End of mandatory introduction offset
 
-#[ --- Set the name and version of your project here
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0007 NEW)
+#[ --- End of mandatory introduction offset
 
 
 # ---[ Set up CMake options for the simulator
@@ -39,27 +38,51 @@ cmake_policy(SET CMP0007 NEW)
   option (BUILD_DOCS "Prepare also HTML/CHM/PDF documentation" ON)
 # Choose whether you need internal information to docs
   option (DOXY_INTERNAL "Include internal info in the docs"  YES)
-    project(GenComp
-            VERSION ${GENCOMP_GIT_VERSION}
-            LANGUAGES C CXX)
+
+include(Colorize)   # Just to make some beauty
+set(CPACK_PACKAGE_NAME "GenComp")
+set(MyVersion ${PROJECT_GIT_VERSION})
+set(MyDate ${PROJECT_TIMESTAMP})
+
+include(Version)    # Take version from git
 project(GenComp
-        LANGUAGES CXX
+        LANGUAGES C CXX
+        VERSION ${PROJECT_GIT_VERSION}
         DESCRIPTION "A visual simulator for time-aware biological and technical computing"
         HOMEPAGE_URL "https://github.com/jvegh/GenComp"
         )
-    set(CPACK_PACKAGE_NAME "GenComp")
-    set(MyVersion ${GENCOMP_GIT_VERSION})
-    set(MyDate "2024.01.19")
+set(NAME_FILE ${CMAKE_SOURCE_DIR}/modules/include/gen_projectversion.h)
+# Only rewrite the version file if a change is seen
+if(EXISTS ${VERSION_FILE})
+    file(READ ${VERSION_FILE} OLD_VERSION)
+else()
+    set(OLD_VERSION "")
+endif()
 
+if (NOT "${VERSION}" STREQUAL "${OLD_VERSION}")
+    file(WRITE ${VERSION_FILE} "${VERSION}")
+    file(WRITE ${VERSION_FILE} "#define PROJECT_VERSION \"${PROJECT_GIT_VERSION}\"")
+endif()
+set(NAME_FILE ${CMAKE_SOURCE_DIR}/modules/include/gen_projectname.h)
 
-include(Colorize)   # Just to make some beauty
+# Only rewrite the name file if a change is seen
+if(EXISTS ${NAME_FILE})
+    file(READ ${NAME_FILE} OLD_NAME)
+else()
+    set(OLD_NAME "")
+endif()
+
+if (NOT "${PROJECT_NAME}" STREQUAL "${OLD_NAME}")
+    file(WRITE ${NAME_FILE} "#define PROJECT_NAME \"${PROJECT_NAME}\"")
+endif()
 include(BuildType)
+
 # ---[ End up CMake options for the user
 
 
 # ---[ DO NOT EDIT BELOW THIS LINE UNTIL YOU KNOW WHAT YOU ARE DOING
-set(GENCOMP_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-set(GENCOMP_BINARY_DIR ${CMAKE_BINARY_DIR})
+#set(GENCOMP_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+#set(GENCOMP_BINARY_DIR ${CMAKE_BINARY_DIR})
 
 #[- Find the SystemC basic component; it is a must
 # Temporary hack:
@@ -163,10 +186,10 @@ find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Widgets PrintSupport REQUIRED PATH
 ##############################################################
 # Copy the version and other configuration info to the source
 ##############################################################
-  message(HIGHLIGHTED "You are setting up a time-aware electronic simulator for modern computing")
+  message(HIGHLIGHTED "A visual simulator for time-aware biological and technical computing")
   message(HIGHLIGHTED "Configuring ${PROJECT_NAME} V${PROJECT_VERSION} system with release date @${MyDate}")
   # Enable to configure from the root
-  configure_file(${CMAKE_SOURCE_DIR}/Project.h.in ${CMAKE_SOURCE_DIR}/modules/include/Project.h)
+##  configure_file(${CMAKE_SOURCE_DIR}/Project.h.in ${CMAKE_SOURCE_DIR}/modules/include/Project.h)
   configure_file(${CMAKE_SOURCE_DIR}/HWConfig.h.in ${CMAKE_SOURCE_DIR}/modules/include/HWConfig.h)
 ##############################################################
 # Add 3-rd party modules
@@ -175,6 +198,7 @@ find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Widgets PrintSupport REQUIRED PATH
   add_subdirectory(modules)	# Hardware module library
   add_subdirectory(main)	# Executables for SystemC&Qt based simulators
   add_subdirectory(cli)	        # Helpers for SystemC&Qt based simulators
+#  add_subdirectory(version)	# version from git repository
   add_subdirectory(QtGUI)	# Qt-based graphics routines
 ##  add_subdirectory(examples)	# Examples for simulations
 
@@ -183,7 +207,7 @@ find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Widgets PrintSupport REQUIRED PATH
 ##############################################################
 if(BUILD_TESTS)
 find_package(GTest REQUIRED)
-  add_subdirectory(test)	# Tests for the tool library
+ # add_subdirectory(test)	# Tests for the tool library
 endif(BUILD_TESTS)
 #file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/data")
 
