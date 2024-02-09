@@ -10,7 +10,6 @@
 
 // Take care: SC_MAKE_TIME_BENCHMARKING and MAKE_TIME_BENCHMARKING
 // may be either defined or undefined
-//extern bool UNIT_TESTING;	// Whether in course of unit testing
 #define MAKE_TIME_BENCHMARKING
 #define SC_MAKE_TIME_BENCHMARKING
 

@@ -16,7 +16,6 @@
 
 #include "DebugMacros.h"
 
-extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 // The units of general computing work in the same way, using general events
 // \brief Implement handling the states of computing

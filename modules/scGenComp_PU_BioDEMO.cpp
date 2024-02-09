@@ -16,7 +16,6 @@
 
 #include "DebugMacros.h"
 
-extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 scGenComp_PU_BioDEMO::
     scGenComp_PU_BioDEMO(sc_core::sc_module_name nm   // Module name

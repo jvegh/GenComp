@@ -16,7 +16,6 @@
 #define DEBUG_DISABLED
 #include "DebugMacros.h"
 
-extern bool UNIT_TESTING;	// Whether in course of unit testing
 
 
 // Implement Hodgkin-Huxley model
