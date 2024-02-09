@@ -15,6 +15,8 @@
 //#define SUPPRESS_LOGGING    // In unit testing mode
 //#define DEBUGGING       // In debug mode
 //#include "Config.h"
+//#include "version.h"
+#include "utils.h"
 //#undef SUPPRESS_LOGGING
 
 #define MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
@@ -22,13 +24,12 @@
 #define SC_MAKE_TIME_BENCHMARKING  // uncomment to measure the time with benchmarking macros
 #include "scMacroTimeBenchmarking.h"    // Must be after the define to have its effect
 
-#include "Project.h"
+//#include "Project.h"
 #include "scGTestModule_simple.h"
 #include "Utils.h"
 unsigned errors = 0;
 GenCompDEVEL_simpleTB_t* GenCompDEVEL_simpleTB;
 
-bool UNIT_TESTING = false;	// Whether in course of unit testing
 //extern bool OBJECT_FILE_PRINTED;
 extern    string SC_TIME_UNIT[];
 
@@ -62,7 +63,7 @@ int sc_main(int argc, char* argv[]) {
 
     std::cerr  << "  -Elapsed for setting up testing : " << x.count()/1000 << " usec" << endl;
     // About to start testing wit GTest
-    std::cerr << ">>> Entering " << PROJECT_NAME << "_DEVEL/simple V" << PROJECT_VERSION << " SystemC unit testing" << endl;
+    std::cerr << ">>> Entering " << GetProjectName().toStdString() << "_DEVEL/simple V" << getGitVersion().toStdString() << " SystemC unit testing" << endl;
     //
     // Make anything before starting unit testing
     //!! all SC-related object and connections must be established before calling sc_start
@@ -73,7 +74,7 @@ int sc_main(int argc, char* argv[]) {
     // Return here when no more events remained
     BENCHMARK_TIME_END(&t,&x,&s);
     SC_BENCHMARK_TIME_END(&SC_t,&SC_x,&SC_s);
-    std::cerr  << "<<< Exiting " << PROJECT_NAME << "_DEVEL/simple V" << PROJECT_VERSION << " SystemC unit testing with ";
+    std::cerr  << "<<< Exiting " << GetProjectName().toStdString() << "_DEVEL/simple V" << getGitVersion().toStdString() << " SystemC unit testing with ";
     int returnValue = GenCompDEVEL_simpleTB->ErrorCode_Get();
     if(returnValue)
         std::cerr << " error code " << returnValue << endl;
